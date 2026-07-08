@@ -29,6 +29,8 @@ This project was developed as a personal portfolio project to combine computer s
 - Identify user investment risk profile using a questionnaire
 - Classify user risk profile as Conservative, Moderate, or Aggressive
 - Display user risk profile score and explanation
+- Match user risk profile with stock risk level
+- Generate a simple suitability explanation
 
 ## Tech Stack
 
@@ -358,11 +360,12 @@ api-docs.png
 - Added user risk profile scoring
 - Added Conservative, Moderate, and Aggressive classification
 - Added source note for questionnaire design
+- Added suitability matching between user risk profile and stock risk level
+- Added personalised suitability explanation
+
 
 ## Future Improvements
 
-- Match user risk profile with stock risk level
-- Generate personalised suitability explanation
 - Compare two stocks side by side
 - Save search history
 - Generate PDF risk report

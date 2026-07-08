@@ -166,7 +166,72 @@ function App() {
     description,
   });
 };
+const getSuitabilityResult = () => {
+  if (!stockData || !userRiskProfile) {
+    return null;
+  }
 
+  const userProfile = userRiskProfile.profile;
+  const stockRisk = stockData.risk_level;
+
+  let suitability = "";
+  let explanation = "";
+
+  if (userProfile === "Conservative") {
+    if (stockRisk === "Low Risk") {
+      suitability = "Suitable";
+      explanation =
+        "This stock generally matches your conservative profile because it has lower price volatility.";
+    } else if (stockRisk === "Medium Risk") {
+      suitability = "Use Caution";
+      explanation =
+        "This stock may require caution because it has moderate price movement, while conservative users usually prefer more stable investments.";
+    } else {
+      suitability = "Not Highly Suitable";
+      explanation =
+        "This stock may not match your conservative profile because it has high volatility and larger price movements.";
+    }
+  }
+
+  if (userProfile === "Moderate") {
+    if (stockRisk === "Low Risk") {
+      suitability = "Suitable";
+      explanation =
+        "This stock may suit your moderate profile because it has lower volatility and may provide a more stable investment experience.";
+    } else if (stockRisk === "Medium Risk") {
+      suitability = "Suitable";
+      explanation =
+        "This stock generally matches your moderate profile because you are willing to accept some level of risk for potential growth.";
+    } else {
+      suitability = "Use Caution";
+      explanation =
+        "This stock is high risk, so it may require caution even though you can accept some investment risk.";
+    }
+  }
+
+  if (userProfile === "Aggressive") {
+    if (stockRisk === "Low Risk") {
+      suitability = "Suitable but Lower Growth Potential";
+      explanation =
+        "This stock has lower volatility, so it may be suitable but may not fully match an aggressive user's preference for higher growth opportunities.";
+    } else if (stockRisk === "Medium Risk") {
+      suitability = "Suitable";
+      explanation =
+        "This stock may match your aggressive profile because it has some volatility and growth potential.";
+    } else {
+      suitability = "Suitable with High Risk";
+      explanation =
+        "This stock may match your aggressive profile, but it still involves high volatility and larger potential losses.";
+    }
+  }
+
+  return {
+    suitability,
+    explanation,
+  };
+};
+
+const suitabilityResult = getSuitabilityResult();
   return (
     <div className="app">
       <header className="hero">
@@ -333,6 +398,31 @@ function App() {
             <h3>Risk Summary</h3>
             <p>{stockData.summary}</p>
           </section>
+
+          {userRiskProfile && suitabilityResult && (
+            <section className="suitability-section">
+              <h3>Suitability Analysis</h3>
+
+              <div className="suitability-grid">
+                <div>
+                  <span className="label">User Risk Profile</span>
+                  <p>{userRiskProfile.profile}</p>
+                </div>
+
+                <div>
+                  <span className="label">Stock Risk Level</span>
+                  <p>{stockData.risk_level}</p>
+                </div>
+
+               <div>
+                 <span className="label">Suitability Result</span>
+                 <p>{suitabilityResult.suitability}</p>
+               </div>
+              </div>
+
+              <p className="suitability-text">{suitabilityResult.explanation}</p>
+            </section>
+          )}
 
           <section className="table-section">
             <h3>Recent Historical Data</h3>
