@@ -18,7 +18,7 @@ function App() {
   const [error, setError] = useState("");
 
   const [riskAnswers, setRiskAnswers] = useState({});
-  const [userRiskProfle, setUserRiskProfile] = useState(null);
+  const [userRiskProfile, setUserRiskProfile] = useState(null);
 
  const riskQuestions = [
   {
@@ -173,7 +173,7 @@ function App() {
         <h1>FinSight</h1>
         <p>AI-Powered Financial Risk Dashboard</p>
         <p className = "disclaimer">
-          FOe educational purposes only. This dashboard does not provide investment advice.
+          For educational purposes only. This dashboard does not provide investment advice.
         </p>
       </header>
 
@@ -198,7 +198,9 @@ function App() {
           <option value="3y">3 Years</option>
           <option value="5y">5 Years</option>
         </select>
-        <button onClick={analyzeStock}>Analyse</button>
+        <button onClick={analyzeStock} disabled={loading}>
+          {loading ? "Analyzing..." : "Analyze"}
+        </button>
       </section>
 
       {loading && <p className="message">Analysing stock data...</p>}
