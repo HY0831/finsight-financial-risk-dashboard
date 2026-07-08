@@ -45,6 +45,13 @@ body {
   font-size: 16px;
 }
 
+.search-section select {
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 16px;
+  background: white;
+}
 .search-section button {
   padding: 14px 24px;
   border: none;
@@ -53,6 +60,11 @@ body {
   color: white;
   font-size: 16px;
   cursor: pointer;
+}
+
+.search-section button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
 }
 
 .search-section button:hover {
@@ -208,4 +220,9 @@ th {
   font-size: 14px;
   color: #9ca3af;
   margin-top: 6px;
+}
+
+.company-name {
+  font-weight: 600;
+  color: #374151;
 }

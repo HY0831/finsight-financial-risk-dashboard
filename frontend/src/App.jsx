@@ -12,6 +12,7 @@ import "./App.css";
 
 function App() {
   const [ticker, setTicker] = useState("");
+  const [period, setPeriod] = useState("1y");
   const [stockData, setStockData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -28,7 +29,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/analyze/${ticker.toUpperCase()}`
+        `http://127.0.0.1:8000/analyze/${ticker.toUpperCase()}?period=${period}`
       );
 
       if (!response.ok) {
@@ -70,6 +71,15 @@ function App() {
             }
           }}
         />
+        <select value={period} onChange={(e) => setPeriod(e.target.value)}>
+          <option value="1mo">1 Month</option>
+          <option value="3mo">3 Months</option>
+          <option value="6mo">6 Months</option>
+          <option value="1y">1 Year</option>
+          <option value="2y">2 Years</option>
+          <option value="3y">3 Years</option>
+          <option value="5y">5 Years</option>
+        </select>
         <button onClick={analyzeStock}>Analyse</button>
       </section>
 
@@ -81,6 +91,8 @@ function App() {
           <section className="stock-header">
             <div>
               <h2>{stockData.ticker}</h2>
+              <p className="company-name">{stockData.company_name}</p>
+              <p>Period Analysed: {stockData.period}</p>
               <p>Latest Price: ${stockData.latest_price}</p>
             </div>
             <span className={`risk-badge ${stockData.risk_level.toLowerCase().replace(" ", "-")}`}>

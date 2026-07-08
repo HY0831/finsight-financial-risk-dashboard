@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from risk_analysis import analyze_stock
 
@@ -28,9 +28,9 @@ def home():
 
 
 @app.get("/analyze/{ticker}")
-def analyze(ticker: str):
+def analyze(ticker: str, period: str = Query(default="1y")):
     try:
-        result = analyze_stock(ticker)
+        result = analyze_stock(ticker, period)
         return result
 
     except ValueError as error:

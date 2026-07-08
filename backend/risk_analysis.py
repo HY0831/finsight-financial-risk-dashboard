@@ -15,7 +15,7 @@ def classify_risk(annualized_volatility):
     
 def generate_summary(ticker, annualized_volatility, risk_level):
     """
-    Generate a simple beginner_friendly risk explanation/
+    Generate a simple beginner_friendly risk explanation.
     """
 
     volatility_percent = annualized_volatility * 100
@@ -41,15 +41,20 @@ def generate_summary(ticker, annualized_volatility, risk_level):
             "It may involve higher short-term risk for users."
         )
 
-def analyze_stock(ticker):
+def analyze_stock(ticker, period="1y"):
     """
     Download stock data and calculate basic financial risk metrics.
     """
     ticker = ticker.upper()
 
-    #Download 1 year of historical stock data
+    #Download historical stock data for the specified period
     stock = yf.Ticker(ticker)
-    data = stock.history(period="1y")
+    company_name = stock.info.get("longName", ticker)  # Use ticker as fallback if longName is not available
+
+    valid_periods = ["1mo", "3mo", "6mo", "1y", "2y", "3y", "5y"]
+    if period not in valid_periods:
+        period = "1y"  # Default to 1 year if invalid period is provided
+    data = stock.history(period=period)
 
     if data.empty:
         raise ValueError("Invalid ticker or no data found.")
@@ -87,6 +92,8 @@ def analyze_stock(ticker):
     
     result = {
         "ticker": ticker,
+        "company_name": company_name,
+        "period": period,
         "latest_price": round(float(latest_price),2),
         "highest_price": round(float(highest_price),2),
         "lowest_price": round(float(lowest_price),2),
