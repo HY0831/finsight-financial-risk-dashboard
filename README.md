@@ -32,6 +32,9 @@ This project was developed as a personal portfolio project to combine computer s
 - Match user risk profile with stock risk level
 - Generate a simple suitability explanation
 - Generate a downloadable PDF stock risk report
+- Save recent stock searches using browser localStorage
+- Allow users to click recent searches to analyse the stock again
+- Clear recent search history
 
 ## Tech Stack
 
@@ -371,9 +374,14 @@ api-docs.png
 - Compared company name, latest price, average daily return, annualized volatility and risk level
 - Added simple comparison summary based on volatility
 
+### Version 4
+- Added recent search history
+- Stored recent searches using browser localStorage
+- Allowed users to re-anlyse stocks from search history
+- Added clear history function
 
 ## Future Improvements
-- Save search history
+- Save search history to database after user login is added
 - Add user login and saved risk profile
 - Add AI-generated personalised explanation
 - Deploy frontend and backend online
