@@ -505,3 +505,93 @@ th {
     grid-template-columns: 1fr;
   }
 }
+
+.history-section {
+  max-width: 1100px;
+  margin: 0 auto 25px auto;
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  gap: 16px;
+}
+
+.history-header h2 {
+  margin: 0 0 8px 0;
+  color: #111827;
+}
+
+.history-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.clear-history-button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 10px;
+  background: #ef4444;
+  color: white;
+  cursor: pointer;
+}
+
+.clear-history-button:hover {
+  background: #dc2626;
+}
+
+.history-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.history-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+  gap: 14px;
+  align-items: center;
+  text-align: left;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 16px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.history-item:hover {
+  background: #f3f4f6;
+}
+
+.history-item strong {
+  font-size: 18px;
+  color: #111827;
+}
+
+.history-item p {
+  margin: 4px 0;
+  color: #4b5563;
+}
+
+.small-badge {
+  display: inline-block;
+  font-size: 13px;
+  padding: 8px 12px;
+}
+
+@media (max-width: 800px) {
+  .history-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .history-item {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -18,6 +18,8 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [searchHistory, setSearchHistory] = useState([]);
+
   const [compareTickerOne, setCompareTickerOne] = useState("");
   const [compareTickerTwo, setCompareTickerTwo] = useState("");
   const [comparisonData, setComparisonData] = useState(null);
@@ -26,6 +28,13 @@ function App() {
 
   const [riskAnswers, setRiskAnswers] = useState({});
   const [userRiskProfile, setUserRiskProfile] = useState(null);
+
+  useEffect(() => {
+    const savedHistory = localStorage.getItem("finsightSearchHistory");
+    if (savedHistory) {
+      setSearchHistory(JSON.parse(savedHistory));
+    }
+  }, []);
 
  const riskQuestions = [
   {
@@ -106,6 +115,25 @@ function App() {
     ],
   },
 ];
+  
+  const saveSearchHistory = (data) => {
+    const newRecord = {
+      ticker: data.ticker,
+      company_name: data.company_name,
+      risk_level: data.risk_level,
+      period: data.period,
+      latest_price: data.latest_price,
+      searched_at: new Date().toLocaleString(),
+    };
+
+    const updatedHistory = [
+      newRecord,
+      ...searchHistory.filter((item) => item.ticker !== data.ticker),
+    ].slice(0,5);
+
+    setSearchHistory(updatedHistory);
+    localStorage.setItem("finsightSearchHistory", JSON.stringify(updatedHistory));
+  };
 
   const analyzeStock = async () => {
     if (!ticker.trim()) {
@@ -128,6 +156,7 @@ function App() {
 
       const data = await response.json();
       setStockData(data);
+      saveSearchHistory(data);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -173,6 +202,38 @@ function App() {
     description,
   });
 };
+
+const analyseFromHistory = async (historyItem) => {
+  setTicker(historyItem.ticker);
+  setPeriod(historyItem.period);
+  setLoading(true);
+  setError("");
+  setStockData(null);
+
+  try {
+    const response = await fetch(
+      `http://127.0.0.1:8000/analyze/${historyItem.ticker}?period=${historyItem.period}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Stock ticker not found. Please try again.");
+    }
+
+    const data = await response.json();
+    setStockData(data);
+    saveSearchHistory(data);
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+const clearSearchHistory = () => {
+  setSearchHistory([]);
+  localStorage.removeItem("finsightSearchHistory");
+};
+
 const getSuitabilityResult = () => {
   if (!stockData || !userRiskProfile) {
     return null;
@@ -466,6 +527,52 @@ const suitabilityResult = getSuitabilityResult();
 
       {loading && <p className="message">Analysing stock data...</p>}
       {error && <p className="error">{error}</p>}
+
+      {searchHistory.length > 0 && (
+        <section className="history-section">
+          <div className="history-header">
+            <div>
+              <h2>Recent Searches</h2>
+              <p>Click a ticker to analyse it agin using the saved period.</p>
+            </div>
+            
+            <button className="clear-history-button" onClick={clearSearchHistory}>
+              Clear History
+            </button>
+          </div>
+
+          <div className="history-list">
+            {searchHistory.map((item) => (
+              <button
+                className="history-item"
+                key = {`${item.ticker}-${item.searched_at}`}
+                >
+                  <div>
+                    <strong>{item.ticker}</strong>
+                    <p>{item.company_name}</p>
+                  </div>
+
+                  <div>
+                    <span
+                      className = {`risk-badge small-badge ${item.risk_level.toLowerCase().replace(" ", "-")}`}
+                    >
+                      {item.risk_level}
+                    </span>
+                  </div>
+
+                  <div>
+                    <p>Period: {item.period}</p>
+                    <p>Price: ${item.latest_price}</p>
+                  </div>
+
+                  <div>
+                    <p>{item.searched_at}</p>
+                  </div>
+                </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section clasName= "compare-section">
         <div className = "section-title">
