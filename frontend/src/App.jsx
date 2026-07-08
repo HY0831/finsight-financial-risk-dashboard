@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  Tooltip,
-  CartesianGrid,
-  ResponsiveContainer,
-} from "recharts";
-import "./App.css";
 import jsPDF from "jspdf";
+import SearchSection from "./components/SearchSection";
+import HistorySection from "./components/HistorySection";
+import ComparisonSection from "./components/ComparisonSection";
+import RiskProfileSection from "./components/RiskProfileSection";
+import StockDashboard from "./components/StockDashboard";
+import "./App.css";
 
 function App() {
   const [ticker, setTicker] = useState("");
@@ -494,341 +490,57 @@ const suitabilityResult = getSuitabilityResult();
       <header className="hero">
         <h1>FinSight</h1>
         <p>AI-Powered Financial Risk Dashboard</p>
-        <p className = "disclaimer">
-          For educational purposes only. This dashboard does not provide investment advice.
+        <p className="disclaimer">
+          For educational purposes only. This dashboard does not provide
+          investment advice.
         </p>
       </header>
 
-      <section className="search-section">
-        <input
-          type="text"
-          placeholder="Enter stock ticker, e.g. AAPL, TSLA, KO"
-          value={ticker}
-          onChange={(e) => setTicker(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              analyzeStock();
-            }
-          }}
-        />
-        <select value={period} onChange={(e) => setPeriod(e.target.value)}>
-          <option value="1mo">1 Month</option>
-          <option value="3mo">3 Months</option>
-          <option value="6mo">6 Months</option>
-          <option value="1y">1 Year</option>
-          <option value="2y">2 Years</option>
-          <option value="3y">3 Years</option>
-          <option value="5y">5 Years</option>
-        </select>
-        <button onClick={analyzeStock} disabled={loading}>
-          {loading ? "Analyzing..." : "Analyze"}
-        </button>
-      </section>
+      <SearchSection
+        ticker={ticker}
+        setTicker={setTicker}
+        period={period}
+        setPeriod={setPeriod}
+        loading={loading}
+        analyzeStock={analyzeStock}
+      />
 
       {loading && <p className="message">Analysing stock data...</p>}
       {error && <p className="error">{error}</p>}
 
-      {searchHistory.length > 0 && (
-        <section className="history-section">
-          <div className="history-header">
-            <div>
-              <h2>Recent Searches</h2>
-              <p>Click a ticker to analyse it agin using the saved period.</p>
-            </div>
-            
-            <button className="clear-history-button" onClick={clearSearchHistory}>
-              Clear History
-            </button>
-          </div>
+      <HistorySection
+        searchHistory={searchHistory}
+        analyseFromHistory={analyseFromHistory}
+        clearSearchHistory={clearSearchHistory}
+      />
 
-          <div className="history-list">
-            {searchHistory.map((item) => (
-              <button
-                className="history-item"
-                key = {`${item.ticker}-${item.searched_at}`}
-                >
-                  <div>
-                    <strong>{item.ticker}</strong>
-                    <p>{item.company_name}</p>
-                  </div>
+      <ComparisonSection
+        compareTickerOne={compareTickerOne}
+        setCompareTickerOne={setCompareTickerOne}
+        compareTickerTwo={compareTickerTwo}
+        setCompareTickerTwo={setCompareTickerTwo}
+        compareStocks={compareStocks}
+        comparisonLoading={comparisonLoading}
+        comparisonError={comparisonError}
+        comparisonData={comparisonData}
+        formatPercent={formatPercent}
+      />
 
-                  <div>
-                    <span
-                      className = {`risk-badge small-badge ${item.risk_level.toLowerCase().replace(" ", "-")}`}
-                    >
-                      {item.risk_level}
-                    </span>
-                  </div>
+      <RiskProfileSection
+        riskQuestions={riskQuestions}
+        riskAnswers={riskAnswers}
+        setRiskAnswers={setRiskAnswers}
+        calculateRiskProfile={calculateRiskProfile}
+        userRiskProfile={userRiskProfile}
+      />
 
-                  <div>
-                    <p>Period: {item.period}</p>
-                    <p>Price: ${item.latest_price}</p>
-                  </div>
-
-                  <div>
-                    <p>{item.searched_at}</p>
-                  </div>
-                </button>
-            ))}
-          </div>
-        </section>
-      )}
-
-      <section clasName= "compare-section">
-        <div className = "section-title">
-          <h2>Compare Two Stocks</h2>
-          <p>
-            Compare two companies using the same selected analysis period. This helps
-            users understand which stock has higher volatility and risk.
-          </p>
-        </div>
-
-        <div className = "comparison-inputs">
-          <input
-            type = "text"
-            placeholder = "First ticker, e.g. AAPL"
-            value = {compareTickerOne}
-            onChange = {(e) => setCompareTickerOne(e.target.value)}
-          />
-          <input
-            type = "text"
-            placeholder = "Second ticker, e.g. TSLA"
-            value = {compareTickerTwo}
-            onChange = {(e) => setCompareTickerTwo(e.target.value)}
-          />
-
-          <button onClick = {compareStocks} disabled = {comparisonLoading}>
-            {comparisonLoading ? "Comparing..." : "Compare"}
-          </button>
-        </div>
-
-        {comparisonError && <p className="error">{comparisonError}</p>}
-
-        {comparisonData && (
-          <div className="comparison-result">
-            <div className = "comparison-card">
-              <h3>{comparisonData.stockOne.ticker}</h3>
-              <p className = "company-name">{comparisonData.stockOne.company_name}</p>
-              <p>
-                Average Daily Return: {" "}
-                {formatPercent(comparisonData.stockOne.average_daily_return)}
-              </p>
-              <p>
-                Annualized Volatility: {" "}
-                {formatPercent(comparisonData.stockOne.annualized_volatility)}
-              </p>
-              <span className={`risk-badge ${comparisonData.stockOne.risk_level.toLowerCase().replace(" ", "-")}`}>
-                {comparisonData.stockOne.risk_level}
-              </span>
-            </div>
-
-            <div className = "comparison-card">
-              <h3>{comparisonData.stockTwo.ticker}</h3>
-              <p className = "company-name">{comparisonData.stockTwo.company_name}</p>
-              <p>
-                Average Daily Return: {" "}
-                {formatPercent(comparisonData.stockTwo.average_daily_return)}
-              </p>
-              <p>
-                Annualized Volatility: {" "}
-                {formatPercent(comparisonData.stockTwo.annualized_volatility)}
-              </p>
-              <span className={`risk-badge ${comparisonData.stockTwo.risk_level.toLowerCase().replace(" ", "-")}`}>
-                {comparisonData.stockTwo.risk_level}
-              </span>
-            </div>
-
-            <div className = "comparison-summary">
-              <h3>Comparison Summary</h3>
-              <p>{comparisonData.summary}</p>
-            </div>
-          </div>
-        )}
-      </section>
-
-      <section className="risk-profile-section">
-        <div className="section-title">
-          <h2>User Risk Profile Questionnaire</h2>
-          <p>
-            Answer these questions to identify your investment risk tolerance.
-            This simplified questionnaire considers common risk profiling factors such as
-            investment objective, time horizon, investment experience, financial situation,
-            and comfort with market volatility.
-          </p>
-
-          <p className="source-note">
-            Questionnaire adapted for educational purposes based on common investor risk
-            profiling factors discussed by FINRA, Vanguard, CIRO, and Ameriprise.
-          </p>
-        </div>
-
-        <div className="question-list">
-          {riskQuestions.map((item, index) => (
-            <div className="question-card" key={item.id}>
-              <h3>
-                {index + 1}. {item.question}
-              </h3>
-
-            <div className="option-group">
-              {item.options.map((option) => (
-                <label className="option-item" key={option.text}>
-                  <input
-                    type="radio"
-                    name={item.id}
-                    value={option.score}
-                    checked={riskAnswers[item.id] === option.score}
-                    onChange={() =>
-                      setRiskAnswers({
-                        ...riskAnswers,
-                        [item.id]: option.score,
-                      })
-                    }
-                  />
-                  <span>{option.text}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <button className="profile-button" onClick={calculateRiskProfile}>
-        Calculate My Risk Profile
-      </button>
-
-      {userRiskProfile && (
-        <div className="profile-result">
-          <h3>Your Risk Profile: {userRiskProfile.profile}</h3>
-          <p>Total Score: {userRiskProfile.score} / 35</p>
-          <p>{userRiskProfile.description}</p>
-        </div>
-      )}
-    </section>
-
-      {stockData && (
-        <main className="dashboard">
-          <section className="stock-header">
-            <div>
-              <h2>{stockData.ticker}</h2>
-              <p className="company-name">{stockData.company_name}</p>
-              <p>Period Analysed: {stockData.period}</p>
-              <p>Latest Price: ${stockData.latest_price}</p>
-            </div>
-
-            <div className="stock-actions">
-              <span className={`risk-badge ${stockData.risk_level.toLowerCase().replace(" ", "-")}`}>
-              {stockData.risk_level}
-            </span>
-
-              <button className = "report-button" onClick = {generatePDFReport}>
-                Generate PDF Report
-              </button>
-            </div>
-          </section>
-
-          <section className="cards">
-            <div className="card">
-              <h3>Average Daily Return</h3>
-              <p>{formatPercent(stockData.average_daily_return)}</p>
-            </div>
-
-            <div className="card">
-              <h3>Daily Volatility</h3>
-              <p>{formatPercent(stockData.volatility)}</p>
-            </div>
-
-            <div className="card">
-              <h3>Annualized Volatility</h3>
-              <p>{formatPercent(stockData.annualized_volatility)}</p>
-            </div>
-
-            <div className="card">
-              <h3>Price Range</h3>
-              <p>
-                ${stockData.lowest_price} - ${stockData.highest_price}
-              </p>
-            </div>
-          </section>
-
-          <section className="chart-section">
-            <h3>Stock Price Trend</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={stockData.price_data}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="close" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </section>
-
-          <section className="chart-section">
-            <h3>Daily Return Trend</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={stockData.price_data}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="daily_return" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </section>
-
-          <section className="summary-section">
-            <h3>Risk Summary</h3>
-            <p>{stockData.summary}</p>
-          </section>
-
-          {userRiskProfile && suitabilityResult && (
-            <section className="suitability-section">
-              <h3>Suitability Analysis</h3>
-
-              <div className="suitability-grid">
-                <div>
-                  <span className="label">User Risk Profile</span>
-                  <p>{userRiskProfile.profile}</p>
-                </div>
-
-                <div>
-                  <span className="label">Stock Risk Level</span>
-                  <p>{stockData.risk_level}</p>
-                </div>
-
-               <div>
-                 <span className="label">Suitability Result</span>
-                 <p>{suitabilityResult.suitability}</p>
-               </div>
-              </div>
-
-              <p className="suitability-text">{suitabilityResult.explanation}</p>
-            </section>
-          )}
-
-          <section className="table-section">
-            <h3>Recent Historical Data</h3>
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Close Price</th>
-                  <th>Daily Return</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stockData.price_data.slice(-10).reverse().map((item) => (
-                  <tr key={item.date}>
-                    <td>{item.date}</td>
-                    <td>${item.close}</td>
-                    <td>{formatPercent(item.daily_return)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </section>
-        </main>
-      )}
+      <StockDashboard
+        stockData={stockData}
+        formatPercent={formatPercent}
+        generatePDFReport={generatePDFReport}
+        userRiskProfile={userRiskProfile}
+        suitabilityResult={suitabilityResult}
+      />
     </div>
   );
 }

@@ -88,6 +88,14 @@ finsight-dashboard/
 ├── frontend/
 │   ├── public/
 │   ├── src/
+│   │   ├── components/
+│   │   │   ├── SearchSection.jsx
+│   │   │   ├── HistorySection.jsx
+│   │   │   ├── ComparisonSection.jsx
+│   │   │   ├── RiskProfileSection.jsx
+│   │   │   ├── StockDashboard.jsx
+│   │   │   └── SuitabilitySection.jsx
+│   │   │
 │   │   ├── App.jsx
 │   │   ├── App.css
 │   │   ├── main.jsx
@@ -379,6 +387,11 @@ api-docs.png
 - Stored recent searches using browser localStorage
 - Allowed users to re-anlyse stocks from search history
 - Added clear history function
+
+### Version 5
+- Refactored frontend into reusable React components
+- Improved code structure and maintainability
+- Separated search, history, comparison, questionnaire, dashboard and suitability sections into individual component files
 
 ## Future Improvements
 - Save search history to database after user login is added
