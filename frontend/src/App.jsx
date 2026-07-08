@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import "./App.css";
+import jsPDF from "jspdf";
 
 function App() {
   const [ticker, setTicker] = useState("");
@@ -231,6 +232,142 @@ const getSuitabilityResult = () => {
   };
 };
 
+const generatePDFReport = () => {
+  if (!stockData) {
+    alert("Please analyse a stock before generating the report.");
+    return;
+  }
+
+  const doc = new jsPDF();
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  let y = 20;
+
+  doc.setFontSize(20);
+  doc.text("FinSight Stock Risk Report", pageWidth / 2, y, {
+    align: "center",
+  });
+
+  y += 12;
+
+  doc.setFontSize(10);
+  doc.text("For educational purposes only. Not financial advice.", pageWidth / 2, y, {
+    align: "center",
+  });
+
+  y += 18;
+
+  doc.setFontSize(14);
+  doc.text("Stock Information", 20, y);
+
+  y += 10;
+
+  doc.setFontSize(11);
+  doc.text(`Ticker: ${stockData.ticker}`, 20, y);
+  y += 8;
+  doc.text(`Company Name: ${stockData.company_name}`, 20, y);
+  y += 8;
+  doc.text(`Analysis Period: ${stockData.period}`, 20, y);
+  y += 8;
+  doc.text(`Latest Price: $${stockData.latest_price}`, 20, y);
+  y += 8;
+  doc.text(`Highest Price: $${stockData.highest_price}`, 20, y);
+  y += 8;
+  doc.text(`Lowest Price: $${stockData.lowest_price}`, 20, y);
+
+  y += 15;
+
+  doc.setFontSize(14);
+  doc.text("Risk Metrics", 20, y);
+
+  y += 10;
+
+  doc.setFontSize(11);
+  doc.text(
+    `Average Daily Return: ${(stockData.average_daily_return * 100).toFixed(2)}%`,
+    20,
+    y
+  );
+  y += 8;
+  doc.text(
+    `Daily Volatility: ${(stockData.volatility * 100).toFixed(2)}%`,
+    20,
+    y
+  );
+  y += 8;
+  doc.text(
+    `Annualized Volatility: ${(stockData.annualized_volatility * 100).toFixed(2)}%`,
+    20,
+    y
+  );
+  y += 8;
+  doc.text(`Stock Risk Level: ${stockData.risk_level}`, 20, y);
+
+  y += 15;
+
+  if (userRiskProfile) {
+    doc.setFontSize(14);
+    doc.text("User Risk Profile", 20, y);
+
+    y += 10;
+
+    doc.setFontSize(11);
+    doc.text(`User Profile: ${userRiskProfile.profile}`, 20, y);
+    y += 8;
+    doc.text(`Risk Profile Score: ${userRiskProfile.score} / 35`, 20, y);
+
+    y += 10;
+
+    const profileLines = doc.splitTextToSize(
+      userRiskProfile.description,
+      170
+    );
+
+    doc.text(profileLines, 20, y);
+    y += profileLines.length * 7 + 8;
+  }
+
+  if (suitabilityResult) {
+    doc.setFontSize(14);
+    doc.text("Suitability Analysis", 20, y);
+
+    y += 10;
+
+    doc.setFontSize(11);
+    doc.text(`Suitability Result: ${suitabilityResult.suitability}`, 20, y);
+
+    y += 10;
+
+    const suitabilityLines = doc.splitTextToSize(
+      suitabilityResult.explanation,
+      170
+    );
+
+    doc.text(suitabilityLines, 20, y);
+    y += suitabilityLines.length * 7 + 8;
+  }
+
+  doc.setFontSize(14);
+  doc.text("Risk Summary", 20, y);
+
+  y += 10;
+
+  doc.setFontSize(11);
+  const summaryLines = doc.splitTextToSize(stockData.summary, 170);
+  doc.text(summaryLines, 20, y);
+
+  y += summaryLines.length * 7 + 15;
+
+  doc.setFontSize(9);
+  const disclaimer =
+    "Disclaimer: This report is generated for educational and portfolio purposes only. It does not provide financial advice, investment recommendation, trading instruction, or professional financial planning service.";
+
+  const disclaimerLines = doc.splitTextToSize(disclaimer, 170);
+  doc.text(disclaimerLines, 20, y);
+
+  doc.save(`${stockData.ticker}_FinSight_Risk_Report.pdf`);
+};
+
 const suitabilityResult = getSuitabilityResult();
   return (
     <div className="app">
@@ -339,9 +476,16 @@ const suitabilityResult = getSuitabilityResult();
               <p>Period Analysed: {stockData.period}</p>
               <p>Latest Price: ${stockData.latest_price}</p>
             </div>
-            <span className={`risk-badge ${stockData.risk_level.toLowerCase().replace(" ", "-")}`}>
+
+            <div className="stock-actions">
+              <span className={`risk-badge ${stockData.risk_level.toLowerCase().replace(" ", "-")}`}>
               {stockData.risk_level}
             </span>
+
+              <button className = "report-button" onClick = {generatePDFReport}>
+                Generate PDF Report
+              </button>
+            </div>
           </section>
 
           <section className="cards">

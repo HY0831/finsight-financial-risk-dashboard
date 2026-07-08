@@ -31,6 +31,7 @@ This project was developed as a personal portfolio project to combine computer s
 - Display user risk profile score and explanation
 - Match user risk profile with stock risk level
 - Generate a simple suitability explanation
+- Generate a downloadable PDF stock risk report
 
 ## Tech Stack
 
@@ -362,13 +363,14 @@ api-docs.png
 - Added source note for questionnaire design
 - Added suitability matching between user risk profile and stock risk level
 - Added personalised suitability explanation
+- Added downloadable PDF risk report
+- Included stock information, risk metrics, user risk profile, suitability analysis and disclaimer in the report
 
 
 ## Future Improvements
 
 - Compare two stocks side by side
 - Save search history
-- Generate PDF risk report
 - Add user login and saved risk profile
 - Add AI-generated personalised explanation
 - Deploy frontend and backend online

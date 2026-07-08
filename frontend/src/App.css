@@ -386,3 +386,30 @@ th {
     grid-template-columns: 1fr;
   }
 }
+
+.stock-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.report-button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.report-button:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width: 600px) {
+  .stock-actions {
+    align-items: flex-start;
+  }
+}
