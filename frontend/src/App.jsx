@@ -18,6 +18,12 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const [compareTickerOne, setCompareTickerOne] = useState("");
+  const [compareTickerTwo, setCompareTickerTwo] = useState("");
+  const [comparisonData, setComparisonData] = useState(null);
+  const [comparisonLoading, setComparisonLoading] = useState(false);
+  const [comparisonError, setComparisonError] = useState("");
+
   const [riskAnswers, setRiskAnswers] = useState({});
   const [userRiskProfile, setUserRiskProfile] = useState(null);
 
@@ -368,6 +374,59 @@ const generatePDFReport = () => {
   doc.save(`${stockData.ticker}_FinSight_Risk_Report.pdf`);
 };
 
+const compareStocks = async () => {
+  if (!compareTickerOne.trim() || !compareTickerTwo.trim()) {
+    setComparisonError("Please enter two stock tickers to compare.");
+    return;
+  }
+
+  if (compareTickerOne.toUpperCase() === compareTickerTwo.toUpperCase()) {
+    setComparisonError("Please enter two different stock tickers.");
+    return;
+  }
+
+  setComparisonLoading(true);
+  setComparisonError("");
+  setComparisonData(null);
+
+  try {
+    const responseOne = await fetch(
+      `http://127.0.0.1:8000/analyze/${compareTickerOne.toUpperCase()}?period=${period}`
+    );
+
+    const responseTwo = await fetch(
+      `http://127.0.0.1:8000/analyze/${compareTickerTwo.toUpperCase()}?period=${period}`
+    );
+
+    if (!responseOne.ok || !responseTwo.ok) {
+      throw new Error("One or both stock tickers could not be found.");
+    }
+
+    const dataOne = await responseOne.json();
+    const dataTwo = await responseTwo.json();
+
+    let comparisonSummary = "";
+
+    if (dataOne.annualized_volatility > dataTwo.annualized_volatility) {
+      comparisonSummary = `${dataOne.ticker} has higher annualized volatility than ${dataTwo.ticker}, which means it had larger price movement during the selected period.`;
+    } else if (dataOne.annualized_volatility < dataTwo.annualized_volatility) {
+      comparisonSummary = `${dataTwo.ticker} has higher annualized volatility than ${dataOne.ticker}, which means it had larger price movement during the selected period.`;
+    } else {
+      comparisonSummary = `${dataOne.ticker} and ${dataTwo.ticker} have similar annualized volatility during the selected period.`;
+    }
+
+    setComparisonData({
+      stockOne: dataOne,
+      stockTwo: dataTwo,
+      summary: comparisonSummary,
+    });
+  } catch (err) {
+    setComparisonError(err.message);
+  } finally {
+    setComparisonLoading(false);
+  }
+};
+
 const suitabilityResult = getSuitabilityResult();
   return (
     <div className="app">
@@ -407,6 +466,78 @@ const suitabilityResult = getSuitabilityResult();
 
       {loading && <p className="message">Analysing stock data...</p>}
       {error && <p className="error">{error}</p>}
+
+      <section clasName= "compare-section">
+        <div className = "section-title">
+          <h2>Compare Two Stocks</h2>
+          <p>
+            Compare two companies using the same selected analysis period. This helps
+            users understand which stock has higher volatility and risk.
+          </p>
+        </div>
+
+        <div className = "comparison-inputs">
+          <input
+            type = "text"
+            placeholder = "First ticker, e.g. AAPL"
+            value = {compareTickerOne}
+            onChange = {(e) => setCompareTickerOne(e.target.value)}
+          />
+          <input
+            type = "text"
+            placeholder = "Second ticker, e.g. TSLA"
+            value = {compareTickerTwo}
+            onChange = {(e) => setCompareTickerTwo(e.target.value)}
+          />
+
+          <button onClick = {compareStocks} disabled = {comparisonLoading}>
+            {comparisonLoading ? "Comparing..." : "Compare"}
+          </button>
+        </div>
+
+        {comparisonError && <p className="error">{comparisonError}</p>}
+
+        {comparisonData && (
+          <div className="comparison-result">
+            <div className = "comparison-card">
+              <h3>{comparisonData.stockOne.ticker}</h3>
+              <p className = "company-name">{comparisonData.stockOne.company_name}</p>
+              <p>
+                Average Daily Return: {" "}
+                {formatPercent(comparisonData.stockOne.average_daily_return)}
+              </p>
+              <p>
+                Annualized Volatility: {" "}
+                {formatPercent(comparisonData.stockOne.annualized_volatility)}
+              </p>
+              <span className={`risk-badge ${comparisonData.stockOne.risk_level.toLowerCase().replace(" ", "-")}`}>
+                {comparisonData.stockOne.risk_level}
+              </span>
+            </div>
+
+            <div className = "comparison-card">
+              <h3>{comparisonData.stockTwo.ticker}</h3>
+              <p className = "company-name">{comparisonData.stockTwo.company_name}</p>
+              <p>
+                Average Daily Return: {" "}
+                {formatPercent(comparisonData.stockTwo.average_daily_return)}
+              </p>
+              <p>
+                Annualized Volatility: {" "}
+                {formatPercent(comparisonData.stockTwo.annualized_volatility)}
+              </p>
+              <span className={`risk-badge ${comparisonData.stockTwo.risk_level.toLowerCase().replace(" ", "-")}`}>
+                {comparisonData.stockTwo.risk_level}
+              </span>
+            </div>
+
+            <div className = "comparison-summary">
+              <h3>Comparison Summary</h3>
+              <p>{comparisonData.summary}</p>
+            </div>
+          </div>
+        )}
+      </section>
 
       <section className="risk-profile-section">
         <div className="section-title">

@@ -366,10 +366,13 @@ api-docs.png
 - Added downloadable PDF risk report
 - Included stock information, risk metrics, user risk profile, suitability analysis and disclaimer in the report
 
+### Version 3
+- Added side-by-side stock comparison
+- Compared company name, latest price, average daily return, annualized volatility and risk level
+- Added simple comparison summary based on volatility
+
 
 ## Future Improvements
-
-- Compare two stocks side by side
 - Save search history
 - Add user login and saved risk profile
 - Add AI-generated personalised explanation
