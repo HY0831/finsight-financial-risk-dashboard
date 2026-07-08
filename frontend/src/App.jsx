@@ -53,6 +53,9 @@ function App() {
       <header className="hero">
         <h1>FinSight</h1>
         <p>AI-Powered Financial Risk Dashboard</p>
+        <p className = "disclaimer">
+          FOe educational purposes only. This dashboard does not provide investment advice.
+        </p>
       </header>
 
       <section className="search-section">

@@ -203,3 +203,9 @@ th {
     gap: 15px;
   }
 }
+
+.disclaimer {
+  font-size: 14px;
+  color: #9ca3af;
+  margin-top: 6px;
+}
