@@ -12,6 +12,9 @@ FinSight aims to simplify this problem by converting historical stock market dat
 
 This project was developed as a personal portfolio project to combine computer science, finance knowledge, data analysis, and full-stack web development.
 
+## Live Demo
+Frontend:https://finsight-financial-risk-dashboard-k.vercel.app/
+Backend API: https://finsight-financial-risk-dashboard.onrender.com
 ## Features
 
 - Search stock ticker such as AAPL, TSLA, MSFT, NVDA, or KO
