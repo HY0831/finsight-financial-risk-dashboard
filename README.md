@@ -496,6 +496,12 @@ api-docs.png
 - Added footer disclaimer
 - Improved overall UI clarity and user experience
 
+### Version 8: Dynamic Stock Search and Improved PDF Report
+- Added dynamic stock search suggestions using backend search endpoint
+- Allowed users to search by ticker, company name or similar company name
+- Added dynamic search suggestions to stock comparison inputs
+- Improved PDF report design with professional layout, colour-coded metric cards, charts, insights, risk profile, suitability analysis and disclaimer
+- Fixed PDF generation when user risk profile is completed
 ## Future Improvements
 
 - Deploy frontend and backend online
