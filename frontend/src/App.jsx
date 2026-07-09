@@ -23,6 +23,10 @@ function App() {
 
   const [searchHistory, setSearchHistory] = useState([]);
 
+  const [compareSuggestionsOne, setCompareSuggestionsOne] = useState([]);
+  const [compareSuggestionsTwo, setCompareSuggestionsTwo] = useState([]);
+  const [compareSuggestionLoadingOne, setCompareSuggestionLoadingOne] = useState(false);
+  const [compareSuggestionLoadingTwo, setCompareSuggestionLoadingTwo] = useState(false);
   const [compareTickerOne, setCompareTickerOne] = useState("");
   const [compareTickerTwo, setCompareTickerTwo] = useState("");
   const [comparisonData, setComparisonData] = useState(null);
@@ -467,14 +471,69 @@ const generatePDFReport = () => {
   doc.save(`${stockData.ticker}_FinSight_Risk_Report.pdf`);
 };
 
-const compareStocks = async () => {
-  if (!compareTickerOne.trim() || !compareTickerTwo.trim()) {
-    setComparisonError("Please enter two stock tickers to compare.");
+const searchCompareStockSuggestions = async (searchText, inputNumber) => {
+  if (!searchText.trim() || searchText.trim().length < 2) {
+    if (inputNumber === 1) {
+      setCompareSuggestionsOne([]);
+    } else {
+      setCompareSuggestionsTwo([]);
+    }
     return;
   }
 
-  if (compareTickerOne.toUpperCase() === compareTickerTwo.toUpperCase()) {
-    setComparisonError("Please enter two different stock tickers.");
+  if (inputNumber === 1) {
+    setCompareSuggestionLoadingOne(true);
+  } else {
+    setCompareSuggestionLoadingTwo(true);
+  }
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/search-stocks?query=${encodeURIComponent(searchText)}`
+    );
+
+    if (!response.ok) {
+      if (inputNumber === 1) {
+        setCompareSuggestionsOne([]);
+      } else {
+        setCompareSuggestionsTwo([]);
+      }
+      return;
+    }
+
+    const data = await response.json();
+
+    if (inputNumber === 1) {
+      setCompareSuggestionsOne(data.results || []);
+    } else {
+      setCompareSuggestionsTwo(data.results || []);
+    }
+  } catch {
+    if (inputNumber === 1) {
+      setCompareSuggestionsOne([]);
+    } else {
+      setCompareSuggestionsTwo([]);
+    }
+  } finally {
+    if (inputNumber === 1) {
+      setCompareSuggestionLoadingOne(false);
+    } else {
+      setCompareSuggestionLoadingTwo(false);
+    }
+  }
+};
+
+const compareStocks = async () => {
+  if (!compareTickerOne.trim() || !compareTickerTwo.trim()) {
+    setComparisonError("Please enter two stock tickers or company names.");
+    return;
+  }
+
+  const selectedTickerOne = compareTickerOne.trim().toUpperCase();
+  const selectedTickerTwo = compareTickerTwo.trim().toUpperCase();
+
+  if (selectedTickerOne === selectedTickerTwo) {
+    setComparisonError("Please enter two different stocks.");
     return;
   }
 
@@ -484,35 +543,40 @@ const compareStocks = async () => {
 
   try {
     const responseOne = await fetch(
-      `${API_BASE_URL}/analyze/${compareTickerOne.toUpperCase()}?period=${period}`
+      `${API_BASE_URL}/analyze/${selectedTickerOne}?period=${period}`
     );
 
     const responseTwo = await fetch(
-      `${API_BASE_URL}/analyze/${compareTickerTwo.toUpperCase()}?period=${period}`
+      `${API_BASE_URL}/analyze/${selectedTickerTwo}?period=${period}`
     );
 
     if (!responseOne.ok || !responseTwo.ok) {
-      throw new Error("One or both stock tickers could not be found.");
+      throw new Error(
+        "One or both stocks were not found. Please select stocks from the search suggestions."
+      );
     }
 
-    const dataOne = await responseOne.json();
-    const dataTwo = await responseTwo.json();
+    const stockOne = await responseOne.json();
+    const stockTwo = await responseTwo.json();
 
-    let comparisonSummary = "";
+    let summary = "";
 
-    if (dataOne.annualized_volatility > dataTwo.annualized_volatility) {
-      comparisonSummary = `${dataOne.ticker} has higher annualized volatility than ${dataTwo.ticker}, which means it had larger price movement during the selected period.`;
-    } else if (dataOne.annualized_volatility < dataTwo.annualized_volatility) {
-      comparisonSummary = `${dataTwo.ticker} has higher annualized volatility than ${dataOne.ticker}, which means it had larger price movement during the selected period.`;
+    if (stockOne.annualized_volatility > stockTwo.annualized_volatility) {
+      summary = `${stockOne.ticker} has higher annualized volatility than ${stockTwo.ticker}, which means it had larger price movement during the selected period.`;
+    } else if (stockTwo.annualized_volatility > stockOne.annualized_volatility) {
+      summary = `${stockTwo.ticker} has higher annualized volatility than ${stockOne.ticker}, which means it had larger price movement during the selected period.`;
     } else {
-      comparisonSummary = `${dataOne.ticker} and ${dataTwo.ticker} have similar annualized volatility during the selected period.`;
+      summary = `${stockOne.ticker} and ${stockTwo.ticker} have similar annualized volatility during the selected period.`;
     }
 
     setComparisonData({
-      stockOne: dataOne,
-      stockTwo: dataTwo,
-      summary: comparisonSummary,
+      stockOne,
+      stockTwo,
+      summary,
     });
+
+    setCompareSuggestionsOne([]);
+    setCompareSuggestionsTwo([]);
   } catch (err) {
     setComparisonError(err.message);
   } finally {
@@ -574,6 +638,13 @@ const suitabilityResult = getSuitabilityResult();
         comparisonError={comparisonError}
         comparisonData={comparisonData}
         formatPercent={formatPercent}
+        compareSuggestionsOne={compareSuggestionsOne}
+        compareSuggestionsTwo={compareSuggestionsTwo}
+        compareSuggestionLoadingOne={compareSuggestionLoadingOne}
+        compareSuggestionLoadingTwo={compareSuggestionLoadingTwo}
+        searchCompareStockSuggestions={searchCompareStockSuggestions}
+        setCompareSuggestionsOne={setCompareSuggestionsOne}
+        setCompareSuggestionsTwo={setCompareSuggestionsTwo}
       />
 
       <RiskProfileSection

@@ -670,8 +670,72 @@ th {
   margin-bottom: 24px;
 }
 
+.compare-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.compare-suggestions-dropdown {
+  position: absolute;
+  top: 54px;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.16);
+  z-index: 100;
+  overflow: hidden;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.comparison-inputs .suggestion-item {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #f3f4f6;
+  background: #ffffff;
+  color: #111827;
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.comparison-inputs .suggestion-item:hover {
+  background: #f9fafb;
+}
+
+.comparison-inputs .suggestion-item div {
+  display: grid;
+  gap: 4px;
+}
+
+.comparison-inputs .suggestion-item strong {
+  color: #111827;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.comparison-inputs .suggestion-item span {
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.comparison-inputs .suggestion-item small {
+  color: #6b7280;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
 .comparison-inputs input {
   width: 100%;
+  min-height: 54px;
   padding: 14px 16px;
   border: 1px solid #d1d5db;
   border-radius: 10px;
@@ -680,13 +744,22 @@ th {
   color: #111827;
 }
 
+.comparison-inputs input:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
+}
+
 .comparison-inputs button {
+  width: 100%;
+  min-height: 54px;
   padding: 14px 24px;
   border: none;
   border-radius: 10px;
   background: #111827;
   color: white;
   font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
 }
 

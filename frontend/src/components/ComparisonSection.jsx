@@ -8,7 +8,69 @@ function ComparisonSection({
   comparisonError,
   comparisonData,
   formatPercent,
+  compareSuggestionsOne = [],
+  compareSuggestionsTwo = [],
+  compareSuggestionLoadingOne = false,
+  compareSuggestionLoadingTwo = false,
+  searchCompareStockSuggestions = () => {},
+  setCompareSuggestionsOne = () => {},
+  setCompareSuggestionsTwo = () => {},
 }) {
+  const handleFirstInputChange = (event) => {
+    const value = event.target.value;
+    setCompareTickerOne(value);
+    searchCompareStockSuggestions(value, 1);
+  };
+
+  const handleSecondInputChange = (event) => {
+    const value = event.target.value;
+    setCompareTickerTwo(value);
+    searchCompareStockSuggestions(value, 2);
+  };
+
+  const handleFirstSuggestionClick = (suggestion) => {
+    setCompareTickerOne(suggestion.ticker);
+    setCompareSuggestionsOne([]);
+  };
+
+  const handleSecondSuggestionClick = (suggestion) => {
+    setCompareTickerTwo(suggestion.ticker);
+    setCompareSuggestionsTwo([]);
+  };
+
+  const renderSuggestionDropdown = (
+    suggestions,
+    isLoading,
+    handleSuggestionClick
+  ) => {
+    if (!isLoading && suggestions.length === 0) {
+      return null;
+    }
+
+    return (
+      <div className="compare-suggestions-dropdown">
+        {isLoading && <p className="suggestion-loading">Searching...</p>}
+
+        {!isLoading &&
+          suggestions.map((suggestion) => (
+            <button
+              type="button"
+              className="suggestion-item"
+              key={`${suggestion.ticker}-${suggestion.exchange}`}
+              onClick={() => handleSuggestionClick(suggestion)}
+            >
+              <div>
+                <strong>{suggestion.ticker}</strong>
+                <span>{suggestion.name}</span>
+              </div>
+
+              <small>{suggestion.exchange}</small>
+            </button>
+          ))}
+      </div>
+    );
+  };
+
   const renderComparisonCard = (stock) => {
     return (
       <div className="comparison-card">
@@ -57,27 +119,53 @@ function ComparisonSection({
       <div className="section-title comparison-title">
         <h2>Compare Two Stocks</h2>
         <p>
-          Compare two companies using the same selected analysis period. This
-          helps users understand which stock has higher volatility and risk.
+          Search by ticker or company name to compare two companies using the
+          same selected analysis period.
         </p>
       </div>
 
       <div className="comparison-inputs">
-        <input
-          type="text"
-          placeholder="First ticker, e.g. AAPL"
-          value={compareTickerOne}
-          onChange={(e) => setCompareTickerOne(e.target.value)}
-        />
+        <div className="compare-input-wrapper">
+          <input
+            type="text"
+            placeholder="First stock, e.g. AAPL or Apple"
+            value={compareTickerOne}
+            onChange={handleFirstInputChange}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                compareStocks();
+              }
+            }}
+          />
 
-        <input
-          type="text"
-          placeholder="Second ticker, e.g. TSLA"
-          value={compareTickerTwo}
-          onChange={(e) => setCompareTickerTwo(e.target.value)}
-        />
+          {renderSuggestionDropdown(
+            compareSuggestionsOne,
+            compareSuggestionLoadingOne,
+            handleFirstSuggestionClick
+          )}
+        </div>
 
-        <button onClick={compareStocks} disabled={comparisonLoading}>
+        <div className="compare-input-wrapper">
+          <input
+            type="text"
+            placeholder="Second stock, e.g. TSLA or Tesla"
+            value={compareTickerTwo}
+            onChange={handleSecondInputChange}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                compareStocks();
+              }
+            }}
+          />
+
+          {renderSuggestionDropdown(
+            compareSuggestionsTwo,
+            compareSuggestionLoadingTwo,
+            handleSecondSuggestionClick
+          )}
+        </div>
+
+        <button type="button" onClick={compareStocks} disabled={comparisonLoading}>
           {comparisonLoading ? "Comparing..." : "Compare"}
         </button>
       </div>
@@ -94,6 +182,7 @@ function ComparisonSection({
               <span>Comparison Insight</span>
               <h3>Volatility Comparison</h3>
             </div>
+
             <p>{comparisonData.summary}</p>
           </div>
         </div>
