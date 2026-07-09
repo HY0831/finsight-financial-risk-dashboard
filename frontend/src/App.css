@@ -1,3 +1,7 @@
+/* =========================================================
+   1. Global Reset & Base Layout
+========================================================= */
+
 * {
   box-sizing: border-box;
 }
@@ -11,8 +15,13 @@ body {
 
 .app {
   min-height: 100vh;
-  padding: 50px 30px 30px30px;
+  padding: 50px 30px 30px 30px;
 }
+
+
+/* =========================================================
+   2. Hero Header
+========================================================= */
 
 .hero {
   text-align: center;
@@ -32,51 +41,183 @@ body {
   margin: 6px 0;
 }
 
-.search-section {
-  max-width: 1000px;
-  margin: 0 auto 30px auto;
-  display: grid;
-  grid-template-columns: 1fr 180px 160px;
-  gap: 12px;
+.disclaimer {
+  font-size: 15px;
+  color: #6b7280;
+  margin-top: 18px;
 }
 
-.search-section input {
+
+/* =========================================================
+   3. Search Section
+========================================================= */
+
+.search-card {
+  max-width: 1100px;
+  margin: 0 auto 30px auto;
+  background: white;
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.search-card-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.search-card-header h2 {
+  margin: 0 0 10px 0;
+  color: #111827;
+  font-size: 34px;
+  font-weight: 700;
+}
+
+.search-card-header p {
+  max-width: 850px;
+  margin: 0 auto;
+  color: #4b5563;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.search-section {
+  display: grid;
+  grid-template-columns: 1fr 180px 150px;
+  gap: 14px;
+  align-items: start;
+}
+
+.search-input-wrapper {
+  position: relative;
   width: 100%;
-  padding: 14px 16px;
+}
+
+.search-section input,
+.search-section select {
+  width: 100%;
+  min-height: 54px;
+  padding: 15px 16px;
   border: 1px solid #d1d5db;
-  border-radius: 10px;
+  border-radius: 12px;
   font-size: 16px;
   background: white;
   color: #111827;
+}
+
+.search-section input:focus,
+.search-section select:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
 }
 
 .search-section select {
-  padding: 14px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 10px;
-  font-size: 16px;
-  background: white;
-  color: #111827;
   appearance: auto;
 }
-.search-section button {
-  padding: 14px 24px;
+
+.search-section > button {
+  width: 100%;
+  min-height: 54px;
+  padding: 15px 24px;
   border: none;
-  border-radius: 10px;
+  border-radius: 12px;
   background: #111827;
   color: white;
   font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.search-section button:disabled {
+.search-section > button:hover {
+  background: #374151;
+}
+
+.search-section > button:disabled {
   background: #9ca3af;
   cursor: not-allowed;
 }
 
-.search-section button:hover {
-  background: #374151;
+
+/* =========================================================
+   4. Stock Search Suggestions Dropdown
+========================================================= */
+
+.suggestions-dropdown {
+  position: absolute;
+  top: 58px;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.16);
+  z-index: 100;
+  overflow: hidden;
+  max-height: 280px;
+  overflow-y: auto;
 }
+
+.suggestion-loading {
+  margin: 0;
+  padding: 14px 16px;
+  color: #6b7280;
+  font-size: 14px;
+  background: #ffffff;
+}
+
+/* Prevent Analyse button styles from affecting suggestion buttons */
+.search-section .suggestion-item {
+  width: 100%;
+  border: none;
+  border-bottom: 1px solid #f3f4f6;
+  background: #ffffff;
+  color: #111827;
+  padding: 14px 16px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.search-section .suggestion-item:hover {
+  background: #f9fafb;
+}
+
+.search-section .suggestion-item div {
+  display: grid;
+  gap: 4px;
+}
+
+.search-section .suggestion-item strong {
+  color: #111827;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.search-section .suggestion-item span {
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.search-section .suggestion-item small {
+  color: #6b7280;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   5. Loading & Error Messages
+========================================================= */
 
 .message {
   text-align: center;
@@ -89,9 +230,82 @@ body {
   font-weight: bold;
 }
 
+
+/* =========================================================
+   6. Empty State
+========================================================= */
+
+.empty-state {
+  max-width: 1100px;
+  margin: 0 auto 25px auto;
+  background: white;
+  padding: 32px;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.empty-state h2 {
+  margin-top: 0;
+  color: #111827;
+}
+
+.empty-state > p {
+  max-width: 760px;
+  margin: 0 auto 24px auto;
+  color: #6b7280;
+  line-height: 1.7;
+}
+
+.empty-tips {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  text-align: left;
+}
+
+.empty-tips div {
+  background: #f9fafb;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+}
+
+.empty-tips strong {
+  color: #111827;
+}
+
+.empty-tips p {
+  color: #4b5563;
+  margin-bottom: 0;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   7. Stock Dashboard Layout
+========================================================= */
+
 .dashboard {
   max-width: 1100px;
   margin: 0 auto;
+}
+
+.dashboard-title {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+.dashboard-title h2 {
+  margin: 0 0 8px 0;
+  color: #111827;
+}
+
+.dashboard-title p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
 }
 
 .stock-header {
@@ -114,6 +328,37 @@ body {
   color: #6b7280;
 }
 
+.company-name {
+  font-weight: 600;
+  color: #374151;
+}
+
+.stock-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.report-button {
+  padding: 12px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #2563eb;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.report-button:hover {
+  background: #1d4ed8;
+}
+
+
+/* =========================================================
+   8. Risk Badges
+========================================================= */
+
 .risk-badge {
   padding: 10px 18px;
   border-radius: 999px;
@@ -134,6 +379,18 @@ body {
   background: #fee2e2;
   color: #991b1b;
 }
+
+.small-badge {
+  display: inline-block;
+  font-size: 13px;
+  padding: 8px 14px;
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   9. Metric Cards
+========================================================= */
 
 .cards {
   display: grid;
@@ -159,6 +416,19 @@ body {
   font-weight: bold;
   margin: 0;
 }
+
+.card span {
+  display: block;
+  margin-top: 10px;
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   10. Chart, Summary & Table Sections
+========================================================= */
 
 .chart-section,
 .summary-section,
@@ -197,42 +467,10 @@ th {
   color: #374151;
 }
 
-@media (max-width: 700px) {
-  .cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
 
-  .search-section {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 600px) {
-  .app {
-    padding: 18px;
-  }
-
-  .cards {
-    grid-template-columns: 1fr;
-  }
-
-  .stock-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 15px;
-  }
-}
-
-.disclaimer {
-  font-size: 15px;
-  color: #6b7280;
-  margin-top: 18px;
-}
-
-.company-name {
-  font-weight: 600;
-  color: #374151;
-}
+/* =========================================================
+   11. Risk Profile Questionnaire
+========================================================= */
 
 .risk-profile-section {
   max-width: 1100px;
@@ -341,6 +579,11 @@ th {
   border-radius: 8px;
 }
 
+
+/* =========================================================
+   12. Suitability Analysis
+========================================================= */
+
 .suitability-section {
   background: white;
   padding: 24px;
@@ -388,38 +631,10 @@ th {
   border-radius: 12px;
 }
 
-@media (max-width: 800px) {
-  .suitability-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
-.stock-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12px;
-}
-
-.report-button {
-  padding: 12px 18px;
-  border: none;
-  border-radius: 10px;
-  background: #2563eb;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-.report-button:hover {
-  background: #1d4ed8;
-}
-
-@media (max-width: 600px) {
-  .stock-actions {
-    align-items: flex-start;
-  }
-}
+/* =========================================================
+   13. Stock Comparison Section
+========================================================= */
 
 .comparison-section {
   max-width: 1100px;
@@ -578,29 +793,10 @@ th {
   font-size: 16px;
 }
 
-@media (max-width: 900px) {
-  .comparison-inputs {
-    grid-template-columns: 1fr;
-  }
 
-  .comparison-result {
-    grid-template-columns: 1fr;
-  }
-
-  .comparison-summary {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 600px) {
-  .comparison-metrics {
-    grid-template-columns: 1fr;
-  }
-
-  .comparison-card-header {
-    flex-direction: column;
-  }
-}
+/* =========================================================
+   14. Recent Search History
+========================================================= */
 
 .history-section {
   max-width: 1100px;
@@ -689,13 +885,6 @@ th {
   justify-content: center;
 }
 
-.small-badge {
-  display: inline-block;
-  font-size: 13px;
-  padding: 8px 14px;
-  white-space: nowrap;
-}
-
 .history-metrics {
   display: grid;
   gap: 8px;
@@ -722,7 +911,38 @@ th {
   text-align: right;
 }
 
+
+/* =========================================================
+   15. Footer
+========================================================= */
+
+.footer {
+  max-width: 1100px;
+  margin: 25px auto 0 auto;
+  text-align: center;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+
+/* =========================================================
+   16. Responsive Design
+========================================================= */
+
 @media (max-width: 900px) {
+  .comparison-inputs {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-result {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-summary {
+    grid-template-columns: 1fr;
+  }
+
   .history-item {
     grid-template-columns: 1fr 1fr;
   }
@@ -736,99 +956,77 @@ th {
   }
 }
 
+@media (max-width: 850px) {
+  .search-section {
+    grid-template-columns: 1fr;
+  }
+
+  .search-card-header h2 {
+    font-size: 28px;
+  }
+
+  .search-card-header p {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 800px) {
+  .suitability-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .empty-tips {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 600px) {
+  .app {
+    padding: 18px;
+  }
+
+  .hero h1 {
+    font-size: 38px;
+  }
+
+  .hero p {
+    font-size: 18px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .stock-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .stock-actions {
+    align-items: flex-start;
+  }
+
+  .comparison-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  .comparison-card-header {
+    flex-direction: column;
+  }
+
   .history-header {
     flex-direction: column;
     align-items: flex-start;
   }
 
   .history-item {
-    grid-template-columns: 1fr;
-  }
-}
-
-.empty-state {
-  max-width: 1100px;
-  margin: 0 auto 25px auto;
-  background: white;
-  padding: 32px;
-  border-radius: 16px;
-  text-align: center;
-}
-
-.empty-state h2 {
-  margin-top: 0;
-  color: #111827;
-}
-
-.empty-state > p {
-  max-width: 760px;
-  margin: 0 auto 24px auto;
-  color: #6b7280;
-  line-height: 1.7;
-}
-
-.empty-tips {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
-  text-align: left;
-}
-
-.empty-tips div {
-  background: #f9fafb;
-  padding: 18px;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-}
-
-.empty-tips strong {
-  color: #111827;
-}
-
-.empty-tips p {
-  color: #4b5563;
-  margin-bottom: 0;
-  line-height: 1.5;
-}
-
-.dashboard-title {
-  background: white;
-  padding: 24px;
-  border-radius: 16px;
-  margin-bottom: 20px;
-}
-
-.dashboard-title h2 {
-  margin: 0 0 8px 0;
-  color: #111827;
-}
-
-.dashboard-title p {
-  margin: 0;
-  color: #6b7280;
-  line-height: 1.6;
-}
-
-.card span {
-  display: block;
-  margin-top: 10px;
-  font-size: 13px;
-  color: #6b7280;
-  line-height: 1.5;
-}
-
-.footer {
-  max-width: 1100px;
-  margin: 25px auto 0 auto;
-  text-align: center;
-  color: #6b7280;
-  font-size: 14px;
-  line-height: 1.6;
-}
-
-@media (max-width: 800px) {
-  .empty-tips {
     grid-template-columns: 1fr;
   }
 }

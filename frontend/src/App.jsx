@@ -10,12 +10,16 @@ import "./App.css";
 
 const API_BASE_URL = 
   import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
+
 function App() {
   const [ticker, setTicker] = useState("");
   const [period, setPeriod] = useState("1y");
   const [stockData, setStockData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [stockSuggestions, setStockSuggestions] = useState([]);
+  const [suggestionLoading, setSuggestionLoading] = useState(false);
 
   const [searchHistory, setSearchHistory] = useState([]);
 
@@ -134,34 +138,63 @@ function App() {
     localStorage.setItem("finsightSearchHistory", JSON.stringify(updatedHistory));
   };
 
-  const analyzeStock = async () => {
-    if (!ticker.trim()) {
-      setError("Please enter a stock ticker.");
+  const searchStockSuggestions = async(searchText) => {
+    if(!searchText.trim() || searchText.trim().length < 2){
+      setStockSuggestions([]);
       return;
     }
 
-    setLoading(true);
-    setError("");
-    setStockData(null);
+    setSuggestionLoading(true);
 
-    try {
-      const response = await fetch(
-        `${API_BASE_URL}/analyze/${ticker.toUpperCase()}?period=${period}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Stock ticker not found. Please try again.");
+    try{
+      const response = await fetch(`${API_BASE_URL}/search-stocks?query=${encodeURIComponent(searchText)}`);
+      if(!response.ok){
+        setStockSuggestions([]);
+        return;
       }
 
       const data = await response.json();
-      setStockData(data);
-      saveSearchHistory(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      setStockSuggestions(data.results || []);
+    }catch{
+      setStockSuggestions([]);
+    }finally{
+      setSuggestionLoading(false);
     }
   };
+
+const analyzeStock = async () => {
+  if (!ticker.trim()) {
+    setError("Please enter a stock ticker or search for a company name.");
+    return;
+  }
+
+  const selectedTicker = ticker.trim().toUpperCase();
+
+  setLoading(true);
+  setError("");
+  setStockData(null);
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/analyze/${selectedTicker}?period=${period}`
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        "Stock not found. Please select a stock from the search suggestions or enter a valid ticker."
+      );
+    }
+
+    const data = await response.json();
+    setStockData(data);
+    saveSearchHistory(data);
+    setStockSuggestions([]);
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const formatPercent = (value) => {
     return `${(value * 100).toFixed(2)}%`;
@@ -506,6 +539,10 @@ const suitabilityResult = getSuitabilityResult();
         setPeriod={setPeriod}
         loading={loading}
         analyzeStock={analyzeStock}
+        stockSuggestions={stockSuggestions}
+        suggestionLoading={suggestionLoading}
+        searchStockSuggestions={searchStockSuggestions}
+        setStockSuggestions={setStockSuggestions}
       />
 
       {loading && <p className="message">Analysing stock data...</p>}

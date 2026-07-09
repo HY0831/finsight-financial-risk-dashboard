@@ -40,6 +40,43 @@ def generate_summary(ticker, annualized_volatility, risk_level):
             "This means the stock price has changed strongly during the selected period. "
             "It may involve higher short-term risk for users."
         )
+def search_stocks(query):
+    if not query or not query.strip():
+        return []
+
+    try:
+        search_result = yf.Search(query, max_results=8)
+        quotes = search_result.quotes
+
+        results = []
+
+        for quote in quotes:
+            symbol = quote.get("symbol")
+            short_name = quote.get("shortname")
+            long_name = quote.get("longname")
+            quote_type = quote.get("quoteType")
+            exchange = quote.get("exchange")
+
+            if not symbol:
+                continue
+
+            if quote_type not in ["EQUITY", "ETF"]:
+                continue
+
+            company_name = short_name or long_name or symbol
+
+            results.append({
+                "ticker": symbol,
+                "name": company_name,
+                "type": quote_type,
+                "exchange": exchange or "N/A",
+            })
+
+        return results
+
+    except Exception as error:
+        print("Search error:", error)
+        return []
 
 def analyze_stock(ticker, period="1y"):
     """
