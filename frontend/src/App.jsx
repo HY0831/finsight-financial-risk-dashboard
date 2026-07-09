@@ -8,6 +8,8 @@ import StockDashboard from "./components/StockDashboard";
 import EmptyState from "./components/EmptyState";
 import "./App.css";
 
+const API_BASE_URL = 
+  import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:8000";
 function App() {
   const [ticker, setTicker] = useState("");
   const [period, setPeriod] = useState("1y");
@@ -144,7 +146,7 @@ function App() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:8000/analyze/${ticker.toUpperCase()}?period=${period}`
+        `${API_BASE_URL}/analyze/${ticker.toUpperCase()}?period=${period}`
       );
 
       if (!response.ok) {
@@ -209,7 +211,7 @@ const analyseFromHistory = async (historyItem) => {
 
   try {
     const response = await fetch(
-      `http://127.0.0.1:8000/analyze/${historyItem.ticker}?period=${historyItem.period}`
+      `${API_BASE_URL}/analyze/${historyItem.ticker}?period=${historyItem.period}`
     );
 
     if (!response.ok) {
@@ -449,11 +451,11 @@ const compareStocks = async () => {
 
   try {
     const responseOne = await fetch(
-      `http://127.0.0.1:8000/analyze/${compareTickerOne.toUpperCase()}?period=${period}`
+      `${API_BASE_URL}/analyze/${compareTickerOne.toUpperCase()}?period=${period}`
     );
 
     const responseTwo = await fetch(
-      `http://127.0.0.1:8000/analyze/${compareTickerTwo.toUpperCase()}?period=${period}`
+      `${API_BASE_URL}/analyze/${compareTickerTwo.toUpperCase()}?period=${period}`
     );
 
     if (!responseOne.ok || !responseTwo.ok) {
