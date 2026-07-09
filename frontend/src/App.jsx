@@ -5,6 +5,7 @@ import HistorySection from "./components/HistorySection";
 import ComparisonSection from "./components/ComparisonSection";
 import RiskProfileSection from "./components/RiskProfileSection";
 import StockDashboard from "./components/StockDashboard";
+import EmptyState from "./components/EmptyState";
 import "./App.css";
 
 function App() {
@@ -508,6 +509,16 @@ const suitabilityResult = getSuitabilityResult();
       {loading && <p className="message">Analysing stock data...</p>}
       {error && <p className="error">{error}</p>}
 
+      {!stockData && !loading && <EmptyState />}
+
+      <StockDashboard
+        stockData={stockData}
+        formatPercent={formatPercent}
+        generatePDFReport={generatePDFReport}
+        userRiskProfile={userRiskProfile}
+        suitabilityResult={suitabilityResult}
+      />
+
       <HistorySection
         searchHistory={searchHistory}
         analyseFromHistory={analyseFromHistory}
@@ -534,13 +545,12 @@ const suitabilityResult = getSuitabilityResult();
         userRiskProfile={userRiskProfile}
       />
 
-      <StockDashboard
-        stockData={stockData}
-        formatPercent={formatPercent}
-        generatePDFReport={generatePDFReport}
-        userRiskProfile={userRiskProfile}
-        suitabilityResult={suitabilityResult}
-      />
+      <footer className = "footer">
+        <p>
+          FinSight is developed for educational and portfolio purposes only. It does
+          not provide financial advice or investment recommendations.
+        </p>
+      </footer>
     </div>
   );
 }

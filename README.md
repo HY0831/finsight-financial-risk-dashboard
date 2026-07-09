@@ -393,6 +393,13 @@ api-docs.png
 - Improved code structure and maintainability
 - Separated search, history, comparison, questionnaire, dashboard and suitability sections into individual component files
 
+### Version 6
+- Added empty state section before stock analysis
+- Added metric explanation text for beginner users
+- Added dashboard result title and explanation
+- Added footer disclaimer
+- Improved overall UI clarity and user experience
+
 ## Future Improvements
 - Save search history to database after user login is added
 - Add user login and saved risk profile

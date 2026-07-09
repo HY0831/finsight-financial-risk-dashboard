@@ -27,12 +27,12 @@ function HistorySection({
             key={`${item.ticker}-${item.searched_at}`}
             onClick={() => analyseFromHistory(item)}
           >
-            <div>
+            <div className="history-company">
               <strong>{item.ticker}</strong>
               <p>{item.company_name}</p>
             </div>
 
-            <div>
+            <div className="history-risk">
               <span
                 className={`risk-badge small-badge ${item.risk_level
                   .toLowerCase()
@@ -42,12 +42,19 @@ function HistorySection({
               </span>
             </div>
 
-            <div>
-              <p>Period: {item.period}</p>
-              <p>Price: ${item.latest_price}</p>
+            <div className="history-metrics">
+              <p>
+                <span>Period</span>
+                {item.period}
+              </p>
+              <p>
+                <span>Latest Price</span>
+                ${item.latest_price}
+              </p>
             </div>
 
-            <div>
+            <div className="history-time">
+              <span>Last analysed</span>
               <p>{item.searched_at}</p>
             </div>
           </button>

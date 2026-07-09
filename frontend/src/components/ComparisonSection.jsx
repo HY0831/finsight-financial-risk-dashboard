@@ -9,9 +9,52 @@ function ComparisonSection({
   comparisonData,
   formatPercent,
 }) {
+  const renderComparisonCard = (stock) => {
+    return (
+      <div className="comparison-card">
+        <div className="comparison-card-header">
+          <div>
+            <h3>{stock.ticker}</h3>
+            <p>{stock.company_name}</p>
+          </div>
+
+          <span
+            className={`risk-badge ${stock.risk_level
+              .toLowerCase()
+              .replace(" ", "-")}`}
+          >
+            {stock.risk_level}
+          </span>
+        </div>
+
+        <div className="comparison-metrics">
+          <div className="comparison-metric">
+            <span>Latest Price</span>
+            <strong>${stock.latest_price}</strong>
+          </div>
+
+          <div className="comparison-metric">
+            <span>Average Daily Return</span>
+            <strong>{formatPercent(stock.average_daily_return)}</strong>
+          </div>
+
+          <div className="comparison-metric">
+            <span>Annualized Volatility</span>
+            <strong>{formatPercent(stock.annualized_volatility)}</strong>
+          </div>
+
+          <div className="comparison-metric">
+            <span>Risk Level</span>
+            <strong>{stock.risk_level}</strong>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <section className="comparison-section">
-      <div className="section-title">
+      <div className="section-title comparison-title">
         <h2>Compare Two Stocks</h2>
         <p>
           Compare two companies using the same selected analysis period. This
@@ -43,50 +86,14 @@ function ComparisonSection({
 
       {comparisonData && (
         <div className="comparison-result">
-          <div className="comparison-card">
-            <h3>{comparisonData.stockOne.ticker}</h3>
-            <p className="company-name">{comparisonData.stockOne.company_name}</p>
-            <p>Latest Price: ${comparisonData.stockOne.latest_price}</p>
-            <p>
-              Average Daily Return:{" "}
-              {formatPercent(comparisonData.stockOne.average_daily_return)}
-            </p>
-            <p>
-              Annualized Volatility:{" "}
-              {formatPercent(comparisonData.stockOne.annualized_volatility)}
-            </p>
-            <span
-              className={`risk-badge ${comparisonData.stockOne.risk_level
-                .toLowerCase()
-                .replace(" ", "-")}`}
-            >
-              {comparisonData.stockOne.risk_level}
-            </span>
-          </div>
-
-          <div className="comparison-card">
-            <h3>{comparisonData.stockTwo.ticker}</h3>
-            <p className="company-name">{comparisonData.stockTwo.company_name}</p>
-            <p>Latest Price: ${comparisonData.stockTwo.latest_price}</p>
-            <p>
-              Average Daily Return:{" "}
-              {formatPercent(comparisonData.stockTwo.average_daily_return)}
-            </p>
-            <p>
-              Annualized Volatility:{" "}
-              {formatPercent(comparisonData.stockTwo.annualized_volatility)}
-            </p>
-            <span
-              className={`risk-badge ${comparisonData.stockTwo.risk_level
-                .toLowerCase()
-                .replace(" ", "-")}`}
-            >
-              {comparisonData.stockTwo.risk_level}
-            </span>
-          </div>
+          {renderComparisonCard(comparisonData.stockOne)}
+          {renderComparisonCard(comparisonData.stockTwo)}
 
           <div className="comparison-summary">
-            <h3>Comparison Summary</h3>
+            <div>
+              <span>Comparison Insight</span>
+              <h3>Volatility Comparison</h3>
+            </div>
             <p>{comparisonData.summary}</p>
           </div>
         </div>

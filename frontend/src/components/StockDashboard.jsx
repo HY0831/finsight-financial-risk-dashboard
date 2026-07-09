@@ -22,6 +22,14 @@ function StockDashboard({
 
   return (
     <main className="dashboard">
+      <section className = "dashboard-title">
+        <h2>Stock Risk Analysis Result</h2>
+        <p>
+          The result below is calculated using historical closing price data and
+          volatility-based risk classification.
+        </p>
+      </section>
+      
       <section className="stock-header">
         <div>
           <h2>{stockData.ticker}</h2>
@@ -49,16 +57,19 @@ function StockDashboard({
         <div className="card">
           <h3>Average Daily Return</h3>
           <p>{formatPercent(stockData.average_daily_return)}</p>
+          <span>Average daily price change during the selected period.</span>
         </div>
 
         <div className="card">
           <h3>Daily Volatility</h3>
           <p>{formatPercent(stockData.volatility)}</p>
+          <span>Measures how much the stock price moves each day.</span>
         </div>
 
         <div className="card">
           <h3>Annualized Volatility</h3>
           <p>{formatPercent(stockData.annualized_volatility)}</p>
+          <span>Estimated yearly volatility based on daily returns.</span>
         </div>
 
         <div className="card">
@@ -66,6 +77,7 @@ function StockDashboard({
           <p>
             ${stockData.lowest_price} - ${stockData.highest_price}
           </p>
+          <span>Lowest and highest closing price in the selected period.</span>
         </div>
       </section>
 
