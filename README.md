@@ -502,6 +502,15 @@ api-docs.png
 - Added dynamic search suggestions to stock comparison inputs
 - Improved PDF report design with professional layout, colour-coded metric cards, charts, insights, risk profile, suitability analysis and disclaimer
 - Fixed PDF generation when user risk profile is completed
+
+### Version 9: Multi-Page Website Layout
+
+- Converted FinSight from a single-page dashboard into a multi-page web application
+- Added navigation bar with Home, Analyze, Compare, Risk Profile, History, and About pages
+- Added a professional Home page with popular stock trend cards
+- Improved user flow by separating each major function into its own page
+- Made the website feel closer to a real financial web application
+
 ## Future Improvements
 
 - Deploy frontend and backend online
