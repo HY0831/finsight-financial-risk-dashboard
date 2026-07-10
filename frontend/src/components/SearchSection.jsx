@@ -71,14 +71,17 @@ function SearchSection({
           )}
         </div>
 
-        <select value={period} onChange={(event) => setPeriod(event.target.value)}>
+        <select
+          value={period}
+          onChange={(event) => setPeriod(event.target.value)}
+        >
           <option value="6mo">6 Months</option>
           <option value="1y">1 Year</option>
           <option value="3y">3 Years</option>
           <option value="5y">5 Years</option>
         </select>
 
-        <button onClick={analyzeStock} disabled={loading}>
+        <button type="button" onClick={analyzeStock} disabled={loading}>
           {loading ? "Analysing..." : "Analyse"}
         </button>
       </div>
