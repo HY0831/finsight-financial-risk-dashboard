@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
+import { Routes, Route } from "react-router";
 import jsPDF from "jspdf";
-import SearchSection from "./components/SearchSection";
-import HistorySection from "./components/HistorySection";
-import ComparisonSection from "./components/ComparisonSection";
-import RiskProfileSection from "./components/RiskProfileSection";
-import StockDashboard from "./components/StockDashboard";
-import EmptyState from "./components/EmptyState";
+import Navbar from "./components/Navbar";
+import HomePage from "./pages/HomePage";
+import AnalyzePage from "./pages/AnalyzePage";
+import ComparePage from "./pages/ComparePage";
+import ProfilePage from "./pages/ProfilePage";
+import HistoryPage from "./pages/HistoryPage";
+import AboutPage from "./pages/AboutPage";
 import "./App.css";
 
 const API_BASE_URL = 
@@ -1174,80 +1176,92 @@ const compareStocks = async () => {
 };
 
 const suitabilityResult = getSuitabilityResult();
-  return (
+    return (
     <div className="app">
-      <header className="hero">
-        <h1>FinSight</h1>
-        <p>AI-Powered Financial Risk Dashboard</p>
-        <p className="disclaimer">
-          For educational purposes only. This dashboard does not provide
-          investment advice.
-        </p>
-      </header>
+      <Navbar />
 
-      <SearchSection
-        ticker={ticker}
-        setTicker={setTicker}
-        period={period}
-        setPeriod={setPeriod}
-        loading={loading}
-        analyzeStock={analyzeStock}
-        stockSuggestions={stockSuggestions}
-        suggestionLoading={suggestionLoading}
-        searchStockSuggestions={searchStockSuggestions}
-        setStockSuggestions={setStockSuggestions}
-      />
+      <Routes>
+        <Route path="/" element={<HomePage apiBaseUrl={API_BASE_URL} />} />
 
-      {loading && <p className="message">Analysing stock data...</p>}
-      {error && <p className="error">{error}</p>}
+        <Route
+          path="/analyze"
+          element={
+            <AnalyzePage
+              ticker={ticker}
+              setTicker={setTicker}
+              period={period}
+              setPeriod={setPeriod}
+              loading={loading}
+              error={error}
+              stockData={stockData}
+              analyzeStock={analyzeStock}
+              stockSuggestions={stockSuggestions}
+              suggestionLoading={suggestionLoading}
+              searchStockSuggestions={searchStockSuggestions}
+              setStockSuggestions={setStockSuggestions}
+              formatPercent={formatPercent}
+              generatePDFReport={generatePDFReport}
+              userRiskProfile={userRiskProfile}
+              suitabilityResult={suitabilityResult}
+            />
+          }
+        />
 
-      {!stockData && !loading && <EmptyState />}
+        <Route
+          path="/compare"
+          element={
+            <ComparePage
+              compareTickerOne={compareTickerOne}
+              setCompareTickerOne={setCompareTickerOne}
+              compareTickerTwo={compareTickerTwo}
+              setCompareTickerTwo={setCompareTickerTwo}
+              compareStocks={compareStocks}
+              comparisonLoading={comparisonLoading}
+              comparisonError={comparisonError}
+              comparisonData={comparisonData}
+              formatPercent={formatPercent}
+              compareSuggestionsOne={compareSuggestionsOne}
+              compareSuggestionsTwo={compareSuggestionsTwo}
+              compareSuggestionLoadingOne={compareSuggestionLoadingOne}
+              compareSuggestionLoadingTwo={compareSuggestionLoadingTwo}
+              searchCompareStockSuggestions={searchCompareStockSuggestions}
+              setCompareSuggestionsOne={setCompareSuggestionsOne}
+              setCompareSuggestionsTwo={setCompareSuggestionsTwo}
+            />
+          }
+        />
 
-      <StockDashboard
-        stockData={stockData}
-        formatPercent={formatPercent}
-        generatePDFReport={generatePDFReport}
-        userRiskProfile={userRiskProfile}
-        suitabilityResult={suitabilityResult}
-      />
+        <Route
+          path="/profile"
+          element={
+            <ProfilePage
+              riskQuestions={riskQuestions}
+              riskAnswers={riskAnswers}
+              setRiskAnswers={setRiskAnswers}
+              calculateRiskProfile={calculateRiskProfile}
+              userRiskProfile={userRiskProfile}
+            />
+          }
+        />
 
-      <HistorySection
-        searchHistory={searchHistory}
-        analyseFromHistory={analyseFromHistory}
-        clearSearchHistory={clearSearchHistory}
-      />
+        <Route
+          path="/history"
+          element={
+            <HistoryPage
+              searchHistory={searchHistory}
+              analyseFromHistory={analyseFromHistory}
+              clearSearchHistory={clearSearchHistory}
+            />
+          }
+        />
 
-      <ComparisonSection
-        compareTickerOne={compareTickerOne}
-        setCompareTickerOne={setCompareTickerOne}
-        compareTickerTwo={compareTickerTwo}
-        setCompareTickerTwo={setCompareTickerTwo}
-        compareStocks={compareStocks}
-        comparisonLoading={comparisonLoading}
-        comparisonError={comparisonError}
-        comparisonData={comparisonData}
-        formatPercent={formatPercent}
-        compareSuggestionsOne={compareSuggestionsOne}
-        compareSuggestionsTwo={compareSuggestionsTwo}
-        compareSuggestionLoadingOne={compareSuggestionLoadingOne}
-        compareSuggestionLoadingTwo={compareSuggestionLoadingTwo}
-        searchCompareStockSuggestions={searchCompareStockSuggestions}
-        setCompareSuggestionsOne={setCompareSuggestionsOne}
-        setCompareSuggestionsTwo={setCompareSuggestionsTwo}
-      />
+        <Route path="/about" element={<AboutPage />} />
+      </Routes>
 
-      <RiskProfileSection
-        riskQuestions={riskQuestions}
-        riskAnswers={riskAnswers}
-        setRiskAnswers={setRiskAnswers}
-        calculateRiskProfile={calculateRiskProfile}
-        userRiskProfile={userRiskProfile}
-      />
-
-      <footer className = "footer">
+      <footer className="footer">
         <p>
-          FinSight is developed for educational and portfolio purposes only. It does
-          not provide financial advice or investment recommendations.
+          FinSight is developed for educational and portfolio purposes only. It
+          does not provide financial advice or investment recommendations.
         </p>
       </footer>
     </div>

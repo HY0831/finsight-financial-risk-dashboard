@@ -18,6 +18,210 @@ body {
   padding: 50px 30px 30px 30px;
 }
 
+/* =========================================================
+   Navigation Bar
+========================================================= */
+
+.navbar {
+  max-width: 1100px;
+  margin: 0 auto 35px auto;
+  background: white;
+  padding: 16px 22px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+
+.navbar-logo {
+  text-decoration: none;
+  color: #111827;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.navbar-links a {
+  text-decoration: none;
+  color: #4b5563;
+  padding: 9px 13px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.navbar-links a:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.navbar-links a.active {
+  background: #111827;
+  color: white;
+}
+
+/* =========================================================
+   Page Headers
+========================================================= */
+
+.page-header {
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.page-header h1 {
+  margin: 0 0 10px 0;
+  color: #111827;
+  font-size: 38px;
+}
+
+.page-header p {
+  max-width: 780px;
+  margin: 0 auto;
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 16px;
+}
+
+
+/* =========================================================
+   Home Page
+========================================================= */
+
+.home-hero {
+  max-width: 1100px;
+  margin: 0 auto 25px auto;
+  background: linear-gradient(135deg, #111827, #1f2937);
+  color: white;
+  padding: 48px 34px;
+  border-radius: 22px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.18);
+}
+
+.home-hero-content {
+  max-width: 760px;
+}
+
+.home-tag {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.12);
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.home-hero h1 {
+  margin: 0 0 16px 0;
+  font-size: 46px;
+  line-height: 1.1;
+}
+
+.home-hero p {
+  margin: 0;
+  color: #d1d5db;
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.home-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 26px;
+  flex-wrap: wrap;
+}
+
+.primary-link-button,
+.secondary-link-button {
+  text-decoration: none;
+  padding: 13px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.primary-link-button {
+  background: white;
+  color: #111827;
+}
+
+.secondary-link-button {
+  background: rgba(255, 255, 255, 0.12);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.home-features {
+  max-width: 1100px;
+  margin: 0 auto 25px auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.feature-card {
+  background: white;
+  padding: 22px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.feature-card h3 {
+  margin: 0 0 10px 0;
+  color: #111827;
+}
+
+.feature-card p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* =========================================================
+   About Page
+========================================================= */
+
+.about-section {
+  max-width: 1100px;
+  margin: 0 auto 25px auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.about-card {
+  background: white;
+  padding: 26px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.about-card h2 {
+  margin: 0 0 10px 0;
+  color: #111827;
+}
+
+.about-card p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.7;
+}
+
+
 
 /* =========================================================
    2. Hero Header
@@ -984,6 +1188,147 @@ th {
   text-align: right;
 }
 
+/* =========================================================
+   Popular Stock Trends Section
+========================================================= */
+
+.trending-section {
+  max-width: 1100px;
+  margin: 0 auto 25px auto;
+  background: white;
+  padding: 28px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.trending-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.trending-header h2 {
+  margin: 0 0 8px 0;
+  color: #111827;
+  font-size: 28px;
+}
+
+.trending-header p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+.live-badge {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.trending-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.trend-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 18px;
+  border-radius: 16px;
+  transition: 0.25s ease;
+}
+
+.trend-card:hover {
+  transform: translateY(-3px);
+  background: #f3f4f6;
+}
+
+.trend-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.trend-card h3 {
+  margin: 0 0 5px 0;
+  color: #111827;
+  font-size: 24px;
+}
+
+.trend-card p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.trend-price-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.trend-price-row span {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.trend-price-row strong {
+  display: block;
+  color: #111827;
+  font-size: 18px;
+}
+
+.trend-bar-wrapper {
+  margin-top: 8px;
+}
+
+.trend-bar-label {
+  display: flex;
+  justify-content: space-between;
+  color: #6b7280;
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.trend-bar {
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.trend-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.trend-bar-fill.low-risk {
+  background: #22c55e;
+}
+
+.trend-bar-fill.medium-risk {
+  background: #f59e0b;
+}
+
+.trend-bar-fill.high-risk {
+  background: #ef4444;
+}
 
 /* =========================================================
    15. Footer
@@ -1100,6 +1445,51 @@ th {
   }
 
   .history-item {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1000px) {
+  .trending-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .trending-header {
+    flex-direction: column;
+  }
+
+  .trending-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .navbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .home-features {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .about-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .page-header h1 {
+    font-size: 30px;
+  }
+
+  .home-hero h1 {
+    font-size: 34px;
+  }
+
+  .home-features {
     grid-template-columns: 1fr;
   }
 }
