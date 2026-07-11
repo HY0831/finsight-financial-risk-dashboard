@@ -5,6 +5,8 @@ function ComparePage({
   setCompareTickerOne,
   compareTickerTwo,
   setCompareTickerTwo,
+  period,
+  setPeriod,
   compareStocks,
   comparisonLoading,
   comparisonError,
@@ -94,6 +96,8 @@ function ComparePage({
         setCompareTickerOne={setCompareTickerOne}
         compareTickerTwo={compareTickerTwo}
         setCompareTickerTwo={setCompareTickerTwo}
+        period={period}
+        setPeriod={setPeriod}
         compareStocks={compareStocks}
         comparisonLoading={comparisonLoading}
         comparisonError=""

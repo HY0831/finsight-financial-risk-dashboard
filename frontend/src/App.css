@@ -1722,7 +1722,7 @@ th {
 
 .comparison-inputs {
   display: grid;
-  grid-template-columns: 1fr 1fr 150px;
+  grid-template-columns: 1fr 1fr 160px 150px;
   gap: 12px;
   margin-bottom: 24px;
 }
@@ -1827,6 +1827,23 @@ th {
 .comparison-inputs button:disabled {
   background: #9ca3af;
   cursor: not-allowed;
+}
+
+.compare-period-select {
+  width: 100%;
+  min-height: 54px;
+  padding: 14px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 16px;
+  background: white;
+  color: #111827;
+}
+
+.compare-period-select:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
 }
 
 .comparison-result {

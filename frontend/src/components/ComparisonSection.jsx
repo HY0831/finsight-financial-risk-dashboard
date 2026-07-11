@@ -3,6 +3,8 @@ function ComparisonSection({
   setCompareTickerOne,
   compareTickerTwo,
   setCompareTickerTwo,
+  period,
+  setPeriod,
   compareStocks,
   comparisonLoading,
   comparisonError,
@@ -164,6 +166,17 @@ function ComparisonSection({
             handleSecondSuggestionClick
           )}
         </div>
+
+        <select
+          className="compare-period-select"
+          value={period}
+          onChange={(e) => setPeriod(e.target.value)}
+        >
+          <option value="6m">6 Months</option>
+          <option value="1y">1 Year</option>
+          <option value="3y">3 Years</option>
+          <option value="5y">5 Years</option>
+        </select>
 
         <button type="button" onClick={compareStocks} disabled={comparisonLoading}>
           {comparisonLoading ? "Comparing..." : "Compare"}
