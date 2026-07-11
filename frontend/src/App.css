@@ -69,6 +69,61 @@ body {
 }
 
 /* =========================================================
+   Global Page Header Center Alignment Fix
+========================================================= */
+
+.home-hero,
+.analyze-hero,
+.compare-hero,
+.profile-hero,
+.history-hero,
+.about-hero,
+.page-header {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.home-hero > div,
+.analyze-hero > div,
+.compare-hero > div,
+.profile-hero > div,
+.history-hero > div,
+.about-hero > div,
+.page-header > div {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+.home-hero h1,
+.analyze-hero h1,
+.compare-hero h1,
+.profile-hero h1,
+.history-hero h1,
+.about-hero h1,
+.page-header h1 {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.home-hero p,
+.analyze-hero p,
+.compare-hero p,
+.profile-hero p,
+.history-hero p,
+.about-hero p,
+.page-header p {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.home-actions{
+  justify-content: center;
+}
+
+/* =========================================================
    Page Headers
 ========================================================= */
 
