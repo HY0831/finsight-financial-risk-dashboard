@@ -2615,6 +2615,43 @@ th {
   background: #fecaca;
 }
 
+.watchlist-summary-grid {
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.watchlist-summary-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.watchlist-summary-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.watchlist-summary-card strong {
+  display: block;
+  color: #111827;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.watchlist-summary-card p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.5;
+  font-size: 13px;
+}
+
 /* =========================================================
    32. Footer
 ========================================================= */
@@ -2905,6 +2942,18 @@ th {
 
   .watchlist-card-header {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 1000px) {
+  .watchlist-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .watchlist-summary-grid {
+    grid-template-columns: 1fr;
   }
 }
 
