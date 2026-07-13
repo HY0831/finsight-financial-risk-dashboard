@@ -81,6 +81,53 @@ function StockDashboard({
         </div>
       </section>
 
+      <section className= "metric-explanation-section">
+        <div className="section-title metric-explanation-title">
+          <h2>Understanding These Metrics</h2>
+          <p>
+              These explanations help users understand how FinSight measures stock risk using return and volatility.
+          </p>
+        </div>
+
+        <div className="metric-explanation-grid">
+          <div className="metric-explanation-card">
+            <h3>Average Daily Return</h3>
+            <p>
+                Average Daily Return shows the average percentage change in the stock
+                price per trading day. A positive value means the stock increased on
+                average, while a negative value means it decreased on average during the
+                selected period.
+            </p>
+          </div>
+
+          <div className="metric-explanation-card">
+            <h3>Daily Volatility</h3>
+            <p>
+                Daily Volatility shows how much the stock return usually changes from
+                day to day. A higher daily volatility means the stock price moved more
+                sharply in the short term.
+            </p>
+          </div>
+
+          <div className="metric-explanation-card">
+            <h3>Annualized Volatility</h3>
+            <p>
+                Annualized Volatility converts daily volatility into a yearly risk
+                measure using around 252 trading days. This makes it easier to compare
+                stock risk over a longer period.  Annualized Volatility estimates the yearly volatility of the stock based on its daily returns. It provides a standardized way to compare the risk of stocks with different price levels or time periods.
+            </p>
+          </div>
+
+          <div className="metric-explanation-card">
+            <h3>Risk Level</h3>
+            <p>
+                Risk level is classified based on annualized volatility. Below 20% is
+                Low Risk, 20% to 40% is Medium Risk, and above 40% is High Risk.
+            </p>
+          </div>
+        </div>
+      </section>
+
       <section className="chart-section">
         <h3>Stock Price Trend</h3>
         <ResponsiveContainer width="100%" height={300}>
