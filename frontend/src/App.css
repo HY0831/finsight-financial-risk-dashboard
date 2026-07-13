@@ -1,5 +1,5 @@
 /* =========================================================
-   1. Global Reset & Base Layout
+  Global Reset & Base Layout
 ========================================================= */
 
 * {
@@ -19,7 +19,7 @@ body {
 }
 
 /* =========================================================
-   2. Navigation Bar
+  Navigation Bar
 ========================================================= */
 
 .navbar {
@@ -69,7 +69,7 @@ body {
 }
 
 /* =========================================================
-   3. Global Page Header Center Alignment Fix
+  Global Page Header Center Alignment Fix
 ========================================================= */
 
 .home-hero,
@@ -124,7 +124,7 @@ body {
 }
 
 /* =========================================================
-   4. Page Headers
+  Page Headers
 ========================================================= */
 
 .page-header {
@@ -153,7 +153,7 @@ body {
 
 
 /* =========================================================
-   5. Home Page
+  Home Page
 ========================================================= */
 
 .home-hero {
@@ -247,7 +247,53 @@ body {
 }
 
 /* =========================================================
-   6. How FinSight Works Section
+  Dashboard Highlight Section
+========================================================= */
+
+.dashboard-highlight-section {
+  max-width: 1100px;
+  margin: 0 auto 25px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.dashboard-highlight-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.dashboard-highlight-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 22px;
+  border-radius: 16px;
+}
+
+.dashboard-highlight-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.dashboard-highlight-card strong {
+  display: block;
+  color: #111827;
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.dashboard-highlight-card p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.5;
+  font-size: 13px;
+}
+/* =========================================================
+   How FinSight Works Section
 ========================================================= */
 
 .how-section,
@@ -321,7 +367,7 @@ body {
 
 
 /* =========================================================
-   7. Risk Classification Preview
+   Risk Classification Preview
 ========================================================= */
 
 .risk-preview-grid {
@@ -370,7 +416,7 @@ body {
 
 
 /* =========================================================
-   8. Home CTA
+  Home CTA
 ========================================================= */
 
 .home-cta {
@@ -392,7 +438,7 @@ body {
 }
 
 /* =========================================================
-   9. About Page
+  About Page
 ========================================================= */
 
 .about-section {
@@ -422,7 +468,7 @@ body {
 }
 
 /* =========================================================
-   10. Analyze Page
+  Analyze Page
 ========================================================= */
 
 .analyze-hero {
@@ -560,7 +606,7 @@ body {
 }
 
 /* =========================================================
-   11. Compare Page
+  Compare Page
 ========================================================= */
 
 .compare-hero {
@@ -650,7 +696,7 @@ body {
 }
 
 /* =========================================================
-   12. Risk Profile Page
+  Risk Profile Page
 ========================================================= */
 
 .profile-hero {
@@ -769,7 +815,7 @@ body {
 }
 
 /* =========================================================
-   13. History Page
+  History Page
 ========================================================= */
 
 .history-hero {
@@ -879,7 +925,7 @@ body {
 }
 
 /* =========================================================
-   14. About Page
+  About Page
 ========================================================= */
 
 .about-hero {
@@ -1077,7 +1123,7 @@ body {
 }
 
 /* =========================================================
-   15. Hero Header
+  Hero Header
 ========================================================= */
 
 .hero {
@@ -1106,7 +1152,7 @@ body {
 
 
 /* =========================================================
-   16. Search Section
+  Search Section
 ========================================================= */
 
 .search-card {
@@ -1201,7 +1247,7 @@ body {
 
 
 /* =========================================================
-   17. Stock Search Suggestions Dropdown
+  Stock Search Suggestions Dropdown
 ========================================================= */
 
 .suggestions-dropdown {
@@ -1273,7 +1319,7 @@ body {
 
 
 /* =========================================================
-   18. Loading & Error Messages
+  Loading & Error Messages
 ========================================================= */
 
 .message {
@@ -1289,7 +1335,7 @@ body {
 
 
 /* =========================================================
-   19. Empty State
+  Empty State
 ========================================================= */
 
 .empty-state {
@@ -1339,7 +1385,7 @@ body {
 
 
 /* =========================================================
-   20. Stock Dashboard Layout
+  Stock Dashboard Layout
 ========================================================= */
 
 .dashboard {
@@ -1438,7 +1484,7 @@ body {
 
 
 /* =========================================================
-   21. Risk Badges
+  Risk Badges
 ========================================================= */
 
 .risk-badge {
@@ -1471,7 +1517,7 @@ body {
 
 
 /* =========================================================
-   22. Metric Cards
+  Metric Cards
 ========================================================= */
 
 .cards {
@@ -1508,7 +1554,7 @@ body {
 }
 
 /* =========================================================
-   23. Metric Explanation Section
+  Metric Explanation Section
 ========================================================= */
 
 .metric-explanation-section {
@@ -1565,7 +1611,7 @@ body {
 }
 
 /* =========================================================
-   24. Chart, Summary & Table Sections
+  Chart, Summary & Table Sections
 ========================================================= */
 
 .chart-section,
@@ -1607,7 +1653,7 @@ th {
 
 
 /* =========================================================
-   25. Risk Profile Questionnaire
+  Risk Profile Questionnaire
 ========================================================= */
 
 .risk-profile-section {
@@ -1719,7 +1765,7 @@ th {
 
 
 /* =========================================================
-   26. Suitability Analysis
+  Suitability Analysis
 ========================================================= */
 
 .suitability-section {
@@ -1771,7 +1817,7 @@ th {
 
 
 /* =========================================================
-   27. Stock Comparison Section
+  Stock Comparison Section
 ========================================================= */
 
 .comparison-section {
@@ -2023,7 +2069,7 @@ th {
 }
 
 /* =========================================================
-   28. Comparison Interpretation Section
+  Comparison Interpretation Section
 ========================================================= */
 
 .comparison-interpretation {
@@ -2121,7 +2167,7 @@ th {
 }
 
 /* =========================================================
-   29. Recent Search History
+  Recent Search History
 ========================================================= */
 
 .history-section {
@@ -2238,7 +2284,7 @@ th {
 }
 
 /* =========================================================
-   30. Popular Stock Trends Section
+  Popular Stock Trends Section
 ========================================================= */
 
 .trending-section {
@@ -2380,7 +2426,7 @@ th {
 }
 
 /* =========================================================
-  31. Watchlist Page
+  Watchlist Page
 ========================================================= */
 
 .watchlist-hero {
@@ -2789,7 +2835,7 @@ th {
 }
 
 /* =========================================================
-   32. Footer
+  Footer
 ========================================================= */
 
 .footer {
@@ -2803,7 +2849,7 @@ th {
 
 
 /* =========================================================
-   33. Responsive Design
+  Responsive Design
 ========================================================= */
 
 @media (max-width: 900px) {
@@ -2996,6 +3042,18 @@ th {
   }
 }
 
+@media (max-width: 1000px) {
+  .dashboard-highlight-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .dashboard-highlight-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 900px) {
   .analyze-guide {
     grid-template-columns: 1fr 1fr;
@@ -3184,8 +3242,8 @@ th {
 }
 
 /* =========================================================
-   34. Final Header & Section Title Alignment Fix
-   Added to center section headers without changing original layout code
+  Final Header & Section Title Alignment Fix
+  Added to center section headers without changing original layout code
 ========================================================= */
 
 /* Center all common section title blocks */

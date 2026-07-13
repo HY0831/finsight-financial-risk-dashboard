@@ -1,7 +1,35 @@
 import { Link } from "react-router";
 import TrendingStocks from "../components/TrendingStocks";
 
-function HomePage({ apiBaseUrl }) {
+function HomePage({
+  apiBaseUrl,
+  searchHistory = [],
+  watchlist = [],
+  userRiskProfile,
+  period,
+}) {
+  const hasUserAnalysed = searchHistory.length > 0;
+
+  const formatPeriodLabel = (selectedPeriod) => {
+    if (selectedPeriod === "6mo") {
+      return "6 Months";
+    }
+
+    if (selectedPeriod === "1y") {
+      return "1 Year";
+    }
+
+    if (selectedPeriod === "3y") {
+      return "3 Years";
+    }
+
+    if (selectedPeriod === "5y") {
+      return "5 Years";
+    }
+
+    return selectedPeriod || "1 Year";
+  };
+
   return (
     <>
       <section className="home-hero">
@@ -28,6 +56,48 @@ function HomePage({ apiBaseUrl }) {
       </section>
 
       <TrendingStocks apiBaseUrl={apiBaseUrl} />
+
+      {hasUserAnalysed && (
+        <section className="dashboard-highlight-section">
+          <div className="section-heading">
+            <h2>Your FinSight Dashboard Highlights</h2>
+            <p>
+              A quick overview of your recent analysis activity, saved stocks,
+              and risk profile status.
+            </p>
+          </div>
+
+          <div className="dashboard-highlight-grid">
+            <div className="dashboard-highlight-card">
+              <span>Recent Searches</span>
+              <strong>{searchHistory.length}</strong>
+              <p>Stocks recently analysed in this browser.</p>
+            </div>
+
+            <div className="dashboard-highlight-card">
+              <span>Watchlist Stocks</span>
+              <strong>{watchlist.length}</strong>
+              <p>Stocks saved for future monitoring.</p>
+            </div>
+
+            <div className="dashboard-highlight-card">
+              <span>Risk Profile</span>
+              <strong>{userRiskProfile ? "Completed" : "Not Set"}</strong>
+              <p>
+                {userRiskProfile
+                  ? `${userRiskProfile.profile} investor profile.`
+                  : "Complete the questionnaire for suitability insights."}
+              </p>
+            </div>
+
+            <div className="dashboard-highlight-card">
+              <span>Default Period</span>
+              <strong>{formatPeriodLabel(period)}</strong>
+              <p>Selected period used for stock analysis.</p>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="how-section">
         <div className="section-heading">

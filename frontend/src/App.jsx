@@ -1293,7 +1293,18 @@ const refreshWatchlist = async () => {
       <Navbar />
 
       <Routes>
-        <Route path="/" element={<HomePage apiBaseUrl={API_BASE_URL} />} />
+        <Route
+          path="/"
+          element={
+            <HomePage
+              apiBaseUrl={API_BASE_URL}
+              searchHistory={searchHistory}
+              watchlist={watchlist}
+              userRiskProfile={userRiskProfile}
+              period={period}
+            />
+          }
+        />
 
         <Route
           path="/analyze"
