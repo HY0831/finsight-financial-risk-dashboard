@@ -59,7 +59,7 @@ function ComparisonSection({
               type="button"
               className="suggestion-item"
               key={`${suggestion.ticker}-${suggestion.exchange}`}
-              onClick={() => handleSuggestionClick(suggestion)}
+              onMouseDown={() => handleSuggestionClick(suggestion)}
             >
               <div>
                 <strong>{suggestion.ticker}</strong>
@@ -111,6 +111,86 @@ function ComparisonSection({
             <span>Risk Level</span>
             <strong>{stock.risk_level}</strong>
           </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderComparisonInterpretation = () => {
+    if (!comparisonData) {
+      return null;
+    }
+
+    const stockOne = comparisonData.stockOne;
+    const stockTwo = comparisonData.stockTwo;
+
+    const stockOneVolatility = stockOne.annualized_volatility;
+    const stockTwoVolatility = stockTwo.annualized_volatility;
+
+    const stockOneReturn = stockOne.average_daily_return;
+    const stockTwoReturn = stockTwo.average_daily_return;
+
+    let riskierStock = stockOne;
+    let moreStableStock = stockTwo;
+
+    if (stockTwoVolatility > stockOneVolatility) {
+      riskierStock = stockTwo;
+      moreStableStock = stockOne;
+    }
+
+    let higherReturnStock = stockOne;
+
+    if (stockTwoReturn > stockOneReturn) {
+      higherReturnStock = stockTwo;
+    }
+
+    return (
+      <div className="comparison-interpretation">
+        <div className="comparison-interpretation-header">
+          <span>Comparison Interpretation</span>
+          <h3>What This Comparison Means</h3>
+          <p>
+            This explanation compares both stocks using annualized volatility
+            and average daily return during the selected period.
+          </p>
+        </div>
+
+        <div className="comparison-interpretation-grid">
+          <div className="comparison-interpretation-card riskier">
+            <h4>Riskier Stock</h4>
+            <strong>{riskierStock.ticker}</strong>
+            <p>
+              {riskierStock.ticker} appears riskier because it has higher
+              annualized volatility. This means its price moved more strongly
+              during the selected period.
+            </p>
+          </div>
+
+          <div className="comparison-interpretation-card stable">
+            <h4>More Stable Stock</h4>
+            <strong>{moreStableStock.ticker}</strong>
+            <p>
+              {moreStableStock.ticker} appears more stable because it has lower
+              annualized volatility. This means its price movement was
+              relatively smaller during the selected period.
+            </p>
+          </div>
+
+          <div className="comparison-interpretation-card return">
+            <h4>Higher Average Daily Return</h4>
+            <strong>{higherReturnStock.ticker}</strong>
+            <p>
+              {higherReturnStock.ticker} has the higher average daily return in
+              this comparison. However, a higher return does not always mean a
+              better investment because risk should also be considered.
+            </p>
+          </div>
+        </div>
+
+        <div className="comparison-interpretation-note">
+          <strong>Important Note:</strong> This comparison is based only on
+          historical return and volatility. It does not predict future
+          performance and should not be treated as financial advice.
         </div>
       </div>
     );
@@ -170,9 +250,9 @@ function ComparisonSection({
         <select
           className="compare-period-select"
           value={period}
-          onChange={(e) => setPeriod(e.target.value)}
+          onChange={(event) => setPeriod(event.target.value)}
         >
-          <option value="6m">6 Months</option>
+          <option value="6mo">6 Months</option>
           <option value="1y">1 Year</option>
           <option value="3y">3 Years</option>
           <option value="5y">5 Years</option>
@@ -186,19 +266,23 @@ function ComparisonSection({
       {comparisonError && <p className="error">{comparisonError}</p>}
 
       {comparisonData && (
-        <div className="comparison-result">
-          {renderComparisonCard(comparisonData.stockOne)}
-          {renderComparisonCard(comparisonData.stockTwo)}
+        <>
+          <div className="comparison-result">
+            {renderComparisonCard(comparisonData.stockOne)}
+            {renderComparisonCard(comparisonData.stockTwo)}
 
-          <div className="comparison-summary">
-            <div>
-              <span>Comparison Insight</span>
-              <h3>Volatility Comparison</h3>
+            <div className="comparison-summary">
+              <div>
+                <span>Comparison Insight</span>
+                <h3>Volatility Comparison</h3>
+              </div>
+
+              <p>{comparisonData.summary}</p>
             </div>
-
-            <p>{comparisonData.summary}</p>
           </div>
-        </div>
+
+          {renderComparisonInterpretation()}
+        </>
       )}
     </section>
   );
