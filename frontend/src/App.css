@@ -247,6 +247,92 @@ body {
 }
 
 /* =========================================================
+   Recent Analysis Preview Section
+========================================================= */
+
+.recent-analysis-preview-section {
+  max-width: 1100px;
+  margin: 0 auto 25px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.recent-analysis-preview-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+
+.recent-analysis-preview-card {
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr 0.8fr 1.2fr;
+  gap: 16px;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 18px 22px;
+  border-radius: 14px;
+}
+
+.recent-analysis-company h3 {
+  margin: 0 0 6px 0;
+  color: #111827;
+  font-size: 24px;
+}
+
+.recent-analysis-company p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.recent-analysis-detail span {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.recent-analysis-detail strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+.risk-text.low-risk {
+  color: #166534;
+}
+
+.risk-text.medium-risk {
+  color: #92400e;
+}
+
+.risk-text.high-risk {
+  color: #991b1b;
+}
+
+.recent-analysis-action {
+  margin-top: 22px;
+  text-align: center;
+}
+
+.dark-link-button {
+  display: inline-block;
+  text-decoration: none;
+  background: #111827;
+  color: white;
+  padding: 13px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+}
+
+.dark-link-button:hover {
+  background: #374151;
+}
+
+/* =========================================================
   Dashboard Highlight Section
 ========================================================= */
 
@@ -3126,6 +3212,18 @@ th {
 @keyframes spin {
   to {
     transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 900px) {
+  .recent-analysis-preview-card {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .recent-analysis-preview-card {
+    grid-template-columns: 1fr;
   }
 }
 

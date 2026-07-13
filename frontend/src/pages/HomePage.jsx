@@ -9,6 +9,7 @@ function HomePage({
   period,
 }) {
   const hasUserAnalysed = searchHistory.length > 0;
+  const recentAnalysisPreview = searchHistory.slice(0,3);
 
   const formatPeriodLabel = (selectedPeriod) => {
     if (selectedPeriod === "6mo") {
@@ -95,6 +96,56 @@ function HomePage({
               <strong>{formatPeriodLabel(period)}</strong>
               <p>Selected period used for stock analysis.</p>
             </div>
+          </div>
+        </section>
+      )}
+
+      {hasUserAnalysed && (
+        <section className="recent-analysis-preview-section">
+          <div className="section-heading">
+            <h2>Your Recent Analysis</h2>
+            <p>
+              Review your latest analysed stocks and continue exploring your stock
+              risk results.
+            </p>
+          </div>
+
+          <div className="recent-analysis-preview-list">
+            {recentAnalysisPreview.map((item) => (
+              <div className="recent-analysis-preview-card" key={item.ticker}>
+                <div className="recent-analysis-company">
+                  <h3>{item.ticker}</h3>
+                  <p>{item.company_name}</p>
+                </div>
+
+                <div className="recent-analysis-detail">
+                  <span>Risk Level</span>
+                  <strong
+                    className={`risk-text ${item.risk_level
+                      .toLowerCase()
+                      .replace(" ", "-")}`}
+                  >
+                    {item.risk_level}
+                  </strong>
+                </div>
+
+                <div className="recent-analysis-detail">
+                  <span>Period</span>
+                  <strong>{formatPeriodLabel(item.period)}</strong>
+                </div>
+
+                <div className="recent-analysis-detail">
+                  <span>Searched At</span>
+                  <strong>{item.searched_at}</strong>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="recent-analysis-action">
+            <Link to="/history" className="dark-link-button">
+              View Full History
+            </Link>
           </div>
         </section>
       )}
