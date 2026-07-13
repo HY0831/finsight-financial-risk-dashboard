@@ -30,6 +30,23 @@ function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist, clear
             : highest
         )
       : null;
+    
+    const lowRiskStocks = watchlist.filter(
+        (item) => item.risk_level === "Low Risk"
+    ).length;
+
+    const mediumRiskStocks = watchlist.filter(
+        (item) => item.risk_level === "Medium Risk"
+    ).length;
+
+    const getRiskPercentage = (count) => {
+        if (watchlist.length === 0) {
+            return 0;
+        }
+
+    return (count / watchlist.length) * 100;
+};
+    
 
   const filteredWatchlist = [...watchlist]
     .filter((item) => {
@@ -133,6 +150,68 @@ function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist, clear
           </div>
         </section>
       )}
+
+      {watchlist.length > 0 && (
+        <section className="watchlist-risk-distribution">
+            <div className="section-heading">
+            <h2>Watchlist Risk Distribution</h2>
+            <p>
+                This shows how your saved stocks are distributed across Low, Medium,
+                and High Risk categories.
+            </p>
+            </div>
+
+            <div className="risk-distribution-list">
+            <div className="risk-distribution-row">
+                <div className="risk-distribution-label">
+                <span className="risk-dot low"></span>
+                <strong>Low Risk</strong>
+                </div>
+
+                <div className="risk-distribution-bar">
+                <div
+                    className="risk-distribution-fill low"
+                    style={{ width: `${getRiskPercentage(lowRiskStocks)}%` }}
+                ></div>
+                </div>
+
+                <span className="risk-distribution-count">{lowRiskStocks}</span>
+            </div>
+
+            <div className="risk-distribution-row">
+                <div className="risk-distribution-label">
+                <span className="risk-dot medium"></span>
+                <strong>Medium Risk</strong>
+                </div>
+
+                <div className="risk-distribution-bar">
+                <div
+                    className="risk-distribution-fill medium"
+                    style={{ width: `${getRiskPercentage(mediumRiskStocks)}%` }}
+                ></div>
+                </div>
+
+                <span className="risk-distribution-count">{mediumRiskStocks}</span>
+            </div>
+
+            <div className="risk-distribution-row">
+                <div className="risk-distribution-label">
+                <span className="risk-dot high"></span>
+                <strong>High Risk</strong>
+                </div>
+
+                <div className="risk-distribution-bar">
+                <div
+                    className="risk-distribution-fill high"
+                    style={{ width: `${getRiskPercentage(highRiskStocks)}%` }}
+                ></div>
+                </div>
+
+                <span className="risk-distribution-count">{highRiskStocks}</span>
+            </div>
+            </div>
+        </section>
+        )}
 
       {watchlist.length === 0 && (
         <section className="watchlist-empty-card">
