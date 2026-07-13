@@ -19,6 +19,8 @@ function AnalyzePage({
   generatePDFReport,
   userRiskProfile,
   suitabilityResult,
+  watchlist,
+  toggleWatchlist,
 }) {
   return (
     <>
@@ -105,6 +107,8 @@ function AnalyzePage({
         generatePDFReport={generatePDFReport}
         userRiskProfile={userRiskProfile}
         suitabilityResult={suitabilityResult}
+        watchlist={watchlist}
+        toggleWatchlist={toggleWatchlist}
       />
     </>
   );

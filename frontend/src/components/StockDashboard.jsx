@@ -15,10 +15,16 @@ function StockDashboard({
   generatePDFReport,
   userRiskProfile,
   suitabilityResult,
+  watchlist=[],
+  toggleWatchlist=() => {},
 }) {
   if (!stockData) {
     return null;
   }
+
+  const isInWatchList = watchlist.some(
+    (item) => item.ticker === stockData.ticker
+  );
 
   return (
     <main className="dashboard">
@@ -46,6 +52,14 @@ function StockDashboard({
           >
             {stockData.risk_level}
           </span>
+
+          <button
+            type="button"
+            className={`watchlist-button ${isInWatchList ? "saved" : ""}`}
+            onClick={() => toggleWatchlist(stockData)}
+          >
+            {isInWatchList ? "Remove from Watchlist" : "Add to Watchlist"}
+          </button>
 
           <button className="report-button" onClick={generatePDFReport}>
             Generate PDF Report

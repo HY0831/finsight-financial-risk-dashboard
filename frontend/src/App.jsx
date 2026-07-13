@@ -38,12 +38,21 @@ function App() {
   const [riskAnswers, setRiskAnswers] = useState({});
   const [userRiskProfile, setUserRiskProfile] = useState(null);
 
+  const [watchlist, setWatchlist] = useState(() => {
+    const savedWatchlist = localStorage.getItem("finsightWatchlist");
+    return savedWatchlist ? JSON.parse(savedWatchlist) : [];
+  });
+
   useEffect(() => {
     const savedHistory = localStorage.getItem("finsightSearchHistory");
     if (savedHistory) {
       setSearchHistory(JSON.parse(savedHistory));
     }
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("finsightWatchlist", JSON.stringify(watchlist));
+  }, [watchlist]);
 
  const riskQuestions = [
   {
@@ -1176,6 +1185,36 @@ const compareStocks = async () => {
 };
 
 const suitabilityResult = getSuitabilityResult();
+
+const toggleWatchlist = (stock) => {
+  if (!stock) {
+    return;
+  }
+
+  const alreadyExists = watchlist.some(
+    (item) => item.ticker === stock.ticker
+  );
+
+  if (alreadyExists) {
+    const updatedWatchlist = watchlist.filter(
+      (item) => item.ticker !== stock.ticker
+    );
+
+    setWatchlist(updatedWatchlist);
+  } else {
+    const newWatchlistItem = {
+      ticker: stock.ticker,
+      company_name: stock.company_name,
+      latest_price: stock.latest_price,
+      risk_level: stock.risk_level,
+      annualized_volatility: stock.annualized_volatility,
+      saved_at: new Date().toLocaleString(),
+    };
+
+    setWatchlist([newWatchlistItem, ...watchlist]);
+  }
+};
+
     return (
     <div className="app">
       <Navbar />
@@ -1203,6 +1242,8 @@ const suitabilityResult = getSuitabilityResult();
               generatePDFReport={generatePDFReport}
               userRiskProfile={userRiskProfile}
               suitabilityResult={suitabilityResult}
+              watchlist={watchlist}
+              toggleWatchlist={toggleWatchlist}
             />
           }
         />
