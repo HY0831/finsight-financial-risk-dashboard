@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import AnalyzePage from "./pages/AnalyzePage";
 import ComparePage from "./pages/ComparePage";
+import WatchlistPage from "./pages/WatchlistPage";
 import ProfilePage from "./pages/ProfilePage";
 import HistoryPage from "./pages/HistoryPage";
 import AboutPage from "./pages/AboutPage";
@@ -1186,6 +1187,37 @@ const compareStocks = async () => {
 
 const suitabilityResult = getSuitabilityResult();
 
+const analyseFromWatchlist = async (watchlistItem) => {
+  if (!watchlistItem || !watchlistItem.ticker) {
+    return;
+  }
+
+  const selectedTicker = watchlistItem.ticker;
+
+  setTicker(selectedTicker);
+  setLoading(true);
+  setError("");
+  setStockData(null);
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/analyze/${selectedTicker}?period=${period}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Unable to analyse this saved stock.");
+    }
+
+    const data = await response.json();
+    setStockData(data);
+    saveSearchHistory(data);
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 const toggleWatchlist = (stock) => {
   if (!stock) {
     return;
@@ -1270,6 +1302,17 @@ const toggleWatchlist = (stock) => {
               searchCompareStockSuggestions={searchCompareStockSuggestions}
               setCompareSuggestionsOne={setCompareSuggestionsOne}
               setCompareSuggestionsTwo={setCompareSuggestionsTwo}
+            />
+          }
+        />
+
+        <Route
+          path="/watchlist"
+          element={
+            <WatchlistPage
+              watchlist={watchlist}
+              toggleWatchlist={toggleWatchlist}
+              analyseFromWatchlist={analyseFromWatchlist}
             />
           }
         />

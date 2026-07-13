@@ -13,6 +13,7 @@ function Navbar() {
         </NavLink>
         <NavLink to="/analyze">Analyze</NavLink>
         <NavLink to="/compare">Compare</NavLink>
+        <NavLink to="/watchlist">Watchlist</NavLink>
         <NavLink to="/profile">Risk Profile</NavLink>
         <NavLink to="/history">History</NavLink>
         <NavLink to="/about">About</NavLink>
