@@ -1367,6 +1367,10 @@ const refreshWatchlist = async () => {
               analyseFromWatchlist={analyseFromWatchlist}
               clearWatchlist={clearWatchlist}
               refreshWatchlist={refreshWatchlist}
+              setCompareTickerOne={setCompareTickerOne}
+              setCompareTickerTwo={setCompareTickerTwo}
+              setComparisonData={setComparisonData}
+              setComparisonError={setComparisonError}
             />
           }
         />
