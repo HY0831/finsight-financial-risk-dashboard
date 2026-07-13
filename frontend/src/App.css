@@ -2652,6 +2652,62 @@ th {
   font-size: 13px;
 }
 
+.watchlist-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.watchlist-controls div {
+  display: grid;
+  gap: 8px;
+}
+
+.watchlist-controls label {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.watchlist-controls select {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: white;
+  color: #111827;
+  font-size: 15px;
+}
+
+.watchlist-controls select:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
+}
+
+.watchlist-filter-empty {
+  margin-top: 20px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 24px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.watchlist-filter-empty h3 {
+  margin: 0 0 8px 0;
+  color: #111827;
+  font-size: 22px;
+}
+
+.watchlist-filter-empty p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
 /* =========================================================
    32. Footer
 ========================================================= */
@@ -2953,6 +3009,12 @@ th {
 
 @media (max-width: 600px) {
   .watchlist-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .watchlist-controls {
     grid-template-columns: 1fr;
   }
 }

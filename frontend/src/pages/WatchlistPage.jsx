@@ -1,7 +1,12 @@
+import { useState } from "react";
 import { useNavigate } from "react-router";
 
 function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist }) {
   const navigate = useNavigate();
+
+  const [riskFilter, setRiskFilter] = useState("All");
+  const [sortOption, setSortOption] = useState("latest");
+
   const totalSavedStocks = watchlist.length;
 
   const highRiskStocks = watchlist.filter(
@@ -10,18 +15,40 @@ function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist }) {
 
   const averageWatchlistVolatility =
     watchlist.length > 0
-        ? watchlist.reduce(
-            (total,item) => total + item.annualized_volatility,
-            0
+      ? watchlist.reduce(
+          (total, item) => total + item.annualized_volatility,
+          0
         ) / watchlist.length
-    : 0;
+      : 0;
 
-    const highestRiskStock = 
-        watchlist.length > 0
-        ? watchlist.reduce((highest,current) =>
-        current.annualized_volatility > highest.annualized_volatility ? current : highest
+  const highestRiskStock =
+    watchlist.length > 0
+      ? watchlist.reduce((highest, current) =>
+          current.annualized_volatility > highest.annualized_volatility
+            ? current
+            : highest
         )
-        : null;
+      : null;
+
+  const filteredWatchlist = [...watchlist]
+    .filter((item) => {
+      if (riskFilter === "All") {
+        return true;
+      }
+
+      return item.risk_level === riskFilter;
+    })
+    .sort((a, b) => {
+      if (sortOption === "highest-volatility") {
+        return b.annualized_volatility - a.annualized_volatility;
+      }
+
+      if (sortOption === "lowest-volatility") {
+        return a.annualized_volatility - b.annualized_volatility;
+      }
+
+      return 0;
+    });
 
   const handleAnalyseStock = async (watchlistItem) => {
     await analyseFromWatchlist(watchlistItem);
@@ -70,35 +97,35 @@ function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist }) {
 
       {watchlist.length > 0 && (
         <section className="watchlist-summary-grid">
-            <div className="watchlist-summary-card">
+          <div className="watchlist-summary-card">
             <span>Total Saved Stocks</span>
             <strong>{totalSavedStocks}</strong>
             <p>Stocks currently saved in your watchlist.</p>
-            </div>
+          </div>
 
-            <div className="watchlist-summary-card">
+          <div className="watchlist-summary-card">
             <span>High Risk Stocks</span>
             <strong>{highRiskStocks}</strong>
             <p>Saved stocks classified as High Risk.</p>
-            </div>
+          </div>
 
-            <div className="watchlist-summary-card">
+          <div className="watchlist-summary-card">
             <span>Average Volatility</span>
             <strong>{(averageWatchlistVolatility * 100).toFixed(2)}%</strong>
             <p>Average annualized volatility of saved stocks.</p>
-            </div>
+          </div>
 
-            <div className="watchlist-summary-card">
+          <div className="watchlist-summary-card">
             <span>Highest Risk Stock</span>
             <strong>{highestRiskStock ? highestRiskStock.ticker : "N/A"}</strong>
             <p>
-                {highestRiskStock
+              {highestRiskStock
                 ? "Stock with the highest annualized volatility."
                 : "No stock available."}
             </p>
-            </div>
+          </div>
         </section>
-        )}
+      )}
 
       {watchlist.length === 0 && (
         <section className="watchlist-empty-card">
@@ -126,8 +153,35 @@ function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist }) {
             </div>
           </div>
 
+          <div className="watchlist-controls">
+            <div>
+              <label>Filter by Risk Level</label>
+              <select
+                value={riskFilter}
+                onChange={(event) => setRiskFilter(event.target.value)}
+              >
+                <option value="All">All Stocks</option>
+                <option value="Low Risk">Low Risk</option>
+                <option value="Medium Risk">Medium Risk</option>
+                <option value="High Risk">High Risk</option>
+              </select>
+            </div>
+
+            <div>
+              <label>Sort Watchlist</label>
+              <select
+                value={sortOption}
+                onChange={(event) => setSortOption(event.target.value)}
+              >
+                <option value="latest">Latest Saved</option>
+                <option value="highest-volatility">Highest Volatility</option>
+                <option value="lowest-volatility">Lowest Volatility</option>
+              </select>
+            </div>
+          </div>
+
           <div className="watchlist-grid">
-            {watchlist.map((item) => (
+            {filteredWatchlist.map((item) => (
               <div className="watchlist-card" key={item.ticker}>
                 <div className="watchlist-card-header">
                   <div>
@@ -183,6 +237,13 @@ function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist }) {
               </div>
             ))}
           </div>
+
+          {filteredWatchlist.length === 0 && (
+            <div className="watchlist-filter-empty">
+              <h3>No stocks match this filter</h3>
+              <p>Try selecting another risk level or changing the sort option.</p>
+            </div>
+          )}
         </section>
       )}
     </>
