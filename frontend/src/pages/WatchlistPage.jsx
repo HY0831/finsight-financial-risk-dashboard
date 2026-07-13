@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist, clearWatchlist, }) {
+function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist, clearWatchlist, refreshWatchlist,}) {
   const navigate = useNavigate();
 
   const [riskFilter, setRiskFilter] = useState("All");
   const [sortOption, setSortOption] = useState("latest");
+  const [refreshing, setRefreshing] = useState(false);
 
   const totalSavedStocks = watchlist.length;
 
@@ -54,6 +55,12 @@ function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist, clear
     await analyseFromWatchlist(watchlistItem);
     navigate("/analyze");
   };
+
+  const handleRefreshWatchlist = async() => {
+    setRefreshing(true);
+    await refreshWatchlist();
+    setRefreshing(false);
+  }
 
   return (
     <>
@@ -145,20 +152,30 @@ function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist, clear
         <section className="watchlist-section">
           <div className="watchlist-header">
             <div>
-              <h2>Saved Stocks</h2>
-              <p>
-                These stocks are stored locally in your browser using
-                localStorage.
-              </p>
+                <h2>Saved Stocks</h2>
+                <p>
+                These stocks are stored locally in your browser using localStorage.
+                </p>
             </div>
 
-            <button
+            <div className="watchlist-header-actions">
+                <button
+                type="button"
+                className="refresh-watchlist-button"
+                onClick={handleRefreshWatchlist}
+                disabled={refreshing}
+                >
+                {refreshing ? "Refreshing..." : "Refresh Data"}
+                </button>
+
+                <button
                 type="button"
                 className="clear-watchlist-button"
                 onClick={clearWatchlist}
-            >
+                >
                 Clear Watchlist
-            </button>
+                </button>
+            </div>
           </div>
 
           <div className="watchlist-controls">
@@ -219,10 +236,15 @@ function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist, clear
                     </strong>
                   </div>
 
-                  <div>
+                 <div>
                     <span>Saved At</span>
                     <strong>{item.saved_at}</strong>
-                  </div>
+                    </div>
+
+                    <div>
+                    <span>Last Updated</span>
+                    <strong>{item.updated_at || "Not refreshed yet"}</strong>
+                    </div>
                 </div>
 
                 <div className="watchlist-actions">

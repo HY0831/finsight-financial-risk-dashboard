@@ -1251,6 +1251,43 @@ const clearWatchlist = () => {
   setWatchlist([]);
 };
 
+const refreshWatchlist = async () => {
+  if (watchlist.length === 0) {
+    return;
+  }
+
+  const updatedWatchlist = [];
+
+  for (const item of watchlist) {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/analyze/${item.ticker}?period=${period}`
+      );
+
+      if (!response.ok) {
+        updatedWatchlist.push(item);
+        continue;
+      }
+
+      const data = await response.json();
+
+      updatedWatchlist.push({
+        ticker: data.ticker,
+        company_name: data.company_name,
+        latest_price: data.latest_price,
+        risk_level: data.risk_level,
+        annualized_volatility: data.annualized_volatility,
+        saved_at: item.saved_at,
+        updated_at: new Date().toLocaleString(),
+      });
+    } catch {
+      updatedWatchlist.push(item);
+    }
+  }
+
+  setWatchlist(updatedWatchlist);
+};
+
     return (
     <div className="app">
       <Navbar />
@@ -1318,6 +1355,7 @@ const clearWatchlist = () => {
               toggleWatchlist={toggleWatchlist}
               analyseFromWatchlist={analyseFromWatchlist}
               clearWatchlist={clearWatchlist}
+              refreshWatchlist={refreshWatchlist}
             />
           }
         />

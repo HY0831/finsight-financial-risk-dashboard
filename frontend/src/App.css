@@ -2591,6 +2591,47 @@ th {
   background: #dc2626;
 }
 
+.watchlist-header-actions {
+  justify-self: end;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.refresh-watchlist-button,
+.clear-watchlist-button {
+  border: none;
+  padding: 11px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.refresh-watchlist-button {
+  background: #111827;
+  color: white;
+}
+
+.refresh-watchlist-button:hover {
+  background: #374151;
+}
+
+.refresh-watchlist-button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.clear-watchlist-button {
+  background: #ef4444;
+  color: white;
+}
+
+.clear-watchlist-button:hover {
+  background: #dc2626;
+}
+
 /* Watchlist Filter and Sort Controls */
 
 .watchlist-controls {
@@ -3060,6 +3101,13 @@ th {
 
   .watchlist-card-header {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 600px) {
+  .watchlist-header-actions {
+    justify-self: center;
+    justify-content: center;
   }
 }
 
