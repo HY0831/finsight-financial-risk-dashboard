@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist }) {
+function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist, clearWatchlist, }) {
   const navigate = useNavigate();
 
   const [riskFilter, setRiskFilter] = useState("All");
@@ -151,6 +151,14 @@ function WatchlistPage({ watchlist, toggleWatchlist, analyseFromWatchlist }) {
                 localStorage.
               </p>
             </div>
+
+            <button
+                type="button"
+                className="clear-watchlist-button"
+                onClick={clearWatchlist}
+            >
+                Clear Watchlist
+            </button>
           </div>
 
           <div className="watchlist-controls">

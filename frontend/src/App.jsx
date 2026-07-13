@@ -1247,6 +1247,10 @@ const toggleWatchlist = (stock) => {
   }
 };
 
+const clearWatchlist = () => {
+  setWatchlist([]);
+};
+
     return (
     <div className="app">
       <Navbar />
@@ -1313,6 +1317,7 @@ const toggleWatchlist = (stock) => {
               watchlist={watchlist}
               toggleWatchlist={toggleWatchlist}
               analyseFromWatchlist={analyseFromWatchlist}
+              clearWatchlist={clearWatchlist}
             />
           }
         />
