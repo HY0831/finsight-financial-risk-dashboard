@@ -77,10 +77,20 @@ function ComparePage({
 
       {comparisonError && (
         <section className="comparison-error-card">
-          <h3>Unable to compare stocks</h3>
-          <p>{comparisonError}</p>
+            <div className="error-icon">!</div>
+
+            <div>
+            <h3>{comparisonError.title || "Unable to compare stocks"}</h3>
+            <p>{comparisonError.message || comparisonError}</p>
+
+            {comparisonError.suggestion && (
+                <span className="error-suggestion">
+                {comparisonError.suggestion}
+                </span>
+            )}
+            </div>
         </section>
-      )}
+        )}
 
       {!comparisonData && !comparisonLoading && !comparisonError && (
         <section className="compare-empty-card">

@@ -19,7 +19,7 @@ function App() {
   const [period, setPeriod] = useState("1y");
   const [stockData, setStockData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
   const [stockSuggestions, setStockSuggestions] = useState([]);
   const [suggestionLoading, setSuggestionLoading] = useState(false);
@@ -34,7 +34,7 @@ function App() {
   const [compareTickerTwo, setCompareTickerTwo] = useState("");
   const [comparisonData, setComparisonData] = useState(null);
   const [comparisonLoading, setComparisonLoading] = useState(false);
-  const [comparisonError, setComparisonError] = useState("");
+  const [comparisonError, setComparisonError] = useState(null);
 
   const [riskAnswers, setRiskAnswers] = useState(() => {
     const savedAnswers = localStorage.getItem("finsightRiskAnswers");
@@ -198,16 +198,73 @@ function App() {
     }
   };
 
+const getFriendlyErrorMessage = (error, type = "analysis") => {
+  const message = error?.message || "";
+
+  if (message === "Failed to fetch") {
+    return {
+      title: "Backend Server Not Connected",
+      message:
+        "FinSight could not connect to the backend server. Please make sure the FastAPI backend is running, then try again.",
+      suggestion:
+        "Run the backend using: uvicorn main:app --reload",
+    };
+  }
+
+  if (message.toLowerCase().includes("stock not found")) {
+    return {
+      title: "Stock Not Found",
+      message:
+        "The stock ticker could not be found. Please check the ticker symbol or select a stock from the search suggestions.",
+      suggestion:
+        "Example: Use AAPL for Apple, TSLA for Tesla, MSFT for Microsoft.",
+    };
+  }
+
+  if (message.toLowerCase().includes("not enough")) {
+    return {
+      title: "Not Enough Data",
+      message:
+        "There is not enough historical price data available for this stock and selected period.",
+      suggestion:
+        "Try choosing a longer analysis period or another stock.",
+    };
+  }
+
+  if (type === "compare") {
+    return {
+      title: "Unable to Compare Stocks",
+      message:
+        "One or both stocks could not be analysed. Please check both tickers and try again.",
+      suggestion:
+        "Select both stocks from the suggestion dropdown for better accuracy.",
+    };
+  }
+
+  return {
+    title: "Unable to Analyse Stock",
+    message:
+      message ||
+      "Something went wrong while analysing this stock. Please try again.",
+    suggestion:
+      "Check your internet connection, backend server, and stock ticker.",
+  };
+};
+
 const analyzeStock = async () => {
   if (!ticker.trim()) {
-    setError("Please enter a stock ticker or search for a company name.");
+    setError({
+      title: "Stock Input Required",
+      message: "Please enter a stock ticker or search for a company name.",
+      suggestion: "Example: AAPL, TSLA, MSFT, NVDA, KO.",
+    });
     return;
   }
 
   const selectedTicker = ticker.trim().toUpperCase();
 
   setLoading(true);
-  setError("");
+  setError(null);
   setStockData(null);
 
   try {
@@ -226,7 +283,7 @@ const analyzeStock = async () => {
     saveSearchHistory(data);
     setStockSuggestions([]);
   } catch (err) {
-    setError(err.message);
+    setError(getFriendlyErrorMessage(err, "analysis"));
   } finally {
     setLoading(false);
   }
@@ -290,7 +347,7 @@ const analyseFromHistory = async (historyItem) => {
   setTicker(historyItem.ticker);
   setPeriod(historyItem.period);
   setLoading(true);
-  setError("");
+  setError(null);
   setStockData(null);
 
   try {
@@ -299,14 +356,14 @@ const analyseFromHistory = async (historyItem) => {
     );
 
     if (!response.ok) {
-      throw new Error("Stock ticker not found. Please try again.");
+      throw new Error("Stock not found");
     }
 
     const data = await response.json();
     setStockData(data);
     saveSearchHistory(data);
   } catch (err) {
-    setError(err.message);
+    setError(getFriendlyErrorMessage(err, "analysis"));
   } finally {
     setLoading(false);
   }
@@ -1161,7 +1218,11 @@ const searchCompareStockSuggestions = async (searchText, inputNumber) => {
 
 const compareStocks = async () => {
   if (!compareTickerOne.trim() || !compareTickerTwo.trim()) {
-    setComparisonError("Please enter two stock tickers or company names.");
+    setComparisonError({
+      title: "Two Stocks Required",
+      message: "Please enter two stock tickers or company names before comparing.",
+      suggestion: "Example: Compare AAPL with TSLA, or MSFT with NVDA.",
+    });
     return;
   }
 
@@ -1169,12 +1230,16 @@ const compareStocks = async () => {
   const selectedTickerTwo = compareTickerTwo.trim().toUpperCase();
 
   if (selectedTickerOne === selectedTickerTwo) {
-    setComparisonError("Please enter two different stocks.");
+   setComparisonError({
+    title: "Same Stock Selected",
+    message: "Please choose two different stocks for comparison.",
+    suggestion: "Example: Compare AAPL with TSLA instead of AAPL with AAPL.",
+  });
     return;
   }
 
   setComparisonLoading(true);
-  setComparisonError("");
+  setComparisonError(null);
   setComparisonData(null);
 
   try {
@@ -1187,9 +1252,7 @@ const compareStocks = async () => {
     );
 
     if (!responseOne.ok || !responseTwo.ok) {
-      throw new Error(
-        "One or both stocks were not found. Please select stocks from the search suggestions."
-      );
+      throw new Error( "Stock not found");
     }
 
     const stockOne = await responseOne.json();
@@ -1214,7 +1277,7 @@ const compareStocks = async () => {
     setCompareSuggestionsOne([]);
     setCompareSuggestionsTwo([]);
   } catch (err) {
-    setComparisonError(err.message);
+    setComparisonError(getFriendlyErrorMessage(err, "compare"));
   } finally {
     setComparisonLoading(false);
   }
@@ -1231,7 +1294,7 @@ const analyseFromWatchlist = async (watchlistItem) => {
 
   setTicker(selectedTicker);
   setLoading(true);
-  setError("");
+  setError(null);
   setStockData(null);
 
   try {
@@ -1240,14 +1303,14 @@ const analyseFromWatchlist = async (watchlistItem) => {
     );
 
     if (!response.ok) {
-      throw new Error("Unable to analyse this saved stock.");
+      throw new Error("Stock not found");
     }
 
     const data = await response.json();
     setStockData(data);
     saveSearchHistory(data);
   } catch (err) {
-    setError(err.message);
+    setError(getFriendlyErrorMessage(err, "analysis"));
   } finally {
     setLoading(false);
   }

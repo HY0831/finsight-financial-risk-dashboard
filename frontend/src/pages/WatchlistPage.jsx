@@ -112,7 +112,7 @@ function WatchlistPage({
     setCompareTickerOne(selectedStocks[0]);
     setCompareTickerTwo(selectedStocks[1]);
     setComparisonData(null);
-    setComparisonError("");
+    setComparisonError(null);
 
     navigate("/compare");
   };

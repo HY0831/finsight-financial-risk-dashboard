@@ -90,10 +90,18 @@ function AnalyzePage({
 
       {error && (
         <section className="analysis-error-card">
-          <h3>Unable to analyse stock</h3>
-          <p>{error}</p>
+            <div className="error-icon">!</div>
+
+            <div>
+            <h3>{error.title || "Unable to analyse stock"}</h3>
+            <p>{error.message || error}</p>
+
+            {error.suggestion && (
+                <span className="error-suggestion">{error.suggestion}</span>
+            )}
+            </div>
         </section>
-      )}
+        )}
 
       {!stockData && !loading && !error && (
         <section className="analyze-empty-wrapper">
