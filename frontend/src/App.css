@@ -2116,6 +2116,76 @@ th {
   color: #374151;
 }
 
+/* =========================================================
+   Risk Insight Summary
+========================================================= */
+
+.risk-insight-summary-section {
+  background: white;
+  padding: 26px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.risk-insight-title {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.risk-insight-title h2 {
+  margin: 0 0 8px 0;
+  color: #111827;
+  font-size: 28px;
+}
+
+.risk-insight-title p {
+  max-width: 760px;
+  margin: 0 auto;
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 15px;
+}
+
+.risk-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.risk-insight-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+  border-radius: 14px;
+}
+
+.risk-insight-card span {
+  display: inline-flex;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #111827;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.risk-insight-card h3 {
+  margin: 0 0 10px 0;
+  color: #111827;
+  font-size: 18px;
+}
+
+.risk-insight-card p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.6;
+  font-size: 14px;
+}
 
 /* =========================================================
   Risk Profile Questionnaire
@@ -3823,6 +3893,12 @@ th {
 
   .risk-distribution-count {
     text-align: left;
+  }
+}
+
+@media (max-width: 800px) {
+  .risk-insight-grid {
+    grid-template-columns: 1fr;
   }
 }
 

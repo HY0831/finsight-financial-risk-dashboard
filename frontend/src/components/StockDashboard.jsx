@@ -26,6 +26,38 @@ function StockDashboard({
     (item) => item.ticker === stockData.ticker
   );
 
+    const getRiskInsight = () => {
+      if (stockData.risk_level === "Low Risk") {
+        return `${stockData.ticker} is classified as Low Risk because its annualized volatility is below 20%. This means the stock had relatively smaller price movements during the selected period.`;
+      }
+
+      if (stockData.risk_level === "Medium Risk") {
+        return `${stockData.ticker} is classified as Medium Risk because its annualized volatility is between 20% and 40%. This means the stock had moderate price movement during the selected period.`;
+      }
+
+      return `${stockData.ticker} is classified as High Risk because its annualized volatility is above 40%. This means the stock had larger price movements and may be more uncertain for lower-risk users.`;
+    };
+
+    const getReturnInsight = () => {
+      if (stockData.average_daily_return > 0) {
+        return `The average daily return is positive, which means the stock increased on average during the selected period.`;
+      }
+
+      if (stockData.average_daily_return < 0) {
+        return `The average daily return is negative, which means the stock decreased on average during the selected period.`;
+      }
+
+      return `The average daily return is close to zero, which means the stock showed limited average movement during the selected period.`;
+    };
+
+    const getVolatilityInsight = () => {
+      return `The daily volatility is ${formatPercent(
+        stockData.volatility
+      )}, while the annualized volatility is ${formatPercent(
+        stockData.annualized_volatility
+      )}. Annualized volatility is the main metric FinSight uses to classify the stock risk level.`;
+    };
+
   return (
     <main className="dashboard">
       <section className = "dashboard-title">
@@ -141,6 +173,47 @@ function StockDashboard({
           </div>
         </div>
       </section>
+
+      <section className="risk-insight-summary-section">
+        <div className="section-title risk-insight-title">
+          <h2>Risk Insight Summary</h2>
+          <p>
+            FinSight explains the stock result in simple language to help users
+            understand the risk level more clearly.
+          </p>
+        </div>
+
+        <div className="risk-insight-grid">
+          <div className="risk-insight-card">
+            <span>01</span>
+            <h3>Risk Level Explanation</h3>
+            <p>{getRiskInsight()}</p>
+          </div>
+
+          <div className="risk-insight-card">
+            <span>02</span>
+            <h3>Return Explanation</h3>
+            <p>{getReturnInsight()}</p>
+          </div>
+
+          <div className="risk-insight-card">
+            <span>03</span>
+            <h3>Volatility Explanation</h3>
+            <p>{getVolatilityInsight()}</p>
+          </div>
+
+          <div className="risk-insight-card">
+            <span>04</span>
+            <h3>Suitability Note</h3>
+            <p>
+              {suitabilityResult
+                ? suitabilityResult.explanation
+                : "Complete the Risk Profile questionnaire to receive a personalised suitability note for this stock."}
+            </p>
+          </div>
+        </div>
+      </section>
+
 
       <section className="chart-section">
         <h3>Stock Price Trend</h3>
