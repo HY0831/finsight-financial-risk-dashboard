@@ -1,91 +1,268 @@
 # FinSight: AI-Powered Financial Risk Dashboard
 
-FinSight is a full-stack financial risk analysis web application that helps users understand stock risk using historical market data. The system retrieves real stock price data, calculates financial risk metrics, classifies stock risk level, and displays the results through a clean multi-page dashboard interface.
+FinSight is an educational and portfolio-based financial risk dashboard that helps users analyse stock risk using historical market data. The system calculates return, volatility, annualized volatility, and classifies stock risk into Low, Medium, or High Risk.
 
-FinSight also includes a simplified user risk profile questionnaire that identifies whether a user has a Conservative, Moderate, or Aggressive investment risk profile. The project combines stock risk analysis, user risk tolerance analysis, suitability matching, stock comparison, recent search history, popular stock trends, and PDF report generation.
-
-## Project Overview
-
-Many beginner investors and students find it difficult to understand stock risk because financial data is often presented in a complex way. They may see stock prices, charts, and financial numbers, but may not know how to interpret return, volatility, or risk level.
-
-FinSight aims to simplify this problem by converting historical stock market data into visual charts, financial risk indicators, and beginner-friendly explanations.
-
-This project was developed as a personal portfolio project to combine computer science, finance knowledge, data analysis, and full-stack web development.
+The project also includes stock comparison, user risk profile analysis, watchlist management, recent analysis history, PDF report generation, and personalised dashboard highlights.
 
 ## Live Demo
 Frontend:https://finsight-financial-risk-dashboard-k.vercel.app/
 Backend API: https://finsight-financial-risk-dashboard.onrender.com
 
-## Features
+## Project Purpose
+The purpose of FinSight is to make stock risk analysis easier for beginner users to understand. Instead of only showing stock price data, FinSight converts historical market data into simple and meaningful risk insights.
 
-- Multi-page website layout with navigation
-- Home, Analyze, Compare, Risk Profile, History, and About pages
-- Popular stock trend cards on the Home page
-- Stock search by ticker, company name, or similar company name
-- Dynamic stock suggestions using backend search endpoint
-- Historical stock risk analysis
-- Selectable analysis period: 6 months, 1 year, 3 years, or 5 years
-- Average daily return calculation
-- Daily volatility calculation
-- Annualized volatility calculation
-- Stock risk classification: Low Risk, Medium Risk, or High Risk
-- Price trend and daily return visualisation
-- User risk profile questionnaire
-- Suitability analysis between user risk profile and stock risk level
-- Side-by-side stock comparison
-- Recent search history using localStorage
-- Downloadable professional PDF risk report
-- Educational disclaimer and About page
+This project was developed as a personal portfolio project to demonstrate skills in:
+
+- Full-stack web development
+- Financial risk analysis
+- API development
+- Data processing
+- React frontend development
+- FastAPI backend development
+- Dashboard UI design
+- PDF report generation
+- Local data persistence
+
+### Key Features
+
+## Stock Risk Analysis
+Users can search for a stock by ticker or company name. FinSight retrieves historical stock data and calculates:
+- Latest stock price
+- Highest price
+- Lowest price
+- Average daily return
+- Daily volatility
+- Annualized volatility
+- Stock risk level
+
+The stock is classified as:
+| Risk Level  | Annualized Volatility | Meaning                                       |
+| ----------- | --------------------: | --------------------------------------------- |
+| Low Risk    |             Below 20% | Smaller price movements                       |
+| Medium Risk |            20% to 40% | Moderate price movements                      |
+| High Risk   |             Above 40% | Larger price movements and higher uncertainty |
+
+## Dynamic Stock Search
+FinSight allows users to search by ticker, company name, or similar company name.
+
+Examples:
+- AAPL
+- Apple
+- TSLA
+- Tesla
+- MSFT
+- Microsoft
+
+This helps users who may not know the exact stock ticker.
+
+## Analysis Period Selection
+Users can select different analysis periods:
+- 6 Months
+- 1 Year
+- 3 Years
+- 5 Years
+
+The selected period is used for stock analysis, stock comparison, watchlist refresh, and risk calculation.
+
+## Stock Risk Insight Summary
+After analysing a stock, FinSight provides a simple explanation of the result, including:
+- Risk level explanation
+- Return explanation
+- Volatility explanation
+- Suitability notes
+
+This helps beginner users understand the mearning behind the financial metrics.
+
+## Stock Comparison
+Users can compare two stocks side by side using the same selected analysis period.
+
+The comparison includes:
+- Company name
+- Latest price
+- Average daily return
+- Daily volatility
+- Annualized volatility
+- Risk level
+- Comparison summary
+- Comparison recommendation summary
+
+The recommendation summary highlights:
+- Lower risk stock
+- Higher risk stock
+- Higher average return stock
+- Conservative user view
+- Overall comparison insight
+
+## Watchlist
+Users can save analysed stocks into a personal watchlist.
+
+The Watchlist page includes:
+- Saved stock cards
+- Latest price
+- Risk level
+- Annualized volatility
+- Saved time
+- Last updated time
+- Analyse again button
+- Remove stock button
+- Clear watchlist button
+
+The watchlist is stored locally in the user's browser using localStorage.
+
+## Watchlist Refresh
+Users can refresh saved stocks to update:
+- Latest price
+- Risk level
+- Annualized volatility
+- Last updated time
+
+This makes the watchlist more useful for monitoring saved stocks over time.
+
+## Watchlist Risk Distribution
+The Watchlist page includes a risk distribution summary showing how saved stocks are grouped by:
+- Low Risk
+- Medium Risk
+- High Risk
+
+This gives users a quick overview of their saved stock risk exposure.
+
+## Compare from Watchlist
+Users can select two saved stocks from the Watchlist page and send them directly to the Compare page.
+
+This improves the user flow because users do not need to type the same stock tickers again.
+
+## User Risk Profile
+FinSight includes a simplified user risk profile questionnaire. The questionnaire asks about:
+- Investment objective
+- Investment time horizon
+- Expected need for money
+- Reaction to market loss
+- Comfort with short-term price movement
+- Investment knowledge and experience
+- Financial stability
+
+Based on the total score, users are classified as:
+| Total Score | User Risk Profile |
+| ----------: | ----------------- |
+|      7 - 16 | Conservative      |
+|     17 - 26 | Moderate          |
+|     27 - 35 | Aggressive        |
+
+The risk profile result and questionnaire answers are saved locally using localStorage, so the result remains available after refreshing the website.
+
+## Suitability Analysis
+FinSight compares the user’s risk profile with the analysed stock’s risk level to generate a simple suitability explanation.
+
+Example:
+User Risk Profile: Conservative
+Stock Risk Level: High Risk
+Suitability Result: Not Highly Suitable
+
+This feature helps users understand whether a stock’s risk level generally matches their personal risk tolerance. It is for educational purposes only and does not provide investment advice.
+
+## Analysis History
+FinSight stores recent stock analysis records locally in the browser.
+
+The History page includes:
+- Recent analysed stocks
+- Total search summary
+- Low, Medium, and High Risk summary
+- Search by ticker or company name
+- Filter by risk level
+- Analyse again button
+- Clear history button
+
+## Home Dashboard Highlights
+After a user has analysed at least one stock, the Home page displays personalised dashboard highlights, including:
+- Recent searches
+- Watchlist stocks
+- Risk profile status
+- Default analysis period
+
+For new users with no analysis history, the Home page remains simple and introductory.
+
+## Recent Analysis Preview
+After analysing stocks, the Home page shows a preview of the latest analysed stocks. Users can quickly review recent activity and access the full History page.
+
+## PDF Risk Report
+Users can download a professional PDF report for an analysed stock.
+
+The PDF report includes:
+- Executive summary
+- Key risk metrics
+- Price overview
+- Risk insight
+- Historical price chart
+- Daily return chart
+- User risk profile
+- Suitability analysis
+- Risk classification method
+- Disclaimer
+
+## Improved Error Messages
+FinSight provides clearer error messages for common issues such as:
+- Backend server not connected
+- Empty stock input
+- Stock not found
+- Not enough data
+- Invalid comparison input
+- Same stock selected for comparison
+
+The messages include suggestions to help users understand and solve the issue.
 
 ### Website Pages
 ## Home Page
 
-The Home page introduces FinSight and provides a quick overview of the system. It includes a hero section, popular stock trend cards, feature highlights, risk classification preview, and call-to-action buttons.
+The Home page introduces FinSight and provides a quick overview of the system. It includes a hero section, popular stock trend cards, dashboard highlights after analysis, recent analysis preview, feature highlights, risk classification preview, and call-to-action buttons.
 
 ## Analyze Page
 
-The Analyze page allows users to search for a stock by ticker or company name, select an analysis period, view stock risk metrics, view price charts, and generate a PDF risk report.
+The Analyze page allows users to search for a stock by ticker or company name, select an analysis period, view stock risk metrics, read risk insight summaries, view charts, add the stock to watchlist, and generate a PDF risk report.
 
 ## Compare Page
 
-The Compare page allows users to compare two stocks side by side using the same selected analysis period. It compares latest price, average daily return, annualized volatility, and stock risk level.
+The Compare page allows users to compare two stocks side by side using the same selected analysis period. It compares latest price, average daily return, daily volatility, annualized volatility, risk level, and provides a comparison recommendation summary.
+
+## Watchlist Page
+
+The Watchlist page allows users to save, refresh, filter, sort, remove, clear, and compare saved stocks. It also includes watchlist summary cards and risk distribution bars.
 
 ## Risk Profile Page
 
-The Risk Profile page includes a questionnaire that classifies the user as Conservative, Moderate, or Aggressive. This result is used in the suitability analysis between the user profile and stock risk level.
+The Risk Profile page includes a questionnaire that classifies the user as Conservative, Moderate, or Aggressive. The result is stored locally and used in suitability analysis.
 
 ## History Page
 
-The History page displays recent stock searches stored locally in the browser. Users can quickly re-open previous stock analyses or clear their search history.
+The History page displays recent stock analysis records stored locally in the browser. Users can search, filter, re-analyse previous stocks, and clear their history.
 
 ## About Page
 
-The About page explains the project purpose, risk classification method, technology stack, and educational disclaimer.
+The About page explains the project overview, methodology, risk formulas, risk classification method, risk profile logic, suitability analysis, technology stack, and educational disclaimer.
 
-## Tech Stack
+### Tech Stack
 
-### Frontend
-
+## Frontend
 - React
 - Vite
 - React Routers
 - Recharts
 - jsPDF
+- JavaSript
+- HTML
 - CSS
 
-### Backend
-
+## Backend
 - Python
 - FastAPI
 - Pandas
 - NumPy
 - yfinance
+- Uvicorn
 
-### Tools
-
+## Tools and Deployment
 - Git
 - GitHub
-- VS Code
+- Visual Studio Code
 - Vercel
 - Render
 
@@ -130,6 +307,7 @@ finsight-dashboard/
 │   │   │   ├── HomePage.jsx
 │   │   │   ├── AnalyzePage.jsx
 │   │   │   ├── ComparePage.jsx
+│   │   │   ├── WatchlistPage.jsx
 │   │   │   ├── ProfilePage.jsx
 │   │   │   ├── HistoryPage.jsx
 │   │   │   └── AboutPage.jsx
@@ -248,6 +426,55 @@ Suitability Result: Not Highly Suitable
 
 This feature is designed to help users understand whether a stock's risk level generally matches their personal risk tolerance. It is for educational purposes only and does not provide investment advice.
 
+## Popular Stock Trends
+FinSight includes popular stock trend cards on the Home page. These cards automatically switch between selected popular stocks and give users a quick overview of recent stock risk movement.
+
+The trend cards display:
+- Stock ticker
+- Company name
+- Latest price
+- Annualized volatility
+- Risk level
+- Risk movement bar
+
+This feature makes the Home page feel closer to a real financial web application.
+
+## Local Data Storage
+FinSight uses broweser localStorage to store selected user data locally.
+
+Stored items include:
+| Data                 | Purpose                                             |
+| -------------------- | --------------------------------------------------- |
+| Search history       | Stores recent stock analysis records                |
+| Watchlist            | Stores saved stocks for future monitoring           |
+| Risk profile answers | Stores questionnaire answers                        |
+| User risk profile    | Stores Conservative, Moderate, or Aggressive result |
+
+This project currently does not use user login or a databse. Database-based storage may be added in a future version.
+
+## PDF Risk Report
+FinSight can generate a downloadable PDF stock risk report.
+
+The PDF report includes:
+- Stock ticker
+- Company name
+- Analysis period
+- Latest price
+- Highest and lowest price
+- Average daily return
+- Daily volatility
+- Annualized volatility
+- Stock risk level
+- Price trend chart
+- Daily return chart
+- User risk profile
+- Suitability analysis
+- Executive insight
+- Risk classification method
+- Disclaimer
+
+This feature helps make the project more practical and report-oriented.
+
 ## Stock Comparison
 
 FinSight allows users to compare two stocks side by side using the same selected analysis period.
@@ -269,65 +496,9 @@ AAPL vs TSLA
 
 The system compares annualized volatility and explains which stock had larger price movement during the selected period.
 
-## Popular Stock Trends
+### API Endpoint
 
-FinSight includes popular stock trend cards on the Home page. These cards automatically switch between selected popular stocks and give users a quick overview of recent stock risk movement.
-
-The trend cards display:
-- Stock ticker
-- Company name
-- Latest price
-- Annualized volatility
-- Risk level
-- Risk movement bar
-
-This feature makes the Home page feel closer to a real financial web application.
-
-## Recent Search History
-
-FinSight saves recent stock searches using browser localStorage.
-
-The recent search history stores:
-
-- Ticker
-- Company name
-- Risk level
-- Analysis period
-- Latest price
-- Search time
-
-Users can click a recent search item to analyse the stock again. Users can also clear the search history.
-
-This feature is currently stored locally in the browser. Database-based search history may be added after user login is implemented in the future.
-
-## PDF Risk Report
-
-FinSight can generate a downloadable PDF stock risk report.
-
-The PDF report includes:
-
-- Stock ticker
-- Company name
-- Analysis period
-- Latest price
-- Highest and lowest price
-- Average daily return
-- Daily volatility
-- Annualized volatility
-- Stock risk level
-- Price trend chart
-- Daily return chart
-- User risk profile
-- Suitability analysis
-- Executive insight
-- Risk classification method
-- Disclaimer
-
-This feature helps make the project more practical and report-oriented.
-
-## API Endpoint
-
-### Home Endpoint
+## Home Endpoint
 
 ```text
 GET /
@@ -344,7 +515,7 @@ Example response:
 }
 ```
 
-### Stock Analysis Endpoint
+## Stock Analysis Endpoint
 
 ```text
 GET /analyze/{ticker}?period={period}
@@ -389,8 +560,7 @@ Example response:
   ]
 }
 ```
-
-### Stock Search Endpoint
+## Stock Search Endpoint
 
 ```text
 GET /search-stocks?query={searchText}
@@ -417,16 +587,16 @@ Example response:
 ```
 The end point is used for dynamic stock suggestions in both the Analyze page and Compare page.
 
-## How to Run the Project
+### How to Run the Project
 
-### 1. Clone the Repository
+## 1. Clone the Repository
 
 ```bash
 git clone https://github.com/HY0831/finsight-financial-risk-dashboard.git
 cd finsight-financial-risk-dashboard
 ```
 
-### 2. Run the Backend
+## 2. Run the Backend
 
 Go to the backend folder:
 
@@ -458,7 +628,7 @@ FastAPI documentation is available at:
 http://127.0.0.1:8000/docs
 ```
 
-### 3. Run the Frontend
+## 3. Run the Frontend
 
 Open another terminal and go to the frontend folder:
 
@@ -515,133 +685,145 @@ pdf-report.png
 api-docs.png
 ```
 
-## Current Version
+### Current Version
 
-### Version 1: Stock Risk Analysis Dashboard
+## Version 1: Stock Risk Analysis Dashboard
+- Added stock ticker search
+- Retrieved stock price data
+- Calculated return and volatility
+- Added stock risk classification
+- Displayed dashboard charts
+- Added simple risk summary
 
-- Stock ticker search
-- Stock price data retrieval
-- Risk metric calculation
-- Stock risk classification
-- Dashboard chart display
-- Simple risk summary
-
-### Version 1.1: Dashboard Enhancement
-
-- Added company name
-- Added analysis period selection
-- Improved loading button state
-- Improved dashboard details
-
-### Version 2: User Risk Profile and Suitability Analysis
-
+## Version 2: User Risk Profile and Suitability Analysis
 - Added user risk profile questionnaire
-- Added user risk profile scoring
 - Added Conservative, Moderate, and Aggressive classification
-- Added source note for questionnaire design
 - Added suitability matching between user risk profile and stock risk level
 - Added personalised suitability explanation
 
-### Version 3: PDF Risk Report
-
+## Version 3: PDF Risk Report
 - Added downloadable PDF risk report
 - Included stock information, risk metrics, user risk profile, suitability analysis, and disclaimer in the report
 
-### Version 4: Stock Comparison
-
+## Version 4: Stock Comparison
 - Added side-by-side stock comparison
-- Compared company name, latest price, average daily return, annualized volatility, and risk level
-- Added simple comparison summary based on volatility
-- Improved comparison section layout and readability
+- Compared latest price, average daily return, annualized volatility, and risk level
+- Added comparison summary based on volatility
 
-### Version 5: Recent Search History
-
-- Added recent search history
-- Stored recent searches using browser localStorage
-- Allowed users to re-analyse stocks from search history
+## Version 5: Recent Search History
+- Added recent search history using browser localStorage
+- Allowed users to re-analyse stocks from history
 - Added clear history function
-- Improved recent search history card design
+- Improved recent search history design
 
-### Version 6: Frontend Refactor
-
+## Version 6: Frontend Refactor
 - Refactored frontend into reusable React components
 - Improved code structure and maintainability
-- Separated search, history, comparison, questionnaire, dashboard, and suitability sections into individual component files
+- Separated major features into component and page files
 
-### Version 7: UI and UX Improvement
-
-- Added empty state section before stock analysis
+## Version 7: UI and UX Improvement
+- Added empty state before stock analysis
 - Added metric explanation text for beginner users
 - Added dashboard result title and explanation
 - Added footer disclaimer
-- Improved overall UI clarity and user experience
+- Improved overall UI clarity
 
-### Version 8: Dynamic Stock Search and Improved PDF Report
+## Version 8: Dynamic Stock Search and Improved PDF Report
 - Added dynamic stock search suggestions using backend search endpoint
-- Allowed users to search by ticker, company name or similar company name
-- Added dynamic search suggestions to stock comparison inputs
-- Improved PDF report design with professional layout, colour-coded metric cards, charts, insights, risk profile, suitability analysis and disclaimer
+- Allowed users to search by ticker, company name, or similar company name
+- Added search suggestions to stock comparison inputs
+- Improved PDF report layout, charts, insights, risk profile, suitability analysis, and disclaimer
 - Fixed PDF generation when user risk profile is completed
 
-### Version 9: Multi-Page Website Layout
-
+## Version 9: Multi-Page Website Layout
 - Converted FinSight from a single-page dashboard into a multi-page web application
-- Added navigation bar with Home, Analyze, Compare, Risk Profile, History, and About pages
-- Added a professional Home page with popular stock trend cards
+- Added Home, Analyze, Compare, Risk Profile, History, and About pages
+- Added navigation bar
 - Improved user flow by separating each major function into its own page
-- Made the website feel closer to a real financial web application
 
-### Version 10: Multi-Page Professional Website Upgrade
+## Version 10: Home and Dashboard Personalisation
+- Added popular stock trend cards
+- Added personalised Home dashboard highlights after analysis
+- Added recent analysis preview on Home page
+- Improved Home page layout and call-to-action sections
 
-- Converted FinSight from a single-page dashboard into a multi-page web application
-- Added navigation bar with Home, Analyze, Compare, Risk Profile, History, and About pages
-- Added a professional Home page with trending popular stock cards
-- Improved Analyze page layout with guide cards, better loading state, and cleaner error display
-- Improved Compare page layout with explanation cards and clearer comparison flow
-- Improved Risk Profile page with investor profile explanation cards
-- Improved History page with recent-search explanation and empty-state action
-- Improved About page with project purpose, risk method, tech stack, and disclaimer sections
-- Improved overall user flow to make FinSight feel closer to a real financial web application
+## Version 11: Watchlist Management
+- Added Watchlist page
+- Added save and remove stock function
+- Added clear watchlist function
+- Added watchlist summary cards
+- Stored saved stocks using localStorage
 
-## Future Improvements
+## Version 12: Watchlist Refresh and Risk Distribution
+- Added refresh watchlist data function
+- Added last updated time
+- Added watchlist risk distribution bar
+- Added filter and sort function for saved stocks
 
-- Add user login and authentication
-- Save search history to a database after login is added
-- Save user risk profile permanently
-- Add stock watchlist feature
-- Add database support for saved analysis records
-- Add AI-generated personalised explanation
-- Add more advanced financial indicators
-- Improve PDF report with more detailed chart visuals
-- Add portfolio-level risk analysis
+## Version 13: Compare from Watchlist
+- Allowed users to select two saved stocks from Watchlist
+- Sent selected stocks to Compare page automatically
+- Improved watchlist-to-comparison user flow
 
-## Learning Outcomes
+## Version 14: Improved About and History Pages
+- Added methodology section to About page
+- Added formula explanation for daily return and volatility
+- Improved History page with summary cards, search, filter, and better empty state
+
+## Version 15: Saved Risk Profile and Better Analysis Insights
+- Saved risk profile answers and result using localStorage
+- Added reset risk profile function
+- Added stock risk insight summary on Analyze page
+- Improved suitability note display
+
+## Version 16: Better Error Handling and Comparison Recommendation
+- Added user-friendly error messages
+- Added error suggestions for common issues
+- Added comparison recommendation summary
+- Improved Compare page result clarity
+
+### Future Improvements
+
+Possible future improvements include:
+- User login and authentication
+- Database support for saved analysis records
+- Account-based watchlist and risk profile storage
+- Portfolio-level risk score
+- Portfolio weight calculation
+- Watchlist PDF summary report
+- More advanced financial indicators
+- Sector and industry analysis
+- AI-generated personalised explanation
+- Dark mode
+- Mobile app version
+
+### Learning Outcomes
 
 Through this project, I practised:
-
 - Building a full-stack web application
 - Creating backend APIs using FastAPI
-- Fetching real stock market data using yfinance
-- Processing financial data using Pandas and NumPy
+- Fetching stock market data using yfinance
+- Processing financial data using pandas and NumPy
 - Calculating return and volatility
 - Designing a dashboard using React and Recharts
 - Creating a multi-page React application using React Router
 - Creating a user risk profile questionnaire
 - Generating PDF reports using jsPDF
-- Using browser localStorage for recent search history
+- Using browser localStorage for search history, watchlist, and risk profile
 - Refactoring React code into reusable components
-- Improving UI/UX design for dashboard-based applications
+- Improving UI and UX design for dashboard-based applications
+- Handling user-friendly error messages
 - Structuring a GitHub portfolio project
 - Deploying frontend and backend services
 - Combining computer science and finance concepts in one project
 
-## Disclaimer
+### Disclaimer
 
 This project is developed for educational and portfolio purposes only.
 
 FinSight does not provide financial advice, investment recommendations, trading instructions, or professional financial planning services. Users should not rely on this system as the only basis for making investment decisions.
 
-## References
+### References
 
 - FINRA. Know Your Risk Tolerance. Available at: https://www.finra.org/investors/investing/investing-basics/know-your-risk-tolerance
 - Vanguard. Investor Questionnaire. Available at: https://investor.vanguard.com/tools-calculators/investor-questionnaire
@@ -649,7 +831,7 @@ FinSight does not provide financial advice, investment recommendations, trading 
 - Ameriprise. Investment Risk Tolerance Quiz. Available at: https://www.ameriprise.com/financial-goals-priorities/investing/investment-risk-tolerance-quiz
 - Yahoo Finance data accessed using the yfinance Python library.
 
-## Author
+### Author
 
 Developed by Tey Hui Yang  
 Bachelor of Computer Science, Taylor's University  
