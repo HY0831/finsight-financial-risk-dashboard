@@ -1177,6 +1177,204 @@ body {
 }
 
 /* =========================================================
+   Improved History Page
+========================================================= */
+
+.history-summary-grid {
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.history-summary-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.history-summary-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.history-summary-card strong {
+  display: block;
+  color: #111827;
+  font-size: 28px;
+  margin-bottom: 8px;
+}
+
+.history-summary-card p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+.history-empty-card,
+.history-section {
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.history-empty-card {
+  text-align: center;
+}
+
+.history-empty-card h3 {
+  margin: 0 0 10px 0;
+  color: #111827;
+  font-size: 24px;
+}
+
+.history-empty-card p {
+  max-width: 700px;
+  margin: 0 auto 22px auto;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.history-empty-card button {
+  border: none;
+  background: #111827;
+  color: white;
+  padding: 13px 20px;
+  border-radius: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.history-empty-card button:hover {
+  background: #374151;
+}
+
+.history-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.history-controls div {
+  display: grid;
+  gap: 8px;
+}
+
+.history-controls label {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.history-controls input,
+.history-controls select {
+  width: 100%;
+  min-height: 50px;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  background: white;
+  color: #111827;
+  font-size: 15px;
+}
+
+.history-controls input:focus,
+.history-controls select:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
+}
+
+.history-list {
+  display: grid;
+  gap: 14px;
+}
+
+.history-card {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 0.7fr 0.8fr 1.2fr auto;
+  gap: 16px;
+  align-items: center;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 18px;
+  border-radius: 14px;
+}
+
+.history-company h3 {
+  margin: 0 0 6px 0;
+  color: #111827;
+  font-size: 24px;
+}
+
+.history-company p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.history-detail span {
+  display: block;
+  color: #6b7280;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+
+.history-detail strong {
+  color: #111827;
+  font-size: 14px;
+}
+
+.history-analyse-button {
+  border: none;
+  background: #111827;
+  color: white;
+  padding: 11px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.history-analyse-button:hover {
+  background: #374151;
+}
+
+.history-filter-empty {
+  margin-top: 20px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 24px;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.history-filter-empty h3 {
+  margin: 0 0 8px 0;
+  color: #111827;
+  font-size: 22px;
+}
+
+.history-filter-empty p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+/* =========================================================
   About Page
 ========================================================= */
 
@@ -3651,6 +3849,28 @@ th {
 
   .history-hero h1 {
     font-size: 30px;
+  }
+}
+
+@media (max-width: 1000px) {
+  .history-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .history-card {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .history-analyse-button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .history-summary-grid,
+  .history-controls,
+  .history-card {
+    grid-template-columns: 1fr;
   }
 }
 
