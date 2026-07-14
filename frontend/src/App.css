@@ -554,6 +554,172 @@ body {
 }
 
 /* =========================================================
+   About Page Methodology
+========================================================= */
+
+.about-overview-section,
+.methodology-section,
+.classification-method-section,
+.suitability-method-section,
+.about-disclaimer-section {
+  max-width: 1100px;
+  margin: 0 auto 25px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.about-overview-grid,
+.suitability-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.about-overview-card,
+.suitability-method-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 22px;
+  border-radius: 16px;
+}
+
+.about-overview-card h3,
+.suitability-method-card h3 {
+  margin: 0 0 10px 0;
+  color: #111827;
+  font-size: 20px;
+}
+
+.about-overview-card p,
+.suitability-method-card p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.methodology-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+.methodology-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 22px;
+  border-radius: 16px;
+}
+
+.methodology-card span {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #111827;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.methodology-card h3 {
+  margin: 0 0 10px 0;
+  color: #111827;
+  font-size: 20px;
+}
+
+.methodology-card p {
+  margin: 0 0 14px 0;
+  color: #4b5563;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.formula-box {
+  background: white;
+  border: 1px dashed #cbd5e1;
+  color: #111827;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.classification-method-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.classification-method-card {
+  padding: 22px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+}
+
+.classification-method-card h3 {
+  margin: 0 0 10px 0;
+  color: #111827;
+  font-size: 20px;
+}
+
+.classification-method-card strong {
+  display: block;
+  color: #111827;
+  font-size: 26px;
+  margin-bottom: 10px;
+}
+
+.classification-method-card p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.classification-method-card.low {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+
+.classification-method-card.medium {
+  background: #fffbeb;
+  border-color: #fde68a;
+}
+
+.classification-method-card.high {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.about-disclaimer-section {
+  background: #111827;
+  color: white;
+}
+
+.about-disclaimer-section h2 {
+  margin: 0 0 12px 0;
+  color: white;
+  font-size: 26px;
+  text-align: center;
+}
+
+.about-disclaimer-section p {
+  max-width: 900px;
+  margin: 0 auto;
+  color: #d1d5db;
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* =========================================================
   Analyze Page
 ========================================================= */
 
@@ -3515,6 +3681,18 @@ th {
 
   .about-detail-grid,
   .tech-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .about-overview-grid,
+  .classification-method-grid,
+  .suitability-method-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .methodology-grid {
     grid-template-columns: 1fr;
   }
 }
