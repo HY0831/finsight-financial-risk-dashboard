@@ -948,6 +948,75 @@ body {
 }
 
 /* =========================================================
+   Comparison Recommendation Summary
+========================================================= */
+
+.comparison-recommendation-section {
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.comparison-recommendation-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.comparison-recommendation-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 22px;
+  border-radius: 16px;
+}
+
+.comparison-recommendation-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.comparison-recommendation-card strong {
+  display: block;
+  color: #111827;
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.comparison-recommendation-card p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+.comparison-recommendation-insight {
+  margin-top: 18px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  padding: 22px;
+  border-radius: 16px;
+}
+
+.comparison-recommendation-insight h3 {
+  margin: 0 0 10px 0;
+  color: #075985;
+  font-size: 20px;
+}
+
+.comparison-recommendation-insight p {
+  margin: 0;
+  color: #0f172a;
+  line-height: 1.7;
+  font-size: 14px;
+}
+
+/* =========================================================
   Risk Profile Page
 ========================================================= */
 
@@ -3882,6 +3951,18 @@ th {
 
   .compare-selected-button {
     width: 100%;
+  }
+}
+
+@media (max-width: 1000px) {
+  .comparison-recommendation-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .comparison-recommendation-grid {
+    grid-template-columns: 1fr;
   }
 }
 

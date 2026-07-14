@@ -196,6 +196,46 @@ function ComparisonSection({
     );
   };
 
+  const getComparisonRecommendation = () => {
+    if (!comparisonData) {
+      return null;
+    }
+
+    const stockOne = comparisonData.stockOne;
+    const stockTwo = comparisonData.stockTwo;
+
+    const stockOneVolatility = stockOne.annualized_volatility;
+    const stockTwoVolatility = stockTwo.annualized_volatility;
+
+    const lowerRiskStock =
+      stockOneVolatility <= stockTwoVolatility ? stockOne : stockTwo;
+
+    const higherRiskStock =
+      stockOneVolatility > stockTwoVolatility ? stockOne : stockTwo;
+
+    const betterReturnStock =
+      stockOne.average_daily_return >= stockTwo.average_daily_return
+        ? stockOne
+        : stockTwo;
+
+    let summary = "";
+
+    if (stockOneVolatility === stockTwoVolatility) {
+      summary = `${stockOne.ticker} and ${stockTwo.ticker} have similar annualized volatility. Users may compare their return, price trend, and business background before making further judgement.`;
+    } else {
+      summary = `${lowerRiskStock.ticker} has lower annualized volatility than ${higherRiskStock.ticker}, so it showed smaller price movement during the selected period. ${higherRiskStock.ticker} had higher volatility, which means it may involve higher uncertainty.`;
+    }
+
+    return {
+      lowerRiskStock,
+      higherRiskStock,
+      betterReturnStock,
+      summary,
+    };
+  };
+
+  const comparisonRecommendation = getComparisonRecommendation();
+
   return (
     <section className="comparison-section">
       <div className="section-title comparison-title">
@@ -283,6 +323,70 @@ function ComparisonSection({
 
           {renderComparisonInterpretation()}
         </>
+      )}
+
+      {comparisonData && comparisonRecommendation && (
+        <section className="comparison-recommendation-section">
+          <div className="section-heading">
+            <h2>Comparison Recommendation Summary</h2>
+            <p>
+              FinSight summarises the comparison result to help users understand which
+              stock showed lower risk, higher risk, and stronger average return.
+            </p>
+          </div>
+
+          <div className="comparison-recommendation-grid">
+            <div className="comparison-recommendation-card">
+              <span>Lower Risk Stock</span>
+              <strong>{comparisonRecommendation.lowerRiskStock.ticker}</strong>
+              <p>
+                Lower annualized volatility at{" "}
+                {formatPercent(
+                  comparisonRecommendation.lowerRiskStock.annualized_volatility
+                )}
+                .
+              </p>
+            </div>
+
+            <div className="comparison-recommendation-card">
+              <span>Higher Risk Stock</span>
+              <strong>{comparisonRecommendation.higherRiskStock.ticker}</strong>
+              <p>
+                Higher annualized volatility at{" "}
+                {formatPercent(
+                  comparisonRecommendation.higherRiskStock.annualized_volatility
+                )}
+                .
+              </p>
+            </div>
+
+            <div className="comparison-recommendation-card">
+              <span>Higher Average Return</span>
+              <strong>{comparisonRecommendation.betterReturnStock.ticker}</strong>
+              <p>
+                Average daily return of{" "}
+                {formatPercent(
+                  comparisonRecommendation.betterReturnStock.average_daily_return
+                )}
+                .
+              </p>
+            </div>
+
+            <div className="comparison-recommendation-card">
+              <span>Conservative User View</span>
+              <strong>{comparisonRecommendation.lowerRiskStock.ticker}</strong>
+              <p>
+                This stock may be more suitable for users who prefer smaller price
+                movements.
+              </p>
+            </div>
+          </div>
+
+          <div className="comparison-recommendation-insight">
+            <h3>Overall Insight</h3>
+            <p>{comparisonRecommendation.summary}</p>
+          </div>
+        </section>
       )}
     </section>
   );
