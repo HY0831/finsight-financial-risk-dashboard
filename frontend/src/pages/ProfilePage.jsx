@@ -6,6 +6,7 @@ function ProfilePage({
   setRiskAnswers,
   calculateRiskProfile,
   userRiskProfile,
+  resetRiskProfile,
 }) {
   return (
     <>
@@ -92,6 +93,7 @@ function ProfilePage({
         setRiskAnswers={setRiskAnswers}
         calculateRiskProfile={calculateRiskProfile}
         userRiskProfile={userRiskProfile}
+        resetRiskProfile={resetRiskProfile}
       />
     </>
   );

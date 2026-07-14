@@ -4,6 +4,7 @@ function RiskProfileSection({
   setRiskAnswers,
   calculateRiskProfile,
   userRiskProfile,
+  resetRiskProfile,
 }) {
   return (
     <section className="risk-profile-section">
@@ -62,6 +63,14 @@ function RiskProfileSection({
           <h3>Your Risk Profile: {userRiskProfile.profile}</h3>
           <p>Total Score: {userRiskProfile.score} / 35</p>
           <p>{userRiskProfile.description}</p>
+
+          <button
+            type="button"
+            className="reset-profile-button"
+            onClick={resetRiskProfile}
+          >
+            Reset Risk Profile
+          </button>
         </div>
       )}
     </section>

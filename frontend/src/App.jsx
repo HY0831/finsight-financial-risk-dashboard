@@ -36,8 +36,15 @@ function App() {
   const [comparisonLoading, setComparisonLoading] = useState(false);
   const [comparisonError, setComparisonError] = useState("");
 
-  const [riskAnswers, setRiskAnswers] = useState({});
-  const [userRiskProfile, setUserRiskProfile] = useState(null);
+  const [riskAnswers, setRiskAnswers] = useState(() => {
+    const savedAnswers = localStorage.getItem("finsightRiskAnswers");
+    return savedAnswers ? JSON.parse(savedAnswers) : {};
+  });
+
+  const [userRiskProfile, setUserRiskProfile] = useState(() => {
+    const savedProfile = localStorage.getItem("finsightUserRiskProfile");
+    return savedProfile ? JSON.parse(savedProfile) : null;
+  });
 
   const [watchlist, setWatchlist] = useState(() => {
     const savedWatchlist = localStorage.getItem("finsightWatchlist");
@@ -54,6 +61,19 @@ function App() {
   useEffect(() => {
     localStorage.setItem("finsightWatchlist", JSON.stringify(watchlist));
   }, [watchlist]);
+
+  useEffect(() => {
+    localStorage.setItem("finsightRiskAnswers", JSON.stringify(riskAnswers));
+  }, [riskAnswers]);
+
+  useEffect(() => {
+    if (userRiskProfile) {
+      localStorage.setItem(
+        "finsightUserRiskProfile",
+        JSON.stringify(userRiskProfile)
+      );
+    }
+  }, [userRiskProfile]);
 
  const riskQuestions = [
   {
@@ -249,6 +269,21 @@ const analyzeStock = async () => {
     profile,
     description,
   });
+};
+
+const resetRiskProfile = () => {
+  const confirmReset = window.confirm(
+    "Are you sure you want to reset your risk profile questionnaire?"
+  );
+
+  if (!confirmReset) {
+    return;
+  }
+
+  setRiskAnswers({});
+  setUserRiskProfile(null);
+  localStorage.removeItem("finsightRiskAnswers");
+  localStorage.removeItem("finsightUserRiskProfile");
 };
 
 const analyseFromHistory = async (historyItem) => {
@@ -1384,6 +1419,7 @@ const refreshWatchlist = async () => {
               setRiskAnswers={setRiskAnswers}
               calculateRiskProfile={calculateRiskProfile}
               userRiskProfile={userRiskProfile}
+              resetRiskProfile={resetRiskProfile}
             />
           }
         />
