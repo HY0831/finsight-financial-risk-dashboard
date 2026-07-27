@@ -70,11 +70,27 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const savedToken = localStorage.getItem("finsightAuthToken");
+
+    if (savedToken) {
+      return;
+    }
+
     const savedHistory = localStorage.getItem("finsightSearchHistory");
+
     if (savedHistory) {
       setSearchHistory(JSON.parse(savedHistory));
     }
   }, []);
+
+  useEffect(() => {
+  if (!authToken && !currentUser) {
+    localStorage.setItem(
+      "finsightSearchHistory",
+      JSON.stringify(searchHistory)
+    );
+  }
+}, [searchHistory, authToken, currentUser]);
 
   useEffect(() => {
     if (!authToken && !currentUser) {
@@ -223,6 +239,48 @@ useEffect(() => {
   loadUserRiskProfile();
 }, [authToken, currentUser]);
 
+useEffect(() => {
+  const loadUserHistory = async () => {
+    if (!authToken || !currentUser) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/history/`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to load user history.");
+      }
+
+      const data = await response.json();
+
+      const formattedHistory = data.map((item) => ({
+        ticker: item.ticker,
+        company_name: item.company_name,
+        latest_price: item.latest_price,
+        risk_level: item.risk_level,
+        annualized_volatility: item.annualized_volatility,
+        average_daily_return: item.average_daily_return,
+        volatility: item.volatility,
+        period: item.period,
+        searched_at: item.searched_at
+          ? new Date(item.searched_at).toLocaleString()
+          : "N/A",
+      }));
+
+      setSearchHistory(formattedHistory);
+    } catch (error) {
+      console.error("History load error:", error);
+    }
+  };
+
+  loadUserHistory();
+}, [authToken, currentUser]);
+
  const riskQuestions = [
   {
     id: "q1",
@@ -303,23 +361,33 @@ useEffect(() => {
   },
 ];
   
-  const saveSearchHistory = (data) => {
-    const newRecord = {
+  const saveSearchHistory = async (data) => {
+    if (!data) {
+      return;
+    }
+
+    const historyItem = {
       ticker: data.ticker,
       company_name: data.company_name,
-      risk_level: data.risk_level,
-      period: data.period,
       latest_price: data.latest_price,
+      risk_level: data.risk_level,
+      annualized_volatility: data.annualized_volatility,
+      average_daily_return: data.average_daily_return,
+      volatility: data.volatility,
+      period: period,
       searched_at: new Date().toLocaleString(),
     };
 
-    const updatedHistory = [
-      newRecord,
-      ...searchHistory.filter((item) => item.ticker !== data.ticker),
-    ].slice(0,5);
+    setSearchHistory((previousHistory) => {
+      const updatedHistory = [historyItem, ...previousHistory];
+      return updatedHistory.slice(0, authToken && currentUser ? 30 : 10);
+    });
 
-    setSearchHistory(updatedHistory);
-    localStorage.setItem("finsightSearchHistory", JSON.stringify(updatedHistory));
+    const token = localStorage.getItem("finsightAuthToken");
+
+    if (token) {
+      await saveHistoryToDatabase(historyItem);
+    }
   };
 
   const searchStockSuggestions = async(searchText) => {
@@ -428,7 +496,7 @@ const analyzeStock = async () => {
 
     const data = await response.json();
     setStockData(data);
-    saveSearchHistory(data);
+    await saveSearchHistory(data);
     setStockSuggestions([]);
   } catch (err) {
     setError(getFriendlyErrorMessage(err, "analysis"));
@@ -548,7 +616,7 @@ const analyseFromHistory = async (historyItem) => {
 
     const data = await response.json();
     setStockData(data);
-    saveSearchHistory(data);
+    await saveSearchHistory(data);
   } catch (err) {
     setError(getFriendlyErrorMessage(err, "analysis"));
   } finally {
@@ -556,8 +624,32 @@ const analyseFromHistory = async (historyItem) => {
   }
 };
 
-const clearSearchHistory = () => {
+const clearSearchHistory = async () => {
+  const confirmClear = window.confirm(
+    "Are you sure you want to clear your analysis history?"
+  );
+
+  if (!confirmClear) {
+    return;
+  }
+
   setSearchHistory([]);
+
+  if (authToken && currentUser) {
+    try {
+      await fetch(`${API_BASE_URL}/user/history/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+    } catch (error) {
+      console.error("Clear history error:", error);
+    }
+
+    return;
+  }
+
   localStorage.removeItem("finsightSearchHistory");
 };
 
@@ -1654,14 +1746,17 @@ const handleLogout = () => {
   resetAnalysisState();
   resetComparisonState();
 
+  const guestWatchlist = localStorage.getItem("finsightWatchlist");
+  setWatchlist(guestWatchlist ? JSON.parse(guestWatchlist) : []);
+
   const guestRiskAnswers = localStorage.getItem("finsightRiskAnswers");
   const guestRiskProfile = localStorage.getItem("finsightUserRiskProfile");
 
   setRiskAnswers(guestRiskAnswers ? JSON.parse(guestRiskAnswers) : {});
   setUserRiskProfile(guestRiskProfile ? JSON.parse(guestRiskProfile) : null);
 
-  const guestWatchlist = localStorage.getItem("finsightWatchlist");
-  setWatchlist(guestWatchlist ? JSON.parse(guestWatchlist) : []);
+  const guestSearchHistory = localStorage.getItem("finsightSearchHistory");
+  setSearchHistory(guestSearchHistory ? JSON.parse(guestSearchHistory) : []);
 
   navigate("/");
 };
@@ -1687,6 +1782,45 @@ const resetComparisonState = () => {
   setComparisonError(null);
   setCompareSuggestionsOne([]);
   setCompareSuggestionsTwo([]);
+};
+
+const saveHistoryToDatabase = async (historyItem) => {
+  const token = localStorage.getItem("finsightAuthToken");
+
+  if (!token || !historyItem) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/user/history/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        ticker: historyItem.ticker,
+        company_name: historyItem.company_name,
+        latest_price: historyItem.latest_price,
+        risk_level: historyItem.risk_level,
+        annualized_volatility: historyItem.annualized_volatility,
+        average_daily_return: historyItem.average_daily_return,
+        volatility: historyItem.volatility,
+        period: historyItem.period,
+      }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("History save failed:", errorData);
+      throw new Error(errorData.detail || "Unable to save history.");
+    }
+
+    const savedItem = await response.json();
+    console.log("History saved to database:", savedItem);
+  } catch (error) {
+    console.error("Save history error:", error);
+  }
 };
 
     return (

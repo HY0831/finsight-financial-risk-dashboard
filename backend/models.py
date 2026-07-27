@@ -48,3 +48,22 @@ class RiskProfile(Base):
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
     user = relationship("User")
+
+class SearchHistoryItem(Base):
+    __tablename__ = "search_history_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+
+    ticker = Column(String, nullable=False)
+    company_name = Column(String, nullable=True)
+    latest_price = Column(Float, nullable=True)
+    risk_level = Column(String, nullable=True)
+    annualized_volatility = Column(Float, nullable=True)
+    average_daily_return = Column(Float, nullable=True)
+    volatility = Column(Float, nullable=True)
+    period = Column(String, nullable=True)
+
+    searched_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    user = relationship("User")

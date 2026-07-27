@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Dict, Optional
 from pydantic import BaseModel, EmailStr
 
@@ -58,6 +59,32 @@ class RiskProfileResponse(BaseModel):
     profile_type: str
     score: int
     answers: Optional[Dict[str, int]] = None
+
+    class Config:
+        from_attributes = True
+
+class SearchHistoryCreate(BaseModel):
+    ticker: str
+    company_name: Optional[str] = None
+    latest_price: Optional[float] = None
+    risk_level: Optional[str] = None
+    annualized_volatility: Optional[float] = None
+    average_daily_return: Optional[float] = None
+    volatility: Optional[float] = None
+    period: Optional[str] = None
+
+
+class SearchHistoryResponse(BaseModel):
+    id: int
+    ticker: str
+    company_name: Optional[str] = None
+    latest_price: Optional[float] = None
+    risk_level: Optional[str] = None
+    annualized_volatility: Optional[float] = None
+    average_daily_return: Optional[float] = None
+    volatility: Optional[float] = None
+    period: Optional[str] = None
+    searched_at: Optional[str] = None
 
     class Config:
         from_attributes = True

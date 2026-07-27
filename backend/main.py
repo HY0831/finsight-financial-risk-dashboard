@@ -5,6 +5,7 @@ from auth_routes import router as auth_router
 from database import Base, engine
 from watchlist_routes import router as watchlist_router
 from risk_profile_routes import router as risk_profile_router
+from history_routes import router as history_router
 
 app = FastAPI(
     title="FinSight API",
@@ -17,6 +18,7 @@ Base.metadata.create_all(bind=engine)
 app.include_router(auth_router)
 app.include_router(watchlist_router)
 app.include_router(risk_profile_router)
+app.include_router(history_router)
 
 app.add_middleware(
     CORSMiddleware,
