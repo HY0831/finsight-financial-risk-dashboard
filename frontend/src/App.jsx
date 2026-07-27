@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Routes, Route } from "react-router";
+import { Routes, Route, useNavigate } from "react-router";
 import jsPDF from "jspdf";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
@@ -67,6 +67,8 @@ function App() {
     return savedUser ? JSON.parse(savedUser) : null;
   })
 
+  const navigate = useNavigate();
+
   useEffect(() => {
     const savedHistory = localStorage.getItem("finsightSearchHistory");
     if (savedHistory) {
@@ -75,8 +77,10 @@ function App() {
   }, []);
 
   useEffect(() => {
+    if (!authToken && !currentUser){
     localStorage.setItem("finsightWatchlist", JSON.stringify(watchlist));
-  }, [watchlist]);
+  }
+}, [watchlist, authToken, currentUser]);
 
   useEffect(() => {
     localStorage.setItem("finsightRiskAnswers", JSON.stringify(riskAnswers));
@@ -137,6 +141,43 @@ function App() {
 
   verifyLoggedInUser();
 }, [authToken]);
+
+useEffect(() => {
+  const loadUserWatchlist = async () => {
+    if (!authToken || !currentUser) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/watchlist/`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to load user watchlist.");
+      }
+
+      const data = await response.json();
+
+      const formattedWatchlist = data.map((item) => ({
+        ticker: item.ticker,
+        company_name: item.company_name,
+        latest_price: item.latest_price,
+        risk_level: item.risk_level,
+        annualized_volatility: item.annualized_volatility,
+        saved_at: item.saved_at || new Date().toLocaleString(),
+      }));
+
+      setWatchlist(formattedWatchlist);
+    } catch (error) {
+      console.error("Watchlist load error:", error);
+    }
+  };
+
+  loadUserWatchlist();
+}, [authToken, currentUser]);
 
  const riskQuestions = [
   {
@@ -1379,7 +1420,7 @@ const analyseFromWatchlist = async (watchlistItem) => {
   }
 };
 
-const toggleWatchlist = (stock) => {
+const toggleWatchlist = async (stock) => {
   if (!stock) {
     return;
   }
@@ -1394,22 +1435,76 @@ const toggleWatchlist = (stock) => {
     );
 
     setWatchlist(updatedWatchlist);
-  } else {
-    const newWatchlistItem = {
-      ticker: stock.ticker,
-      company_name: stock.company_name,
-      latest_price: stock.latest_price,
-      risk_level: stock.risk_level,
-      annualized_volatility: stock.annualized_volatility,
-      saved_at: new Date().toLocaleString(),
-    };
 
-    setWatchlist([newWatchlistItem, ...watchlist]);
+    if (authToken && currentUser) {
+      try {
+        await fetch(`${API_BASE_URL}/user/watchlist/${stock.ticker}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+      } catch (error) {
+        console.error("Remove watchlist error:", error);
+      }
+    }
+
+    return;
+  }
+
+  const newWatchlistItem = {
+    ticker: stock.ticker,
+    company_name: stock.company_name,
+    latest_price: stock.latest_price,
+    risk_level: stock.risk_level,
+    annualized_volatility: stock.annualized_volatility,
+    saved_at: new Date().toLocaleString(),
+  };
+
+  setWatchlist([newWatchlistItem, ...watchlist]);
+
+  if (authToken && currentUser) {
+    try {
+      await fetch(`${API_BASE_URL}/user/watchlist/`, {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({
+          ticker: stock.ticker,
+          company_name: stock.company_name,
+          latest_price: stock.latest_price,
+          risk_level: stock.risk_level,
+          annualized_volatility: stock.annualized_volatility,
+        }),
+      });
+    } catch (error) {
+      console.error("Add watchlist error:", error);
+    }
   }
 };
 
-const clearWatchlist = () => {
+const clearWatchlist = async () => {
+  const confirmClear = window.confirm(
+    "Are you sure you want to clear all saved stocks from your watchlist?"
+  );
+
+  if (!confirmClear) {
+    return;
+  }
+
   setWatchlist([]);
+
+  if (authToken && currentUser) {
+    try {
+      await fetch(`${API_BASE_URL}/user/watchlist/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+    } catch (error) {
+      console.error("Clear watchlist error:", error);
+    }
+  }
 };
 
 const refreshWatchlist = async () => {
@@ -1432,7 +1527,7 @@ const refreshWatchlist = async () => {
 
       const data = await response.json();
 
-      updatedWatchlist.push({
+      const updatedItem = {
         ticker: data.ticker,
         company_name: data.company_name,
         latest_price: data.latest_price,
@@ -1440,8 +1535,25 @@ const refreshWatchlist = async () => {
         annualized_volatility: data.annualized_volatility,
         saved_at: item.saved_at,
         updated_at: new Date().toLocaleString(),
-      });
-    } catch {
+      };
+
+      updatedWatchlist.push(updatedItem);
+
+      if (authToken && currentUser) {
+        await fetch(`${API_BASE_URL}/user/watchlist/`, {
+          method: "POST",
+          headers: getAuthHeaders(),
+          body: JSON.stringify({
+            ticker: updatedItem.ticker,
+            company_name: updatedItem.company_name,
+            latest_price: updatedItem.latest_price,
+            risk_level: updatedItem.risk_level,
+            annualized_volatility: updatedItem.annualized_volatility,
+          }),
+        });
+      }
+    } catch (error) {
+      console.error("Refresh watchlist item error:", error);
       updatedWatchlist.push(item);
     }
   }
@@ -1455,6 +1567,37 @@ const handleLogout = () => {
 
   setAuthToken("");
   setCurrentUser(null);
+
+  resetAnalysisState();
+  resetComparisonState();
+
+  const guestWatchlist = localStorage.getItem("finsightWatchlist");
+  setWatchlist(guestWatchlist ? JSON.parse(guestWatchlist) : []);
+
+  navigate("/");
+};
+
+const getAuthHeaders = () => {
+  return{
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${authToken}`,
+  };
+};
+
+const resetAnalysisState = () => {
+  setTicker("");
+  setStockData(null);
+  setError(null);
+  setStockSuggestions([]);
+};
+
+const resetComparisonState = () => {
+  setCompareTickerOne("");
+  setCompareTickerTwo("");
+  setComparisonData(null);
+  setComparisonError(null);
+  setCompareSuggestionsOne([]);
+  setCompareSuggestionsTwo([]);
 };
 
     return (
@@ -1578,6 +1721,8 @@ const handleLogout = () => {
               apiBaseUrl={API_BASE_URL}
               setCurrentUser={setCurrentUser}
               setAuthToken={setAuthToken}
+              resetAnalysisState={resetAnalysisState}
+              resetComparisonState={resetComparisonState}
               />
           }
         />
@@ -1589,6 +1734,8 @@ const handleLogout = () => {
               apiBaseUrl={API_BASE_URL}
               setCurrentUser={setCurrentUser}
               setAuthToken={setAuthToken}
+              resetAnalysisState={resetAnalysisState}
+              resetComparisonState={resetComparisonState}
             />
           }
         />

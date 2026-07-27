@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 
-function RegisterPage({ apiBaseUrl, setCurrentUser, setAuthToken }) {
+function RegisterPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisState, resetComparisonState, }) {
   const navigate = useNavigate();
 
   const [registerForm, setRegisterForm] = useState({
@@ -72,6 +72,9 @@ function RegisterPage({ apiBaseUrl, setCurrentUser, setAuthToken }) {
 
       setAuthToken(data.access_token);
       setCurrentUser(data.user);
+
+      resetAnalysisState();
+      resetComparisonState();
 
       navigate("/");
     } catch (error) {

@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 
-function LoginPage({ apiBaseUrl, setCurrentUser, setAuthToken }) {
+function LoginPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisState, resetComparisonState, }) {
   const navigate = useNavigate();
 
   const [loginForm, setLoginForm] = useState({
@@ -55,6 +55,9 @@ function LoginPage({ apiBaseUrl, setCurrentUser, setAuthToken }) {
 
       setAuthToken(data.access_token);
       setCurrentUser(data.user);
+
+      resetAnalysisState();
+      resetComparisonState();
 
       navigate("/");
     } catch (error) {

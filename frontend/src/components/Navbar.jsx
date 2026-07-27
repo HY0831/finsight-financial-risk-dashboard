@@ -45,7 +45,7 @@ function Navbar({ theme, setTheme, currentUser, handleLogout }) {
           {currentUser ? (
             <>
               <span className="auth-user-name">
-                Hi, {currentUser.full_name}
+                Hi, {currentUser.full_name} · Cloud Save On 
               </span>
 
               <button type="button" onClick={handleLogout}>

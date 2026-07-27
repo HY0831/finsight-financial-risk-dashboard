@@ -125,7 +125,9 @@ function WatchlistPage({
           <h1>Your Stock Watchlist</h1>
           <p>
             Save stocks that you want to monitor, refresh their latest risk data,
-            and compare selected stocks from your saved list.
+            and compare selected stocks from your saved list. Logged-in users can
+            save their watchlist to the database, while guest users use browser
+            storage.
           </p>
         </div>
       </section>
