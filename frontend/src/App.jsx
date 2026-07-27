@@ -77,23 +77,23 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!authToken && !currentUser){
-    localStorage.setItem("finsightWatchlist", JSON.stringify(watchlist));
-  }
-}, [watchlist, authToken, currentUser]);
-
-  useEffect(() => {
-    localStorage.setItem("finsightRiskAnswers", JSON.stringify(riskAnswers));
-  }, [riskAnswers]);
-
-  useEffect(() => {
-    if (userRiskProfile) {
-      localStorage.setItem(
-        "finsightUserRiskProfile",
-        JSON.stringify(userRiskProfile)
-      );
+    if (!authToken && !currentUser) {
+      localStorage.setItem("finsightRiskAnswers", JSON.stringify(riskAnswers));
     }
-  }, [userRiskProfile]);
+  }, [riskAnswers, authToken, currentUser]);
+
+  useEffect(() => {
+    if (!authToken && !currentUser) {
+      if (userRiskProfile) {
+        localStorage.setItem(
+          "finsightUserRiskProfile",
+          JSON.stringify(userRiskProfile)
+        );
+      } else {
+        localStorage.removeItem("finsightUserRiskProfile");
+      }
+    }
+  }, [userRiskProfile, authToken, currentUser]);
 
   useEffect(() =>{
     localStorage.setItem("finsightTheme", theme);
@@ -177,6 +177,50 @@ useEffect(() => {
   };
 
   loadUserWatchlist();
+}, [authToken, currentUser]);
+
+useEffect(() => {
+  const loadUserRiskProfile = async () => {
+    if (!authToken || !currentUser) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/user/risk-profile/`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (response.status === 404) {
+        setRiskAnswers({});
+        setUserRiskProfile(null);
+        return;
+      }
+
+      if (!response.ok) {
+        throw new Error("Unable to load user risk profile.");
+      }
+
+      const data = await response.json();
+
+      setRiskAnswers(data.answers || {});
+      setUserRiskProfile({
+        profile: data.profile_type,
+        score: data.score,
+        description:
+          data.profile_type === "Conservative"
+            ? "You prefer stability and capital protection. You may be less comfortable with large price movements or short-term losses."
+            : data.profile_type === "Moderate"
+            ? "You are willing to accept some investment risk for potential growth, but you may still prefer a balanced approach."
+            : "You are willing to accept higher risk and larger price movements for the possibility of higher long-term returns.",
+      });
+    } catch (error) {
+      console.error("Risk profile load error:", error);
+    }
+  };
+
+  loadUserRiskProfile();
 }, [authToken, currentUser]);
 
  const riskQuestions = [
@@ -425,14 +469,37 @@ const analyzeStock = async () => {
       "You are willing to accept higher risk and larger price movements for the possibility of higher long-term returns.";
   }
 
-  setUserRiskProfile({
+  const profileResult = {
     score: totalScore,
     profile,
     description,
-  });
+  };
+
+  setUserRiskProfile(profileResult);
+  saveRiskProfileToDatabase(profileResult, riskAnswers);
 };
 
-const resetRiskProfile = () => {
+const saveRiskProfileToDatabase = async (profileResult, answers) => {
+  if (!authToken || !currentUser) {
+    return;
+  }
+
+  try {
+    await fetch(`${API_BASE_URL}/user/risk-profile/`, {
+      method: "POST",
+      headers: getAuthHeaders(),
+      body: JSON.stringify({
+        profile_type: profileResult.profile,
+        score: profileResult.score,
+        answers: answers,
+      }),
+    });
+  } catch (error) {
+    console.error("Save risk profile error:", error);
+  }
+};
+
+const resetRiskProfile = async () => {
   const confirmReset = window.confirm(
     "Are you sure you want to reset your risk profile questionnaire?"
   );
@@ -443,6 +510,22 @@ const resetRiskProfile = () => {
 
   setRiskAnswers({});
   setUserRiskProfile(null);
+
+  if (authToken && currentUser) {
+    try {
+      await fetch(`${API_BASE_URL}/user/risk-profile/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+    } catch (error) {
+      console.error("Delete risk profile error:", error);
+    }
+
+    return;
+  }
+
   localStorage.removeItem("finsightRiskAnswers");
   localStorage.removeItem("finsightUserRiskProfile");
 };
@@ -1570,6 +1653,12 @@ const handleLogout = () => {
 
   resetAnalysisState();
   resetComparisonState();
+
+  const guestRiskAnswers = localStorage.getItem("finsightRiskAnswers");
+  const guestRiskProfile = localStorage.getItem("finsightUserRiskProfile");
+
+  setRiskAnswers(guestRiskAnswers ? JSON.parse(guestRiskAnswers) : {});
+  setUserRiskProfile(guestRiskProfile ? JSON.parse(guestRiskProfile) : null);
 
   const guestWatchlist = localStorage.getItem("finsightWatchlist");
   setWatchlist(guestWatchlist ? JSON.parse(guestWatchlist) : []);

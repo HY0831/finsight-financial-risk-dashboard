@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import Boolean, Column, DateTime, Float, ForeignKey, Integer, JSON, String, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -34,3 +34,17 @@ class WatchlistItem(Base):
     __table_args__ = (
         UniqueConstraint("user_id", "ticker", name="unique_user_ticker"),
     )
+
+class RiskProfile(Base):
+    __tablename__ = "risk_profiles"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), unique=True, nullable=False)
+
+    profile_type = Column(String, nullable=False)
+    score = Column(Integer, nullable=False)
+    answers = Column(JSON, nullable=True)
+
+    updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    user = relationship("User")

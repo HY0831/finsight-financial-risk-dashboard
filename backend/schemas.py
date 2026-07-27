@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Dict, Optional
 from pydantic import BaseModel, EmailStr
 
 
@@ -43,6 +43,21 @@ class WatchlistItemResponse(BaseModel):
     latest_price: Optional[float] = None
     risk_level: Optional[str] = None
     annualized_volatility: Optional[float] = None
+
+    class Config:
+        from_attributes = True
+
+class RiskProfileCreate(BaseModel):
+    profile_type: str
+    score: int
+    answers: Optional[Dict[str, int]] = None
+
+
+class RiskProfileResponse(BaseModel):
+    id: int
+    profile_type: str
+    score: int
+    answers: Optional[Dict[str, int]] = None
 
     class Config:
         from_attributes = True
