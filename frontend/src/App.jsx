@@ -9,6 +9,8 @@ import WatchlistPage from "./pages/WatchlistPage";
 import ProfilePage from "./pages/ProfilePage";
 import HistoryPage from "./pages/HistoryPage";
 import AboutPage from "./pages/AboutPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
 import "./App.css";
 
 const API_BASE_URL = 
@@ -56,6 +58,15 @@ function App() {
     return savedTheme || "light";
   });
 
+  const [authToken, setAuthToken] = useState(() => {
+    return localStorage.getItem("finsightAuthToken") || "";
+  });
+
+  const [currentUser, setCurrentUser] = useState(() => {
+    const savedUser = localStorage.getItem("finsightCurrentUser");
+    return savedUser ? JSON.parse(savedUser) : null;
+  })
+
   useEffect(() => {
     const savedHistory = localStorage.getItem("finsightSearchHistory");
     if (savedHistory) {
@@ -93,6 +104,39 @@ function App() {
       document.body.classList.add("eye-mode");
     }
   }, [theme]);
+
+  useEffect(() => {
+  const verifyLoggedInUser = async () => {
+    if (!authToken) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Invalid token");
+      }
+
+      const user = await response.json();
+
+      localStorage.setItem("finsightCurrentUser", JSON.stringify(user));
+      setCurrentUser(user);
+    } catch {
+      localStorage.removeItem("finsightAuthToken");
+      localStorage.removeItem("finsightCurrentUser");
+
+      setAuthToken("");
+      setCurrentUser(null);
+    }
+  };
+
+  verifyLoggedInUser();
+}, [authToken]);
 
  const riskQuestions = [
   {
@@ -1405,9 +1449,17 @@ const refreshWatchlist = async () => {
   setWatchlist(updatedWatchlist);
 };
 
+const handleLogout = () => {
+  localStorage.removeItem("finsightAuthToken");
+  localStorage.removeItem("finsightCurrentUser");
+
+  setAuthToken("");
+  setCurrentUser(null);
+};
+
     return (
     <div className={`app ${theme === "dark" ? "dark-mode" : theme === "eye" ? "eye-mode" : ""}`}>
-      <Navbar theme={theme} setTheme={setTheme} />
+      <Navbar theme={theme} setTheme={setTheme} currentUser={currentUser} handleLogout={handleLogout} />
 
       <Routes>
         <Route
@@ -1518,6 +1570,28 @@ const refreshWatchlist = async () => {
         />
 
         <Route path="/about" element={<AboutPage />} />
+
+        <Route
+          path="/login"
+          element={
+            <LoginPage
+              apiBaseUrl={API_BASE_URL}
+              setCurrentUser={setCurrentUser}
+              setAuthToken={setAuthToken}
+              />
+          }
+        />
+
+        <Route
+          path="/register"
+          element={
+            <RegisterPage
+              apiBaseUrl={API_BASE_URL}
+              setCurrentUser={setCurrentUser}
+              setAuthToken={setAuthToken}
+            />
+          }
+        />
       </Routes>
 
       <footer className="footer">

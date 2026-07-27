@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 
-function Navbar({ theme, setTheme }) {
+function Navbar({ theme, setTheme, currentUser, handleLogout }) {
   return (
     <nav className="navbar">
       <NavLink to="/" className="navbar-logo">
@@ -20,18 +20,47 @@ function Navbar({ theme, setTheme }) {
         <NavLink to="/about">About</NavLink>
       </div>
 
-      <div className="theme-selector">
-        <span>{theme === "dark" ? "Dark" : theme === "eye" ? "Eye Protection" : "Light"}</span>
+      <div className="navbar-right">
+        <div className="theme-selector">
+          <span>
+            {theme === "dark"
+              ? "Dark"
+              : theme === "eye"
+              ? "Eye Protection"
+              : "Light"}
+          </span>
 
-        <select
-          value={theme}
-          onChange={(event) => setTheme(event.target.value)}
-          aria-label="Select website theme"
-        >
-          <option value="light">Light Mode</option>
-          <option value="dark">Dark Mode</option>
-          <option value="eye">Eye Protection</option>
-        </select>
+          <select
+            value={theme}
+            onChange={(event) => setTheme(event.target.value)}
+            aria-label="Select website theme"
+          >
+            <option value="light">Light Mode</option>
+            <option value="dark">Dark Mode</option>
+            <option value="eye">Eye Protection</option>
+          </select>
+        </div>
+
+        <div className="auth-navbar">
+          {currentUser ? (
+            <>
+              <span className="auth-user-name">
+                Hi, {currentUser.full_name}
+              </span>
+
+              <button type="button" onClick={handleLogout}>
+                Logout
+              </button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/login">Login</NavLink>
+              <NavLink to="/register" className="register-link">
+                Register
+              </NavLink>
+            </>
+          )}
+        </div>
       </div>
     </nav>
   );
