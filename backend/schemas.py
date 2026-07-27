@@ -1,3 +1,4 @@
+from typing import Optional
 from pydantic import BaseModel, EmailStr
 
 
@@ -26,3 +27,22 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str
     user: UserResponse
+
+class WatchlistItemCreate(BaseModel):
+    ticker: str
+    company_name: Optional[str] = None
+    latest_price: Optional[float] = None
+    risk_level: Optional[str] = None
+    annualized_volatility: Optional[float] = None
+
+
+class WatchlistItemResponse(BaseModel):
+    id: int
+    ticker: str
+    company_name: Optional[str] = None
+    latest_price: Optional[float] = None
+    risk_level: Optional[str] = None
+    annualized_volatility: Optional[float] = None
+
+    class Config:
+        from_attributes = True
