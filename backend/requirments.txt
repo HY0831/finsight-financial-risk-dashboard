@@ -52,7 +52,7 @@ audioop-lts==0.2.2
 Automat @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_ddy0059olt/croot/automat_1743532570194/work
 autopep8 @ file:///croot/autopep8_1708962882016/work
 babel @ file:///opt/miniconda3/conda-bld/babel_1764159365447/work
-bcrypt @ file:///opt/miniconda3/conda-bld/bcrypt_1762875116397/work
+bcrypt==4.0.1
 beautifulsoup4 @ file:///private/var/folders/k1/30mswbxs7r1g6zwn8y4fyt500000gp/T/abs_4910wm3bdc/croot/beautifulsoup4-split_1756453097265/work
 binaryornot @ file:///tmp/build/80754af9/binaryornot_1617751525010/work
 black @ file:///opt/miniconda3/conda-bld/black_1760632311471/work
