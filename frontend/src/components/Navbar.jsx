@@ -17,6 +17,7 @@ function Navbar({ theme, setTheme, currentUser, handleLogout }) {
         <NavLink to="/watchlist">Watchlist</NavLink>
         <NavLink to="/profile">Risk Profile</NavLink>
         <NavLink to="/history">History</NavLink>
+        <NavLink to="/account">Account</NavLink>
         <NavLink to="/about">About</NavLink>
       </div>
 

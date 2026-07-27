@@ -11,6 +11,7 @@ import HistoryPage from "./pages/HistoryPage";
 import AboutPage from "./pages/AboutPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import AccountPage from "./pages/AccountPage";
 import "./App.css";
 
 const API_BASE_URL = 
@@ -1959,6 +1960,19 @@ const saveHistoryToDatabase = async (historyItem) => {
               setAuthToken={setAuthToken}
               resetAnalysisState={resetAnalysisState}
               resetComparisonState={resetComparisonState}
+            />
+          }
+        />
+
+        <Route
+          path="/account"
+          element={
+            <AccountPage
+              currentUser={currentUser}
+              watchlist={watchlist}
+              searchHistory={searchHistory}
+              userRiskProfile={userRiskProfile}
+              handleLogout={handleLogout}
             />
           }
         />
