@@ -1,6 +1,6 @@
 import { NavLink } from "react-router";
 
-function Navbar() {
+function Navbar({ theme, setTheme }) {
   return (
     <nav className="navbar">
       <NavLink to="/" className="navbar-logo">
@@ -11,12 +11,26 @@ function Navbar() {
         <NavLink to="/" end>
           Home
         </NavLink>
+
         <NavLink to="/analyze">Analyze</NavLink>
         <NavLink to="/compare">Compare</NavLink>
         <NavLink to="/watchlist">Watchlist</NavLink>
         <NavLink to="/profile">Risk Profile</NavLink>
         <NavLink to="/history">History</NavLink>
         <NavLink to="/about">About</NavLink>
+      </div>
+
+      <div className="theme-selector">
+        <span>{theme === "dark" ? "Dark" : "Light"}</span>
+
+        <select
+          value={theme}
+          onChange={(event) => setTheme(event.target.value)}
+          aria-label="Select website theme"
+        >
+          <option value="light">Light Mode</option>
+          <option value="dark">Dark Mode</option>
+        </select>
       </div>
     </nav>
   );

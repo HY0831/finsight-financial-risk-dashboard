@@ -69,6 +69,39 @@ body {
 }
 
 /* =========================================================
+   Theme Selector
+========================================================= */
+
+.theme-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-selector span {
+  color: #374151;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.theme-selector select {
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #111827;
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.theme-selector select:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
+}
+
+/* =========================================================
   Global Page Header Center Alignment Fix
 ========================================================= */
 
@@ -3679,6 +3712,96 @@ th {
   line-height: 1.6;
 }
 
+/* =========================================================
+  Final Header & Section Title Alignment Fix
+  Added to center section headers without changing original layout code
+========================================================= */
+
+/* Center all common section title blocks */
+.section-heading,
+.section-title,
+.comparison-title {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-heading h2,
+.section-title h2,
+.comparison-title h2 {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.section-heading p,
+.section-title p,
+.comparison-title p {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 760px;
+}
+
+/* Center Popular Stock Trends header while keeping Live badge on the right */
+.trending-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: start;
+  gap: 18px;
+  text-align: center;
+}
+
+.trending-header > div {
+  grid-column: 2;
+  text-align: center;
+}
+
+.trending-header h2,
+.trending-header p {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.trending-header p {
+  max-width: 720px;
+}
+
+.trending-header .live-badge,
+.live-badge {
+  justify-self: end;
+}
+
+/* Center Recent Searches header while keeping Clear History button on the right */
+.history-header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 18px;
+  text-align: center;
+}
+
+.history-header > div {
+  grid-column: 2;
+  text-align: center;
+}
+
+.history-header h2,
+.history-header p {
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.history-header p {
+  max-width: 720px;
+}
+
+.history-header .clear-history-button,
+.clear-history-button {
+  justify-self: end;
+}
 
 /* =========================================================
   Responsive Design
@@ -3822,6 +3945,11 @@ th {
   .navbar {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .theme-selector {
+    width: 100%;
+    justify-content: flex-start;
   }
 
   .home-features {
@@ -4173,97 +4301,6 @@ th {
   }
 }
 
-/* =========================================================
-  Final Header & Section Title Alignment Fix
-  Added to center section headers without changing original layout code
-========================================================= */
-
-/* Center all common section title blocks */
-.section-heading,
-.section-title,
-.comparison-title {
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.section-heading h2,
-.section-title h2,
-.comparison-title h2 {
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.section-heading p,
-.section-title p,
-.comparison-title p {
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-  max-width: 760px;
-}
-
-/* Center Popular Stock Trends header while keeping Live badge on the right */
-.trending-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: start;
-  gap: 18px;
-  text-align: center;
-}
-
-.trending-header > div {
-  grid-column: 2;
-  text-align: center;
-}
-
-.trending-header h2,
-.trending-header p {
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.trending-header p {
-  max-width: 720px;
-}
-
-.trending-header .live-badge,
-.live-badge {
-  justify-self: end;
-}
-
-/* Center Recent Searches header while keeping Clear History button on the right */
-.history-header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 18px;
-  text-align: center;
-}
-
-.history-header > div {
-  grid-column: 2;
-  text-align: center;
-}
-
-.history-header h2,
-.history-header p {
-  text-align: center;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.history-header p {
-  max-width: 720px;
-}
-
-.history-header .clear-history-button,
-.clear-history-button {
-  justify-self: end;
-}
-
 /* Mobile alignment for Popular Stock Trends and Recent Searches */
 @media (max-width: 600px) {
   .trending-header,
@@ -4284,4 +4321,511 @@ th {
   .clear-history-button {
     justify-self: center;
   }
+}
+
+/* =========================================================
+   Dark Mode
+========================================================= */
+
+body.dark-mode {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+body.dark-mode .app,
+.app.dark-mode {
+  background: #020617;
+  color: #e5e7eb;
+  min-height: 100vh;
+}
+
+/* Navbar */
+
+body.dark-mode .navbar,
+.app.dark-mode .navbar {
+  background: #0f172a;
+  border-bottom: 1px solid #1f2937;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+body.dark-mode .navbar-logo,
+.app.dark-mode .navbar-logo {
+  color: #f9fafb;
+}
+
+body.dark-mode .navbar-links a,
+.app.dark-mode .navbar-links a {
+  color: #cbd5e1;
+}
+
+body.dark-mode .navbar-links a:hover,
+body.dark-mode .navbar-links a.active,
+.app.dark-mode .navbar-links a:hover,
+.app.dark-mode .navbar-links a.active {
+  background: #020617;
+  color: #ffffff;
+}
+
+body.dark-mode .theme-selector span,
+.app.dark-mode .theme-selector span {
+  color: #e5e7eb;
+}
+
+body.dark-mode .theme-selector select,
+.app.dark-mode .theme-selector select {
+  background: #020617;
+  color: #f9fafb;
+  border-color: #475569;
+}
+
+/* Main sections */
+
+body.dark-mode .page-header,
+body.dark-mode .trending-section,
+body.dark-mode .dashboard-highlight-section,
+body.dark-mode .recent-analysis-preview-section,
+body.dark-mode .how-section,
+body.dark-mode .risk-preview-section,
+body.dark-mode .home-cta,
+body.dark-mode .search-card,
+body.dark-mode .dashboard-title,
+body.dark-mode .stock-header,
+body.dark-mode .chart-section,
+body.dark-mode .summary-section,
+body.dark-mode .table-section,
+body.dark-mode .metric-explanation-section,
+body.dark-mode .risk-insight-summary-section,
+body.dark-mode .comparison-section,
+body.dark-mode .comparison-recommendation-section,
+body.dark-mode .comparison-interpretation,
+body.dark-mode .comparison-interpretation-section,
+body.dark-mode .comparison-summary,
+body.dark-mode .compare-empty-card,
+body.dark-mode .watchlist-section,
+body.dark-mode .watchlist-empty-card,
+body.dark-mode .watchlist-risk-distribution,
+body.dark-mode .watchlist-compare-panel,
+body.dark-mode .history-section,
+body.dark-mode .history-empty-card,
+body.dark-mode .history-filter-empty,
+body.dark-mode .watchlist-filter-empty,
+body.dark-mode .profile-explanation-section,
+body.dark-mode .risk-profile-section,
+body.dark-mode .profile-result,
+body.dark-mode .suitability-section,
+body.dark-mode .suitability-text,
+body.dark-mode .about-card,
+body.dark-mode .about-overview-section,
+body.dark-mode .about-detail-section,
+body.dark-mode .method-section,
+body.dark-mode .tech-section,
+body.dark-mode .methodology-section,
+body.dark-mode .classification-method-section,
+body.dark-mode .suitability-method-section,
+body.dark-mode .empty-state,
+.app.dark-mode .page-header,
+.app.dark-mode .trending-section,
+.app.dark-mode .dashboard-highlight-section,
+.app.dark-mode .recent-analysis-preview-section,
+.app.dark-mode .how-section,
+.app.dark-mode .risk-preview-section,
+.app.dark-mode .home-cta,
+.app.dark-mode .search-card,
+.app.dark-mode .dashboard-title,
+.app.dark-mode .stock-header,
+.app.dark-mode .chart-section,
+.app.dark-mode .summary-section,
+.app.dark-mode .table-section,
+.app.dark-mode .metric-explanation-section,
+.app.dark-mode .risk-insight-summary-section,
+.app.dark-mode .comparison-section,
+.app.dark-mode .comparison-recommendation-section,
+.app.dark-mode .comparison-interpretation,
+.app.dark-mode .comparison-interpretation-section,
+.app.dark-mode .comparison-summary,
+.app.dark-mode .compare-empty-card,
+.app.dark-mode .watchlist-section,
+.app.dark-mode .watchlist-empty-card,
+.app.dark-mode .watchlist-risk-distribution,
+.app.dark-mode .watchlist-compare-panel,
+.app.dark-mode .history-section,
+.app.dark-mode .history-empty-card,
+.app.dark-mode .history-filter-empty,
+.app.dark-mode .watchlist-filter-empty,
+.app.dark-mode .profile-explanation-section,
+.app.dark-mode .risk-profile-section,
+.app.dark-mode .profile-result,
+.app.dark-mode .suitability-section,
+.app.dark-mode .suitability-text,
+.app.dark-mode .about-card,
+.app.dark-mode .about-overview-section,
+.app.dark-mode .about-detail-section,
+.app.dark-mode .method-section,
+.app.dark-mode .tech-section,
+.app.dark-mode .methodology-section,
+.app.dark-mode .classification-method-section,
+.app.dark-mode .suitability-method-section,
+.app.dark-mode .empty-state {
+  background: #0f172a;
+  border-color: #1f2937;
+  color: #e5e7eb;
+}
+
+/* Cards */
+
+body.dark-mode .feature-card,
+body.dark-mode .how-card,
+body.dark-mode .guide-card,
+body.dark-mode .card,
+body.dark-mode .metric-card,
+body.dark-mode .risk-insight-card,
+body.dark-mode .metric-explanation-card,
+body.dark-mode .comparison-card,
+body.dark-mode .comparison-metric,
+body.dark-mode .comparison-recommendation-card,
+body.dark-mode .comparison-interpretation-card,
+body.dark-mode .watchlist-card,
+body.dark-mode .watchlist-info-card,
+body.dark-mode .watchlist-summary-card,
+body.dark-mode .watchlist-metrics div,
+body.dark-mode .history-card,
+body.dark-mode .history-summary-card,
+body.dark-mode .history-info-card,
+body.dark-mode .profile-info-card,
+body.dark-mode .profile-type-card,
+body.dark-mode .question-card,
+body.dark-mode .option-item,
+body.dark-mode .suitability-grid div,
+body.dark-mode .about-overview-card,
+body.dark-mode .about-detail-card,
+body.dark-mode .methodology-card,
+body.dark-mode .method-card,
+body.dark-mode .tech-card,
+body.dark-mode .suitability-method-card,
+body.dark-mode .dashboard-highlight-card,
+body.dark-mode .recent-analysis-preview-card,
+body.dark-mode .classification-method-card,
+body.dark-mode .risk-preview-card,
+body.dark-mode .trend-card,
+body.dark-mode .empty-tips div,
+.app.dark-mode .feature-card,
+.app.dark-mode .how-card,
+.app.dark-mode .guide-card,
+.app.dark-mode .card,
+.app.dark-mode .metric-card,
+.app.dark-mode .risk-insight-card,
+.app.dark-mode .metric-explanation-card,
+.app.dark-mode .comparison-card,
+.app.dark-mode .comparison-metric,
+.app.dark-mode .comparison-recommendation-card,
+.app.dark-mode .comparison-interpretation-card,
+.app.dark-mode .watchlist-card,
+.app.dark-mode .watchlist-info-card,
+.app.dark-mode .watchlist-summary-card,
+.app.dark-mode .watchlist-metrics div,
+.app.dark-mode .history-card,
+.app.dark-mode .history-summary-card,
+.app.dark-mode .history-info-card,
+.app.dark-mode .profile-info-card,
+.app.dark-mode .profile-type-card,
+.app.dark-mode .question-card,
+.app.dark-mode .option-item,
+.app.dark-mode .suitability-grid div,
+.app.dark-mode .about-overview-card,
+.app.dark-mode .about-detail-card,
+.app.dark-mode .methodology-card,
+.app.dark-mode .method-card,
+.app.dark-mode .tech-card,
+.app.dark-mode .suitability-method-card,
+.app.dark-mode .dashboard-highlight-card,
+.app.dark-mode .recent-analysis-preview-card,
+.app.dark-mode .classification-method-card,
+.app.dark-mode .risk-preview-card,
+.app.dark-mode .trend-card,
+.app.dark-mode .empty-tips div {
+  background: #111827;
+  border-color: #374151;
+  color: #e5e7eb;
+}
+
+/* Text */
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode strong,
+.app.dark-mode h1,
+.app.dark-mode h2,
+.app.dark-mode h3,
+.app.dark-mode h4,
+.app.dark-mode strong {
+  color: #f9fafb;
+}
+
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode label,
+body.dark-mode small,
+.app.dark-mode p,
+.app.dark-mode span,
+.app.dark-mode label,
+.app.dark-mode small {
+  color: #cbd5e1;
+}
+
+body.dark-mode .section-heading p,
+body.dark-mode .section-title p,
+body.dark-mode .comparison-title p,
+.app.dark-mode .section-heading p,
+.app.dark-mode .section-title p,
+.app.dark-mode .comparison-title p {
+  color: #cbd5e1;
+}
+
+/* Inputs */
+
+body.dark-mode input,
+body.dark-mode select,
+.app.dark-mode input,
+.app.dark-mode select {
+  background: #111827;
+  color: #f9fafb;
+  border-color: #475569;
+}
+
+body.dark-mode input::placeholder,
+.app.dark-mode input::placeholder {
+  color: #9ca3af;
+}
+
+body.dark-mode input:focus,
+body.dark-mode select:focus,
+.app.dark-mode input:focus,
+.app.dark-mode select:focus {
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.2);
+}
+
+/* Search suggestions */
+
+body.dark-mode .suggestions-dropdown,
+body.dark-mode .compare-suggestions-dropdown,
+.app.dark-mode .suggestions-dropdown,
+.app.dark-mode .compare-suggestions-dropdown {
+  background: #111827;
+  border-color: #374151;
+}
+
+body.dark-mode .suggestion-loading,
+.app.dark-mode .suggestion-loading {
+  background: #111827;
+  color: #cbd5e1;
+}
+
+body.dark-mode .search-section .suggestion-item,
+body.dark-mode .comparison-inputs .suggestion-item,
+.app.dark-mode .search-section .suggestion-item,
+.app.dark-mode .comparison-inputs .suggestion-item {
+  background: #111827;
+  color: #f9fafb;
+  border-bottom: 1px solid #374151;
+}
+
+body.dark-mode .search-section .suggestion-item:hover,
+body.dark-mode .comparison-inputs .suggestion-item:hover,
+.app.dark-mode .search-section .suggestion-item:hover,
+.app.dark-mode .comparison-inputs .suggestion-item:hover {
+  background: #1f2937;
+}
+
+/* Tables */
+
+body.dark-mode table,
+body.dark-mode th,
+body.dark-mode td,
+.app.dark-mode table,
+.app.dark-mode th,
+.app.dark-mode td {
+  border-color: #374151;
+}
+
+body.dark-mode th,
+.app.dark-mode th {
+  background: #1f2937;
+  color: #f9fafb;
+}
+
+body.dark-mode td,
+.app.dark-mode td {
+  color: #e5e7eb;
+}
+
+/* Special sections */
+
+body.dark-mode .formula-box,
+.app.dark-mode .formula-box {
+  background: #020617;
+  border-color: #475569;
+  color: #e5e7eb;
+}
+
+body.dark-mode .source-note,
+.app.dark-mode .source-note {
+  background: #020617;
+  border-left-color: #475569;
+  color: #cbd5e1;
+}
+
+body.dark-mode .risk-distribution-bar,
+body.dark-mode .trend-bar,
+.app.dark-mode .risk-distribution-bar,
+.app.dark-mode .trend-bar {
+  background: #374151;
+}
+
+body.dark-mode .comparison-recommendation-insight,
+body.dark-mode .comparison-interpretation-note,
+.app.dark-mode .comparison-recommendation-insight,
+.app.dark-mode .comparison-interpretation-note {
+  background: #172554;
+  border-color: #1e40af;
+  color: #dbeafe;
+}
+
+body.dark-mode .comparison-recommendation-insight h3,
+body.dark-mode .comparison-recommendation-insight p,
+body.dark-mode .comparison-interpretation-note,
+.app.dark-mode .comparison-recommendation-insight h3,
+.app.dark-mode .comparison-recommendation-insight p,
+.app.dark-mode .comparison-interpretation-note {
+  color: #dbeafe;
+}
+
+/* Risk badges keep their colours */
+
+body.dark-mode .low-risk,
+.app.dark-mode .low-risk {
+  background: #14532d;
+  color: #bbf7d0;
+}
+
+body.dark-mode .medium-risk,
+.app.dark-mode .medium-risk {
+  background: #78350f;
+  color: #fde68a;
+}
+
+body.dark-mode .high-risk,
+.app.dark-mode .high-risk {
+  background: #7f1d1d;
+  color: #fecaca;
+}
+
+/* Buttons */
+
+body.dark-mode .primary-link-button,
+.app.dark-mode .primary-link-button {
+  background: #f9fafb;
+  color: #111827;
+}
+
+body.dark-mode .secondary-link-button,
+.app.dark-mode .secondary-link-button {
+  background: #1f2937;
+  color: #f9fafb;
+  border-color: #475569;
+}
+
+body.dark-mode .dark-link-button,
+.app.dark-mode .dark-link-button {
+  background: #f9fafb;
+  color: #111827;
+}
+
+body.dark-mode .profile-button,
+body.dark-mode .watchlist-button,
+body.dark-mode .watchlist-analyse-button,
+body.dark-mode .compare-selected-button,
+body.dark-mode .comparison-inputs button,
+body.dark-mode .search-section > button,
+body.dark-mode .history-analyse-button,
+.app.dark-mode .profile-button,
+.app.dark-mode .watchlist-button,
+.app.dark-mode .watchlist-analyse-button,
+.app.dark-mode .compare-selected-button,
+.app.dark-mode .comparison-inputs button,
+.app.dark-mode .search-section > button,
+.app.dark-mode .history-analyse-button {
+  background: #f9fafb;
+  color: #111827;
+}
+
+body.dark-mode .watchlist-button.saved,
+.app.dark-mode .watchlist-button.saved {
+  background: #78350f;
+  color: #fde68a;
+}
+
+/* Error cards */
+
+body.dark-mode .analysis-error-card,
+body.dark-mode .comparison-error-card,
+.app.dark-mode .analysis-error-card,
+.app.dark-mode .comparison-error-card {
+  background: #450a0a;
+  border-color: #7f1d1d;
+}
+
+body.dark-mode .analysis-error-card h3,
+body.dark-mode .comparison-error-card h3,
+.app.dark-mode .analysis-error-card h3,
+.app.dark-mode .comparison-error-card h3 {
+  color: #fecaca;
+}
+
+body.dark-mode .analysis-error-card p,
+body.dark-mode .comparison-error-card p,
+.app.dark-mode .analysis-error-card p,
+.app.dark-mode .comparison-error-card p {
+  color: #fee2e2;
+}
+
+body.dark-mode .error-suggestion,
+.app.dark-mode .error-suggestion {
+  background: #7f1d1d;
+  border-color: #991b1b;
+  color: #fee2e2;
+}
+
+/* Footer */
+
+body.dark-mode .footer,
+.app.dark-mode .footer {
+  background: #020617;
+  border-top: 1px solid #1f2937;
+}
+
+body.dark-mode .footer p,
+.app.dark-mode .footer p {
+  color: #9ca3af;
+}
+
+/* About disclaimer dark mode fix */
+
+body.dark-mode .about-disclaimer-section,
+.app.dark-mode .about-disclaimer-section {
+  background: #7f1d1d;
+  border: 1px solid #ef4444;
+  color: #fee2e2;
+}
+
+body.dark-mode .about-disclaimer-section h2,
+.app.dark-mode .about-disclaimer-section h2 {
+  color: #ffffff;
+}
+
+body.dark-mode .about-disclaimer-section p,
+.app.dark-mode .about-disclaimer-section p {
+  color: #fee2e2;
 }

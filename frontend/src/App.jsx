@@ -51,6 +51,11 @@ function App() {
     return savedWatchlist ? JSON.parse(savedWatchlist) : [];
   });
 
+  const [theme, setTheme] = useState(() =>{
+    const savedTheme = localStorage.getItem("finsightTheme");
+    return savedTheme || "light";
+  });
+
   useEffect(() => {
     const savedHistory = localStorage.getItem("finsightSearchHistory");
     if (savedHistory) {
@@ -74,6 +79,16 @@ function App() {
       );
     }
   }, [userRiskProfile]);
+
+  useEffect(() =>{
+    localStorage.setItem("finsightTheme", theme);
+
+    if(theme === "dark"){
+      document.body.classList.add("dark-mode");
+    } else{
+
+    } document.body.classList.remove("dark-mode");
+  }, [theme]);
 
  const riskQuestions = [
   {
@@ -1387,8 +1402,8 @@ const refreshWatchlist = async () => {
 };
 
     return (
-    <div className="app">
-      <Navbar />
+    <div className={`app ${theme === "dark" ? "dark-mode" : ""}`}>
+      <Navbar theme={theme} setTheme={setTheme} />
 
       <Routes>
         <Route
