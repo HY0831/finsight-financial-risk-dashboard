@@ -83,11 +83,15 @@ function App() {
   useEffect(() =>{
     localStorage.setItem("finsightTheme", theme);
 
-    if(theme === "dark"){
-      document.body.classList.add("dark-mode");
-    } else{
+    document.body.classList.remove("dark-mode","eye-mode");
 
-    } document.body.classList.remove("dark-mode");
+    if (theme === "dark"){
+      document.body.classList.add("dark-mode");
+    }
+
+    if (theme === "eye"){
+      document.body.classList.add("eye-mode");
+    }
   }, [theme]);
 
  const riskQuestions = [
@@ -1402,7 +1406,7 @@ const refreshWatchlist = async () => {
 };
 
     return (
-    <div className={`app ${theme === "dark" ? "dark-mode" : ""}`}>
+    <div className={`app ${theme === "dark" ? "dark-mode" : theme === "eye" ? "eye-mode" : ""}`}>
       <Navbar theme={theme} setTheme={setTheme} />
 
       <Routes>

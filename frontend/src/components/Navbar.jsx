@@ -21,7 +21,7 @@ function Navbar({ theme, setTheme }) {
       </div>
 
       <div className="theme-selector">
-        <span>{theme === "dark" ? "Dark" : "Light"}</span>
+        <span>{theme === "dark" ? "Dark" : theme === "eye" ? "Eye Protection" : "Light"}</span>
 
         <select
           value={theme}
@@ -30,6 +30,7 @@ function Navbar({ theme, setTheme }) {
         >
           <option value="light">Light Mode</option>
           <option value="dark">Dark Mode</option>
+          <option value="eye">Eye Protection</option>
         </select>
       </div>
     </nav>
