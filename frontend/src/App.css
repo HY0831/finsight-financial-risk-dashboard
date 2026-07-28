@@ -21,19 +21,58 @@ body {
 /* =========================================================
   Navigation Bar
 ========================================================= */
+
 .nav-wrapper {
   max-width: 1200px;
   margin: 0 auto 28px auto;
 }
 
-.auth-topbar {
+/* Top right area: theme + login/register */
+.nav-topbar {
+  max-width: 1200px;
+  margin: 0 auto 12px auto;
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 14px;
-  margin-bottom: 10px;
-  font-size: 14px;
-  font-weight: 700;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Theme selector */
+.topbar-theme-selector {
+  display: flex;
+  align-items: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.topbar-theme-selector select {
+  border: 1px solid #e5e7eb;
+  outline: none;
+  background: #f9fafb;
+  color: #111827;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 9px 34px 9px 14px;
+  border-radius: 999px;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+  transition: 0.2s ease;
+}
+
+.topbar-theme-selector select:hover {
+  background: #ffffff;
+  border-color: #d1d5db;
+}
+
+/* Login / Register area */
+.auth-topbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .auth-topbar a,
@@ -41,38 +80,47 @@ body {
   text-decoration: none;
   border: none;
   background: transparent;
-  color: #374151;
+  color: #4b5563;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 800;
   cursor: pointer;
-  padding: 7px 12px;
+  padding: 9px 14px;
   border-radius: 999px;
+  transition: 0.2s ease;
 }
 
 .auth-topbar a:hover,
 .auth-topbar button:hover {
   background: #f3f4f6;
+  color: #111827;
 }
 
 .auth-topbar .topbar-register {
   background: #111827;
-  color: white;
+  color: #ffffff;
+  padding: 10px 18px;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
 }
 
 .auth-topbar .topbar-register:hover {
   background: #1f2937;
+  color: #ffffff;
+  transform: translateY(-1px);
 }
 
+/* Cloud save badge */
 .cloud-save-text {
-  color: #16a34a;
+  color: #166534;
   background: #dcfce7;
-  padding: 6px 10px;
+  padding: 7px 11px;
   border-radius: 999px;
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 800;
 }
 
+/* Main navbar */
 .navbar {
-  background: white;
+  background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 22px;
   padding: 22px 26px;
@@ -83,6 +131,7 @@ body {
   box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
+/* Logo */
 .navbar-logo {
   font-size: 32px;
   font-weight: 900;
@@ -91,10 +140,11 @@ body {
   white-space: nowrap;
 }
 
+/* Main links */
 .navbar-links {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 8px;
   flex: 1;
   flex-wrap: wrap;
@@ -107,33 +157,17 @@ body {
   font-size: 15px;
   padding: 10px 14px;
   border-radius: 12px;
+  transition: 0.2s ease;
+}
+
+.navbar-links a:hover {
+  background: #f3f4f6;
+  color: #111827;
 }
 
 .navbar-links a.active {
   background: #111827;
-  color: white;
-}
-
-.theme-selector {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  white-space: nowrap;
-}
-
-.theme-selector span {
-  font-size: 14px;
-  font-weight: 700;
-  color: #374151;
-}
-
-.theme-selector select {
-  padding: 9px 12px;
-  border-radius: 12px;
-  border: 1px solid #d1d5db;
-  font-weight: 700;
-  background: white;
-  color: #111827;
+  color: #ffffff;
 }
 
 /* =========================================================
@@ -4824,6 +4858,136 @@ th {
   }
 }
 
+@media (max-width: 700px) {
+  .nav-topbar {
+    justify-content: center;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .navbar-links {
+    justify-content: center;
+  }
+}
+
+/* =========================================================
+   Responsive Navigation
+========================================================= */
+
+@media (max-width: 1050px) {
+  .nav-wrapper {
+    margin: 0 auto 24px auto;
+  }
+
+  .nav-topbar {
+    justify-content: flex-end;
+    padding: 0 8px;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 26px 22px;
+    gap: 20px;
+  }
+
+  .navbar-logo {
+    font-size: 38px;
+  }
+
+  .navbar-links {
+    justify-content: center;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .navbar-links a {
+    font-size: 15px;
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 760px) {
+  .nav-topbar {
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .topbar-theme-selector select {
+    font-size: 13px;
+    padding: 8px 28px 8px 12px;
+  }
+
+  .auth-topbar {
+    gap: 6px;
+  }
+
+  .auth-topbar a,
+  .auth-topbar button {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  .auth-topbar .topbar-register {
+    padding: 9px 15px;
+  }
+
+  .navbar {
+    border-radius: 20px;
+    padding: 24px 18px;
+  }
+
+  .navbar-logo {
+    font-size: 34px;
+  }
+
+  .navbar-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .navbar-links a {
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    padding: 11px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-topbar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .auth-topbar {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .navbar {
+    padding: 22px 14px;
+  }
+
+  .navbar-logo {
+    font-size: 30px;
+  }
+
+  .navbar-links {
+    grid-template-columns: 1fr;
+  }
+
+  .navbar-links a {
+    font-size: 14px;
+  }
+}
+
 /* =========================================================
    Dark Mode
 ========================================================= */
@@ -4840,51 +5004,99 @@ body.dark-mode .app,
   min-height: 100vh;
 }
 
-/* Navbar */
+/* =========================================================
+   Dark Mode Navbar + Topbar
+========================================================= */
 
+body.dark-mode .nav-topbar,
+.app.dark-mode .nav-topbar {
+  background: transparent;
+}
+
+/* Theme selector container */
+body.dark-mode .topbar-theme-selector,
+.app.dark-mode .topbar-theme-selector {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Theme dropdown */
+body.dark-mode .topbar-theme-selector select,
+.app.dark-mode .topbar-theme-selector select {
+  background: #020617;
+  color: #f9fafb;
+  border: 1px solid #1f2937;
+  border-radius: 999px;
+}
+
+/* Dropdown options */
+body.dark-mode .topbar-theme-selector select option,
+.app.dark-mode .topbar-theme-selector select option {
+  background: #020617;
+  color: #f9fafb;
+}
+
+/* Login / Logout */
 body.dark-mode .auth-topbar a,
 body.dark-mode .auth-topbar button,
 .app.dark-mode .auth-topbar a,
 .app.dark-mode .auth-topbar button {
-  color: #e5e7eb;
+  color: #cbd5e1;
 }
 
+/* Login / Logout hover */
 body.dark-mode .auth-topbar a:hover,
 body.dark-mode .auth-topbar button:hover,
 .app.dark-mode .auth-topbar a:hover,
 .app.dark-mode .auth-topbar button:hover {
   background: #1f2937;
+  color: #ffffff;
 }
 
+/* Register button */
 body.dark-mode .auth-topbar .topbar-register,
 .app.dark-mode .auth-topbar .topbar-register {
-  background: #2563eb;
-  color: white;
+  background: #f9fafb;
+  color: #020617;
+  box-shadow: none;
 }
 
+/* Register hover */
+body.dark-mode .auth-topbar .topbar-register:hover,
+.app.dark-mode .auth-topbar .topbar-register:hover {
+  background: #e5e7eb;
+  color: #020617;
+}
+
+/* Cloud save badge */
 body.dark-mode .cloud-save-text,
 .app.dark-mode .cloud-save-text {
   background: #14532d;
   color: #bbf7d0;
 }
 
+/* Main navbar */
 body.dark-mode .navbar,
 .app.dark-mode .navbar {
   background: #0f172a;
-  border-bottom: 1px solid #1f2937;
+  border: 1px solid #1f2937;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
+/* Logo */
 body.dark-mode .navbar-logo,
 .app.dark-mode .navbar-logo {
   color: #f9fafb;
 }
 
+/* Navbar links */
 body.dark-mode .navbar-links a,
 .app.dark-mode .navbar-links a {
   color: #cbd5e1;
 }
 
+/* Navbar links hover and active */
 body.dark-mode .navbar-links a:hover,
 body.dark-mode .navbar-links a.active,
 .app.dark-mode .navbar-links a:hover,
@@ -4893,16 +5105,24 @@ body.dark-mode .navbar-links a.active,
   color: #ffffff;
 }
 
+/* General theme selector fallback */
+body.dark-mode .theme-selector,
+.app.dark-mode .theme-selector {
+  background: transparent;
+}
+
+/* General theme selector text */
 body.dark-mode .theme-selector span,
 .app.dark-mode .theme-selector span {
   color: #e5e7eb;
 }
 
+/* General theme selector select */
 body.dark-mode .theme-selector select,
 .app.dark-mode .theme-selector select {
   background: #020617;
   color: #f9fafb;
-  border-color: #475569;
+  border-color: #1f2937;
 }
 
 /* Main sections */
@@ -5460,34 +5680,79 @@ body.eye-mode .app,
   min-height: 100vh;
 }
 
-/* Navbar */
+/* =========================================================
+   Eye Protection Navbar + Topbar
+========================================================= */
 
+body.eye-mode .nav-topbar,
+.app.eye-mode .nav-topbar {
+  background: transparent;
+}
+
+/* Theme selector container */
+body.eye-mode .topbar-theme-selector,
+.app.eye-mode .topbar-theme-selector {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Theme dropdown */
+body.eye-mode .topbar-theme-selector select,
+.app.eye-mode .topbar-theme-selector select {
+  background: #eef7e7;
+  color: #1f3320;
+  border: 1px solid #cfe3c0;
+  border-radius: 999px;
+}
+
+/* Dropdown options */
+body.eye-mode .topbar-theme-selector select option,
+.app.eye-mode .topbar-theme-selector select option {
+  background: #eef7e7;
+  color: #1f3320;
+}
+
+/* Login / Logout */
 body.eye-mode .auth-topbar a,
 body.eye-mode .auth-topbar button,
 .app.eye-mode .auth-topbar a,
 .app.eye-mode .auth-topbar button {
-  color: #2f422f;
+  color: #3f513b;
 }
 
+/* Login / Logout hover */
 body.eye-mode .auth-topbar a:hover,
 body.eye-mode .auth-topbar button:hover,
 .app.eye-mode .auth-topbar a:hover,
 .app.eye-mode .auth-topbar button:hover {
   background: #e4efd8;
+  color: #243424;
 }
 
+/* Register button */
 body.eye-mode .auth-topbar .topbar-register,
 .app.eye-mode .auth-topbar .topbar-register {
   background: #3f6f3a;
-  color: white;
+  color: #ffffff;
+  box-shadow: none;
 }
 
+/* Register hover */
+body.eye-mode .auth-topbar .topbar-register:hover,
+.app.eye-mode .auth-topbar .topbar-register:hover {
+  background: #315f34;
+  color: #ffffff;
+}
+
+/* Cloud save badge */
 body.eye-mode .cloud-save-text,
 .app.eye-mode .cloud-save-text {
   background: #dceccd;
   color: #2f5f2f;
 }
 
+/* Main navbar */
 body.eye-mode .navbar,
 .app.eye-mode .navbar {
   background: #f8fbf2;
@@ -5495,38 +5760,50 @@ body.eye-mode .navbar,
   box-shadow: 0 10px 30px rgba(80, 110, 70, 0.12);
 }
 
+/* Logo */
 body.eye-mode .navbar-logo,
 .app.eye-mode .navbar-logo {
   color: #1f3320;
 }
 
+/* Navbar links */
 body.eye-mode .navbar-links a,
 .app.eye-mode .navbar-links a {
   color: #4b5f45;
 }
 
+/* Navbar links hover */
 body.eye-mode .navbar-links a:hover,
 .app.eye-mode .navbar-links a:hover {
   background: #e2efd8;
   color: #1f3320;
 }
 
+/* Navbar active link */
 body.eye-mode .navbar-links a.active,
 .app.eye-mode .navbar-links a.active {
   background: #3f6f3a;
   color: #ffffff;
 }
 
+/* General theme selector fallback */
+body.eye-mode .theme-selector,
+.app.eye-mode .theme-selector {
+  background: transparent;
+}
+
+/* General theme selector text */
 body.eye-mode .theme-selector span,
 .app.eye-mode .theme-selector span {
   color: #2f4a2d;
 }
 
+/* General theme selector select */
 body.eye-mode .theme-selector select,
 .app.eye-mode .theme-selector select {
-  background: #f8fbf2;
+  background: #eef7e7;
   color: #1f3320;
-  border-color: #bdd6ae;
+  border-color: #cfe3c0;
 }
 
 /* Hero sections */
