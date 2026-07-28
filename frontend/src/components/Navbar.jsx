@@ -2,26 +2,45 @@ import { NavLink } from "react-router";
 
 function Navbar({ theme, setTheme, currentUser, handleLogout }) {
   return (
-    <nav className="navbar">
-      <NavLink to="/" className="navbar-logo">
-        FinSight
-      </NavLink>
-
-      <div className="navbar-links">
-        <NavLink to="/" end>
-          Home
-        </NavLink>
-
-        <NavLink to="/analyze">Analyze</NavLink>
-        <NavLink to="/compare">Compare</NavLink>
-        <NavLink to="/watchlist">Watchlist</NavLink>
-        <NavLink to="/profile">Risk Profile</NavLink>
-        <NavLink to="/history">History</NavLink>
-        <NavLink to="/account">Account</NavLink>
-        <NavLink to="/about">About</NavLink>
+    <header className="nav-wrapper">
+      <div className="auth-topbar">
+        {currentUser ? (
+          <>
+            <span>Hi, {currentUser.full_name}</span>
+            <span className="cloud-save-text">Cloud Save On</span>
+            <button type="button" onClick={handleLogout}>
+              Logout
+            </button>
+          </>
+        ) : (
+          <>
+            <NavLink to="/login">Login</NavLink>
+            <NavLink to="/register" className="topbar-register">
+              Register
+            </NavLink>
+          </>
+        )}
       </div>
 
-      <div className="navbar-right">
+      <nav className="navbar">
+        <NavLink to="/" className="navbar-logo">
+          FinSight
+        </NavLink>
+
+        <div className="navbar-links">
+          <NavLink to="/" end>
+            Home
+          </NavLink>
+
+          <NavLink to="/analyze">Analyze</NavLink>
+          <NavLink to="/compare">Compare</NavLink>
+          <NavLink to="/watchlist">Watchlist</NavLink>
+          <NavLink to="/profile">Risk Profile</NavLink>
+          <NavLink to="/history">History</NavLink>
+          <NavLink to="/account">Account</NavLink>
+          <NavLink to="/about">About</NavLink>
+        </div>
+
         <div className="theme-selector">
           <span>
             {theme === "dark"
@@ -41,29 +60,8 @@ function Navbar({ theme, setTheme, currentUser, handleLogout }) {
             <option value="eye">Eye Protection</option>
           </select>
         </div>
-
-        <div className="auth-navbar">
-          {currentUser ? (
-            <>
-              <span className="auth-user-name">
-                Hi, {currentUser.full_name} · Cloud Save On 
-              </span>
-
-              <button type="button" onClick={handleLogout}>
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <NavLink to="/login">Login</NavLink>
-              <NavLink to="/register" className="register-link">
-                Register
-              </NavLink>
-            </>
-          )}
-        </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 }
 

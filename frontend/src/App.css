@@ -21,46 +21,92 @@ body {
 /* =========================================================
   Navigation Bar
 ========================================================= */
+.nav-wrapper {
+  max-width: 1200px;
+  margin: 0 auto 28px auto;
+}
+
+.auth-topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.auth-topbar a,
+.auth-topbar button {
+  text-decoration: none;
+  border: none;
+  background: transparent;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 7px 12px;
+  border-radius: 999px;
+}
+
+.auth-topbar a:hover,
+.auth-topbar button:hover {
+  background: #f3f4f6;
+}
+
+.auth-topbar .topbar-register {
+  background: #111827;
+  color: white;
+}
+
+.auth-topbar .topbar-register:hover {
+  background: #1f2937;
+}
+
+.cloud-save-text {
+  color: #16a34a;
+  background: #dcfce7;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+}
 
 .navbar {
-  max-width: 1100px;
-  margin: 0 auto 35px auto;
   background: white;
-  padding: 16px 22px;
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  border: 1px solid #e5e7eb;
+  border-radius: 22px;
+  padding: 22px 26px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 18px;
+  justify-content: space-between;
+  gap: 22px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
 .navbar-logo {
-  text-decoration: none;
+  font-size: 32px;
+  font-weight: 900;
   color: #111827;
-  font-size: 24px;
-  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .navbar-links {
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  gap: 8px;
+  flex: 1;
   flex-wrap: wrap;
 }
 
 .navbar-links a {
+  color: #374151;
   text-decoration: none;
-  color: #4b5563;
-  padding: 9px 13px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.navbar-links a:hover {
-  background: #f3f4f6;
-  color: #111827;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 10px 14px;
+  border-radius: 12px;
 }
 
 .navbar-links a.active {
@@ -68,37 +114,26 @@ body {
   color: white;
 }
 
-/* =========================================================
-   Theme Selector
-========================================================= */
-
 .theme-selector {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  white-space: nowrap;
 }
 
 .theme-selector span {
-  color: #374151;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
+  color: #374151;
 }
 
 .theme-selector select {
+  padding: 9px 12px;
+  border-radius: 12px;
   border: 1px solid #d1d5db;
+  font-weight: 700;
   background: white;
   color: #111827;
-  padding: 8px 10px;
-  border-radius: 10px;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.theme-selector select:focus {
-  outline: none;
-  border-color: #111827;
-  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.12);
 }
 
 /* =========================================================
@@ -4807,6 +4842,32 @@ body.dark-mode .app,
 
 /* Navbar */
 
+body.dark-mode .auth-topbar a,
+body.dark-mode .auth-topbar button,
+.app.dark-mode .auth-topbar a,
+.app.dark-mode .auth-topbar button {
+  color: #e5e7eb;
+}
+
+body.dark-mode .auth-topbar a:hover,
+body.dark-mode .auth-topbar button:hover,
+.app.dark-mode .auth-topbar a:hover,
+.app.dark-mode .auth-topbar button:hover {
+  background: #1f2937;
+}
+
+body.dark-mode .auth-topbar .topbar-register,
+.app.dark-mode .auth-topbar .topbar-register {
+  background: #2563eb;
+  color: white;
+}
+
+body.dark-mode .cloud-save-text,
+.app.dark-mode .cloud-save-text {
+  background: #14532d;
+  color: #bbf7d0;
+}
+
 body.dark-mode .navbar,
 .app.dark-mode .navbar {
   background: #0f172a;
@@ -5400,6 +5461,32 @@ body.eye-mode .app,
 }
 
 /* Navbar */
+
+body.eye-mode .auth-topbar a,
+body.eye-mode .auth-topbar button,
+.app.eye-mode .auth-topbar a,
+.app.eye-mode .auth-topbar button {
+  color: #2f422f;
+}
+
+body.eye-mode .auth-topbar a:hover,
+body.eye-mode .auth-topbar button:hover,
+.app.eye-mode .auth-topbar a:hover,
+.app.eye-mode .auth-topbar button:hover {
+  background: #e4efd8;
+}
+
+body.eye-mode .auth-topbar .topbar-register,
+.app.eye-mode .auth-topbar .topbar-register {
+  background: #3f6f3a;
+  color: white;
+}
+
+body.eye-mode .cloud-save-text,
+.app.eye-mode .cloud-save-text {
+  background: #dceccd;
+  color: #2f5f2f;
+}
 
 body.eye-mode .navbar,
 .app.eye-mode .navbar {
