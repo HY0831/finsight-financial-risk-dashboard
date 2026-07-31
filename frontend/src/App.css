@@ -252,6 +252,98 @@ body {
 }
 
 /* =========================================================
+   Hero Colour Variations
+========================================================= */
+
+/* Home Hero - Blue / Purple */
+.home-hero {
+  background: linear-gradient(135deg, #1e3a8a, #312e81);
+  color: #ffffff;
+}
+
+.home-hero h1,
+.home-hero p {
+  color: #ffffff;
+}
+
+/* Analyze Hero - Green / Teal */
+.analyze-hero {
+  background: linear-gradient(135deg, #064e3b, #0f766e);
+  color: #ffffff;
+}
+
+.analyze-hero h1,
+.analyze-hero p {
+  color: #ffffff;
+}
+
+/* Compare Hero - Navy / Slate */
+.compare-hero {
+  background: linear-gradient(135deg, #111827, #334155);
+  color: #ffffff;
+}
+
+.compare-hero h1,
+.compare-hero p {
+  color: #ffffff;
+}
+
+/* Watchlist Hero - Orange / Amber */
+.watchlist-hero {
+  background: linear-gradient(135deg, #7c2d12, #b45309);
+  color: #ffffff;
+}
+
+.watchlist-hero h1,
+.watchlist-hero p {
+  color: #ffffff;
+}
+
+/* Risk Profile Hero - Purple */
+.profile-hero {
+  background: linear-gradient(135deg, #581c87, #7e22ce);
+  color: #ffffff;
+}
+
+.profile-hero h1,
+.profile-hero p {
+  color: #ffffff;
+}
+
+/* History Hero - Indigo */
+.history-hero {
+  background: linear-gradient(135deg, #312e81, #4338ca);
+  color: #ffffff;
+}
+
+.history-hero h1,
+.history-hero p {
+  color: #ffffff;
+}
+
+/* Account Hero - Emerald */
+.account-hero {
+  background: linear-gradient(135deg, #14532d, #15803d);
+  color: #ffffff;
+}
+
+.account-hero h1,
+.account-hero p {
+  color: #ffffff;
+}
+
+/* About Hero - Slate / Blue */
+.about-hero {
+  background: linear-gradient(135deg, #0f172a, #1e40af);
+  color: #ffffff;
+}
+
+.about-hero h1,
+.about-hero p {
+  color: #ffffff;
+}
+
+/* =========================================================
    Toast Message
 ========================================================= */
 
@@ -605,7 +697,7 @@ body {
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: #111827;
+  background: #1e3a8a;
   color: white;
   align-items: center;
   justify-content: center;
@@ -794,7 +886,7 @@ body {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #111827;
+  background: #1e40af;
   color: white;
   align-items: center;
   justify-content: center;
@@ -949,12 +1041,12 @@ body {
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
 }
 
-.guide-card span {
+.analyze-guide .guide-card span {
   display: inline-flex;
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #111827;
+  background: #064e3b;
   color: white;
   align-items: center;
   justify-content: center;
@@ -1067,6 +1159,20 @@ body {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 16px;
+}
+
+.compare-guide .guide-card span {
+  display: inline-flex;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #334155;
+  color: white;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 13px;
+  margin-bottom: 12px;
 }
 
 .comparison-status-card,
@@ -1311,7 +1417,7 @@ body {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #312e81;
+  background: #581c87;
   color: white;
   align-items: center;
   justify-content: center;
@@ -1445,7 +1551,7 @@ body {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #065f46;
+  background: #312e81;
   color: white;
   align-items: center;
   justify-content: center;
@@ -2479,7 +2585,7 @@ th {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #111827;
+  background: #064e3b;
   color: white;
   align-items: center;
   justify-content: center;
@@ -5062,6 +5168,62 @@ th {
 }
 
 /* =========================================================
+   Mobile Hero Text Fix
+========================================================= */
+
+@media (max-width: 760px) {
+  .home-hero,
+  .analyze-hero,
+  .compare-hero,
+  .watchlist-hero,
+  .profile-hero,
+  .history-hero,
+  .account-hero,
+  .about-hero {
+    padding: 36px 22px;
+    text-align: center;
+  }
+
+  .home-hero h1,
+  .analyze-hero h1,
+  .compare-hero h1,
+  .watchlist-hero h1,
+  .profile-hero h1,
+  .history-hero h1,
+  .account-hero h1,
+  .about-hero h1 {
+    color: #ffffff;
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  .home-hero p,
+  .analyze-hero p,
+  .compare-hero p,
+  .watchlist-hero p,
+  .profile-hero p,
+  .history-hero p,
+  .account-hero p,
+  .about-hero p {
+    color: #f3f4f6;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .home-hero .page-tag,
+  .analyze-hero .page-tag,
+  .compare-hero .page-tag,
+  .watchlist-hero .page-tag,
+  .profile-hero .page-tag,
+  .history-hero .page-tag,
+  .account-hero .page-tag,
+  .about-hero .page-tag {
+    background: rgba(255, 255, 255, 0.16);
+    color: #ffffff;
+  }
+}
+
+/* =========================================================
    Dark Mode
 ========================================================= */
 
@@ -5727,6 +5889,18 @@ body.dark-mode .account-storage-card,
   background: #0f172a;
   border-color: #1f2937;
   color: #e5e7eb;
+}
+
+body.dark-mode .account-status.guest,
+.app.dark-mode .account-status.guest {
+  background: #78350f;
+  color: #fde68a;
+}
+
+body.dark-mode .account-status.logged-in,
+.app.dark-mode .account-status.logged-in {
+  background: #14532d;
+  color: #bbf7d0;
 }
 
 body.dark-mode .account-status-card h2,
@@ -6587,4 +6761,1327 @@ body.eye-mode .toast-message.info,
   background: #dbe8d4;
   color: #315f34;
   border-color: #bdd6ae;
+}
+
+/* =========================================================
+   Eye Protection Hero Fix
+========================================================= */
+
+body.eye-mode .home-hero,
+body.eye-mode .analyze-hero,
+body.eye-mode .compare-hero,
+body.eye-mode .watchlist-hero,
+body.eye-mode .profile-hero,
+body.eye-mode .history-hero,
+body.eye-mode .account-hero,
+body.eye-mode .about-hero,
+.app.eye-mode .home-hero,
+.app.eye-mode .analyze-hero,
+.app.eye-mode .compare-hero,
+.app.eye-mode .watchlist-hero,
+.app.eye-mode .profile-hero,
+.app.eye-mode .history-hero,
+.app.eye-mode .account-hero,
+.app.eye-mode .about-hero {
+  background: linear-gradient(135deg, #315f34, #5f7f4f);
+  color: #ffffff;
+}
+
+body.eye-mode .home-hero h1,
+body.eye-mode .home-hero p,
+body.eye-mode .analyze-hero h1,
+body.eye-mode .analyze-hero p,
+body.eye-mode .compare-hero h1,
+body.eye-mode .compare-hero p,
+body.eye-mode .watchlist-hero h1,
+body.eye-mode .watchlist-hero p,
+body.eye-mode .profile-hero h1,
+body.eye-mode .profile-hero p,
+body.eye-mode .history-hero h1,
+body.eye-mode .history-hero p,
+body.eye-mode .account-hero h1,
+body.eye-mode .account-hero p,
+body.eye-mode .about-hero h1,
+body.eye-mode .about-hero p,
+.app.eye-mode .home-hero h1,
+.app.eye-mode .home-hero p,
+.app.eye-mode .analyze-hero h1,
+.app.eye-mode .analyze-hero p,
+.app.eye-mode .compare-hero h1,
+.app.eye-mode .compare-hero p,
+.app.eye-mode .watchlist-hero h1,
+.app.eye-mode .watchlist-hero p,
+.app.eye-mode .profile-hero h1,
+.app.eye-mode .profile-hero p,
+.app.eye-mode .history-hero h1,
+.app.eye-mode .history-hero p,
+.app.eye-mode .account-hero h1,
+.app.eye-mode .account-hero p,
+.app.eye-mode .about-hero h1,
+.app.eye-mode .about-hero p {
+  color: #ffffff;
+}
+
+/* =========================================================
+   FINAL MINIMALIST DESIGN SYSTEM
+   Use this section as the final colour system for FinSight.
+   It intentionally keeps the website professional, neutral,
+   and less colourful.
+========================================================= */
+
+:root {
+  --fs-bg: #f5f6f8;
+  --fs-surface: #ffffff;
+  --fs-surface-soft: #f9fafb;
+  --fs-border: #e5e7eb;
+  --fs-text: #111827;
+  --fs-muted: #6b7280;
+  --fs-primary: #111827;
+  --fs-primary-soft: #1f2937;
+  --fs-accent: #334155;
+  --fs-success-bg: #ecfdf5;
+  --fs-success-text: #166534;
+  --fs-warning-bg: #fffbeb;
+  --fs-warning-text: #92400e;
+  --fs-danger-bg: #fef2f2;
+  --fs-danger-text: #991b1b;
+  --fs-info-bg: #f1f5f9;
+  --fs-info-text: #334155;
+  --fs-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+/* Base */
+body {
+  background: var(--fs-bg);
+  color: var(--fs-text);
+}
+
+.app {
+  background: var(--fs-bg);
+}
+
+/* Topbar and Navbar */
+.nav-wrapper {
+  max-width: 1200px;
+  margin: 0 auto 28px auto;
+}
+
+.nav-topbar {
+  max-width: 1200px;
+  margin: 0 auto 12px auto;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.topbar-theme-selector {
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+}
+
+.topbar-theme-selector select {
+  border: 1px solid var(--fs-border);
+  outline: none;
+  background: var(--fs-surface);
+  color: var(--fs-text);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 9px 34px 9px 14px;
+  border-radius: 999px;
+  box-shadow: none;
+}
+
+.topbar-theme-selector select:hover {
+  background: var(--fs-surface-soft);
+  border-color: #d1d5db;
+}
+
+.auth-topbar a,
+.auth-topbar button {
+  color: var(--fs-muted);
+}
+
+.auth-topbar a:hover,
+.auth-topbar button:hover {
+  background: var(--fs-surface-soft);
+  color: var(--fs-text);
+}
+
+.auth-topbar .topbar-register {
+  background: var(--fs-primary);
+  color: #ffffff;
+  box-shadow: none;
+}
+
+.auth-topbar .topbar-register:hover {
+  background: var(--fs-primary-soft);
+  color: #ffffff;
+  transform: none;
+}
+
+.navbar {
+  background: var(--fs-surface);
+  border: 1px solid var(--fs-border);
+  border-radius: 22px;
+  box-shadow: var(--fs-shadow);
+}
+
+.navbar-logo {
+  color: var(--fs-text);
+}
+
+.navbar-links a {
+  color: #374151;
+}
+
+.navbar-links a:hover {
+  background: var(--fs-surface-soft);
+  color: var(--fs-text);
+}
+
+.navbar-links a.active {
+  background: var(--fs-primary);
+  color: #ffffff;
+}
+
+/* Minimal page heroes - same professional colour across pages */
+.home-hero,
+.analyze-hero,
+.compare-hero,
+.watchlist-hero,
+.profile-hero,
+.history-hero,
+.account-hero,
+.about-hero,
+.auth-hero,
+.home-cta {
+  background: linear-gradient(135deg, #111827, #1f2937);
+  color: #ffffff;
+  box-shadow: var(--fs-shadow);
+}
+
+.home-hero h1,
+.home-hero p,
+.analyze-hero h1,
+.analyze-hero p,
+.compare-hero h1,
+.compare-hero p,
+.watchlist-hero h1,
+.watchlist-hero p,
+.profile-hero h1,
+.profile-hero p,
+.history-hero h1,
+.history-hero p,
+.account-hero h1,
+.account-hero p,
+.about-hero h1,
+.about-hero p,
+.auth-hero h1,
+.auth-hero p,
+.home-cta h2,
+.home-cta p {
+  color: #ffffff;
+}
+
+.home-tag,
+.page-tag {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+}
+
+/* Main sections and cards */
+.page-header,
+.trending-section,
+.dashboard-highlight-section,
+.recent-analysis-preview-section,
+.how-section,
+.risk-preview-section,
+.search-card,
+.dashboard-title,
+.stock-header,
+.chart-section,
+.summary-section,
+.table-section,
+.metric-explanation-section,
+.risk-insight-summary-section,
+.comparison-section,
+.comparison-recommendation-section,
+.comparison-interpretation,
+.comparison-summary,
+.compare-empty-card,
+.watchlist-section,
+.watchlist-empty-card,
+.watchlist-risk-distribution,
+.watchlist-compare-panel,
+.history-section,
+.history-empty-card,
+.history-filter-empty,
+.watchlist-filter-empty,
+.profile-explanation-section,
+.risk-profile-section,
+.profile-result,
+.suitability-section,
+.suitability-text,
+.about-card,
+.about-overview-section,
+.about-detail-section,
+.method-section,
+.tech-section,
+.methodology-section,
+.classification-method-section,
+.suitability-method-section,
+.empty-state,
+.auth-card,
+.guest-note,
+.account-section,
+.account-storage-section,
+.account-status-card,
+.about-disclaimer-section {
+  background: var(--fs-surface);
+  border-color: var(--fs-border);
+  color: var(--fs-text);
+  box-shadow: var(--fs-shadow);
+}
+
+.feature-card,
+.how-card,
+.guide-card,
+.card,
+.metric-card,
+.risk-insight-card,
+.metric-explanation-card,
+.comparison-card,
+.comparison-metric,
+.comparison-recommendation-card,
+.comparison-interpretation-card,
+.watchlist-card,
+.watchlist-info-card,
+.watchlist-summary-card,
+.watchlist-metrics div,
+.history-card,
+.history-summary-card,
+.history-info-card,
+.profile-info-card,
+.profile-type-card,
+.question-card,
+.option-item,
+.suitability-grid div,
+.about-overview-card,
+.about-detail-card,
+.methodology-card,
+.method-card,
+.tech-card,
+.suitability-method-card,
+.dashboard-highlight-card,
+.recent-analysis-preview-card,
+.classification-method-card,
+.risk-preview-card,
+.trend-card,
+.empty-tips div,
+.account-summary-card,
+.account-storage-card {
+  background: var(--fs-surface-soft);
+  border-color: var(--fs-border);
+  color: var(--fs-text);
+}
+
+/* Text consistency */
+h1,
+h2,
+h3,
+h4,
+strong {
+  color: var(--fs-text);
+}
+
+p,
+span,
+label,
+small {
+  color: var(--fs-muted);
+}
+
+.section-heading p,
+.section-title p,
+.comparison-title p {
+  color: var(--fs-muted);
+}
+
+/* Number circles and small icon badges */
+.how-card span,
+.analyze-guide .guide-card span,
+.compare-guide .guide-card span,
+.watchlist-info-card span,
+.profile-info-card span,
+.history-info-card span,
+.about-overview-card span,
+.methodology-card span,
+.risk-insight-card span {
+  background: var(--fs-primary);
+  color: #ffffff;
+}
+
+/* Inputs */
+input,
+select,
+textarea,
+.search-section input,
+.search-section select,
+.comparison-inputs input,
+.compare-period-select,
+.history-controls input,
+.history-controls select,
+.watchlist-controls select,
+.auth-form input {
+  background: var(--fs-surface);
+  color: var(--fs-text);
+  border-color: #d1d5db;
+}
+
+input:focus,
+select:focus,
+textarea:focus,
+.search-section input:focus,
+.search-section select:focus,
+.comparison-inputs input:focus,
+.compare-period-select:focus,
+.history-controls input:focus,
+.history-controls select:focus,
+.watchlist-controls select:focus,
+.auth-form input:focus {
+  border-color: var(--fs-primary);
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.10);
+}
+
+/* Buttons */
+.primary-link-button,
+.dark-link-button,
+.profile-button,
+.watchlist-button,
+.watchlist-analyse-button,
+.compare-selected-button,
+.comparison-inputs button,
+.search-section > button,
+.history-analyse-button,
+.report-button,
+.refresh-watchlist-button,
+.account-actions .primary-account-link,
+.auth-form button {
+  background: var(--fs-primary);
+  color: #ffffff;
+}
+
+.primary-link-button:hover,
+.dark-link-button:hover,
+.profile-button:hover,
+.watchlist-button:hover,
+.watchlist-analyse-button:hover,
+.compare-selected-button:hover,
+.comparison-inputs button:hover,
+.search-section > button:hover,
+.history-analyse-button:hover,
+.report-button:hover,
+.refresh-watchlist-button:hover,
+.account-actions .primary-account-link:hover,
+.auth-form button:hover {
+  background: var(--fs-primary-soft);
+  color: #ffffff;
+}
+
+.secondary-link-button {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.account-actions a,
+.watchlist-select-button,
+.password-toggle {
+  background: var(--fs-surface-soft);
+  color: var(--fs-text);
+  border: 1px solid var(--fs-border);
+}
+
+.account-actions a:hover,
+.watchlist-select-button:hover,
+.password-toggle:hover {
+  background: #f3f4f6;
+}
+
+/* Keep only meaningful financial colours */
+.low-risk,
+.risk-text.low-risk,
+.trend-bar-fill.low-risk,
+.risk-distribution-fill.low,
+.risk-dot.low {
+  background: var(--fs-success-bg);
+  color: var(--fs-success-text);
+}
+
+.medium-risk,
+.risk-text.medium-risk,
+.trend-bar-fill.medium-risk,
+.risk-distribution-fill.medium,
+.risk-dot.medium {
+  background: var(--fs-warning-bg);
+  color: var(--fs-warning-text);
+}
+
+.high-risk,
+.risk-text.high-risk,
+.trend-bar-fill.high-risk,
+.risk-distribution-fill.high,
+.risk-dot.high {
+  background: var(--fs-danger-bg);
+  color: var(--fs-danger-text);
+}
+
+.trend-bar-fill.low-risk,
+.risk-distribution-fill.low,
+.risk-dot.low {
+  background: #16a34a;
+}
+
+.trend-bar-fill.medium-risk,
+.risk-distribution-fill.medium,
+.risk-dot.medium {
+  background: #d97706;
+}
+
+.trend-bar-fill.high-risk,
+.risk-distribution-fill.high,
+.risk-dot.high {
+  background: #dc2626;
+}
+
+.watchlist-button.saved,
+.watchlist-select-button.selected,
+.account-status.logged-in,
+.cloud-save-text,
+.live-badge {
+  background: var(--fs-success-bg);
+  color: var(--fs-success-text);
+}
+
+.account-status.guest {
+  background: var(--fs-info-bg);
+  color: var(--fs-info-text);
+}
+
+.clear-history-button,
+.clear-watchlist-button,
+.watchlist-remove-button,
+.reset-profile-button,
+.auth-navbar button,
+.account-status-card button {
+  background: var(--fs-danger-bg);
+  color: var(--fs-danger-text);
+  border: 1px solid #fecaca;
+}
+
+.clear-history-button:hover,
+.clear-watchlist-button:hover,
+.watchlist-remove-button:hover,
+.reset-profile-button:hover,
+.auth-navbar button:hover,
+.account-status-card button:hover {
+  background: #fee2e2;
+  color: var(--fs-danger-text);
+}
+
+/* Info / explanation boxes */
+.comparison-summary,
+.comparison-recommendation-insight,
+.comparison-interpretation-note,
+.source-note,
+.formula-box {
+  background: var(--fs-info-bg);
+  border-color: var(--fs-border);
+  color: var(--fs-info-text);
+}
+
+.comparison-summary h3,
+.comparison-recommendation-insight h3 {
+  color: var(--fs-text);
+}
+
+.comparison-summary span,
+.comparison-recommendation-insight p,
+.comparison-interpretation-note {
+  color: var(--fs-muted);
+}
+
+/* Error and toast messages */
+.analysis-error-card,
+.comparison-error-card,
+.auth-error,
+.toast-message.error {
+  background: var(--fs-danger-bg);
+  border-color: #fecaca;
+  color: var(--fs-danger-text);
+}
+
+.toast-message.success {
+  background: var(--fs-success-bg);
+  color: var(--fs-success-text);
+  border-color: #bbf7d0;
+}
+
+.toast-message.info {
+  background: var(--fs-info-bg);
+  color: var(--fs-info-text);
+  border-color: var(--fs-border);
+}
+
+/* Suggestions */
+.suggestions-dropdown,
+.compare-suggestions-dropdown {
+  background: var(--fs-surface);
+  border-color: var(--fs-border);
+}
+
+.search-section .suggestion-item,
+.comparison-inputs .suggestion-item {
+  background: var(--fs-surface);
+  color: var(--fs-text);
+  border-bottom: 1px solid var(--fs-border);
+}
+
+.search-section .suggestion-item:hover,
+.comparison-inputs .suggestion-item:hover {
+  background: var(--fs-surface-soft);
+}
+
+/* Tables */
+th {
+  background: var(--fs-surface-soft);
+  color: #374151;
+}
+
+td {
+  color: var(--fs-text);
+}
+
+/* =========================================================
+   DARK MODE - Minimalist
+========================================================= */
+
+body.dark-mode,
+body.dark-mode .app,
+.app.dark-mode {
+  background: #020617;
+  color: #e5e7eb;
+}
+
+body.dark-mode .navbar,
+.app.dark-mode .navbar,
+body.dark-mode .page-header,
+body.dark-mode .trending-section,
+body.dark-mode .dashboard-highlight-section,
+body.dark-mode .recent-analysis-preview-section,
+body.dark-mode .how-section,
+body.dark-mode .risk-preview-section,
+body.dark-mode .search-card,
+body.dark-mode .dashboard-title,
+body.dark-mode .stock-header,
+body.dark-mode .chart-section,
+body.dark-mode .summary-section,
+body.dark-mode .table-section,
+body.dark-mode .metric-explanation-section,
+body.dark-mode .risk-insight-summary-section,
+body.dark-mode .comparison-section,
+body.dark-mode .comparison-recommendation-section,
+body.dark-mode .comparison-interpretation,
+body.dark-mode .comparison-summary,
+body.dark-mode .compare-empty-card,
+body.dark-mode .watchlist-section,
+body.dark-mode .watchlist-empty-card,
+body.dark-mode .watchlist-risk-distribution,
+body.dark-mode .watchlist-compare-panel,
+body.dark-mode .history-section,
+body.dark-mode .history-empty-card,
+body.dark-mode .history-filter-empty,
+body.dark-mode .watchlist-filter-empty,
+body.dark-mode .profile-explanation-section,
+body.dark-mode .risk-profile-section,
+body.dark-mode .profile-result,
+body.dark-mode .suitability-section,
+body.dark-mode .suitability-text,
+body.dark-mode .about-card,
+body.dark-mode .about-overview-section,
+body.dark-mode .about-detail-section,
+body.dark-mode .method-section,
+body.dark-mode .tech-section,
+body.dark-mode .methodology-section,
+body.dark-mode .classification-method-section,
+body.dark-mode .suitability-method-section,
+body.dark-mode .empty-state,
+body.dark-mode .auth-card,
+body.dark-mode .guest-note,
+body.dark-mode .account-section,
+body.dark-mode .account-storage-section,
+body.dark-mode .account-status-card,
+body.dark-mode .about-disclaimer-section,
+.app.dark-mode .page-header,
+.app.dark-mode .trending-section,
+.app.dark-mode .dashboard-highlight-section,
+.app.dark-mode .recent-analysis-preview-section,
+.app.dark-mode .how-section,
+.app.dark-mode .risk-preview-section,
+.app.dark-mode .search-card,
+.app.dark-mode .dashboard-title,
+.app.dark-mode .stock-header,
+.app.dark-mode .chart-section,
+.app.dark-mode .summary-section,
+.app.dark-mode .table-section,
+.app.dark-mode .metric-explanation-section,
+.app.dark-mode .risk-insight-summary-section,
+.app.dark-mode .comparison-section,
+.app.dark-mode .comparison-recommendation-section,
+.app.dark-mode .comparison-interpretation,
+.app.dark-mode .comparison-summary,
+.app.dark-mode .compare-empty-card,
+.app.dark-mode .watchlist-section,
+.app.dark-mode .watchlist-empty-card,
+.app.dark-mode .watchlist-risk-distribution,
+.app.dark-mode .watchlist-compare-panel,
+.app.dark-mode .history-section,
+.app.dark-mode .history-empty-card,
+.app.dark-mode .history-filter-empty,
+.app.dark-mode .watchlist-filter-empty,
+.app.dark-mode .profile-explanation-section,
+.app.dark-mode .risk-profile-section,
+.app.dark-mode .profile-result,
+.app.dark-mode .suitability-section,
+.app.dark-mode .suitability-text,
+.app.dark-mode .about-card,
+.app.dark-mode .about-overview-section,
+.app.dark-mode .about-detail-section,
+.app.dark-mode .method-section,
+.app.dark-mode .tech-section,
+.app.dark-mode .methodology-section,
+.app.dark-mode .classification-method-section,
+.app.dark-mode .suitability-method-section,
+.app.dark-mode .empty-state,
+.app.dark-mode .auth-card,
+.app.dark-mode .guest-note,
+.app.dark-mode .account-section,
+.app.dark-mode .account-storage-section,
+.app.dark-mode .account-status-card,
+.app.dark-mode .about-disclaimer-section {
+  background: #0f172a;
+  border-color: #1f2937;
+  color: #e5e7eb;
+  box-shadow: none;
+}
+
+body.dark-mode .feature-card,
+body.dark-mode .how-card,
+body.dark-mode .guide-card,
+body.dark-mode .card,
+body.dark-mode .metric-card,
+body.dark-mode .risk-insight-card,
+body.dark-mode .metric-explanation-card,
+body.dark-mode .comparison-card,
+body.dark-mode .comparison-metric,
+body.dark-mode .comparison-recommendation-card,
+body.dark-mode .comparison-interpretation-card,
+body.dark-mode .watchlist-card,
+body.dark-mode .watchlist-info-card,
+body.dark-mode .watchlist-summary-card,
+body.dark-mode .watchlist-metrics div,
+body.dark-mode .history-card,
+body.dark-mode .history-summary-card,
+body.dark-mode .history-info-card,
+body.dark-mode .profile-info-card,
+body.dark-mode .profile-type-card,
+body.dark-mode .question-card,
+body.dark-mode .option-item,
+body.dark-mode .suitability-grid div,
+body.dark-mode .about-overview-card,
+body.dark-mode .about-detail-card,
+body.dark-mode .methodology-card,
+body.dark-mode .method-card,
+body.dark-mode .tech-card,
+body.dark-mode .suitability-method-card,
+body.dark-mode .dashboard-highlight-card,
+body.dark-mode .recent-analysis-preview-card,
+body.dark-mode .classification-method-card,
+body.dark-mode .risk-preview-card,
+body.dark-mode .trend-card,
+body.dark-mode .empty-tips div,
+body.dark-mode .account-summary-card,
+body.dark-mode .account-storage-card,
+.app.dark-mode .feature-card,
+.app.dark-mode .how-card,
+.app.dark-mode .guide-card,
+.app.dark-mode .card,
+.app.dark-mode .metric-card,
+.app.dark-mode .risk-insight-card,
+.app.dark-mode .metric-explanation-card,
+.app.dark-mode .comparison-card,
+.app.dark-mode .comparison-metric,
+.app.dark-mode .comparison-recommendation-card,
+.app.dark-mode .comparison-interpretation-card,
+.app.dark-mode .watchlist-card,
+.app.dark-mode .watchlist-info-card,
+.app.dark-mode .watchlist-summary-card,
+.app.dark-mode .watchlist-metrics div,
+.app.dark-mode .history-card,
+.app.dark-mode .history-summary-card,
+.app.dark-mode .history-info-card,
+.app.dark-mode .profile-info-card,
+.app.dark-mode .profile-type-card,
+.app.dark-mode .question-card,
+.app.dark-mode .option-item,
+.app.dark-mode .suitability-grid div,
+.app.dark-mode .about-overview-card,
+.app.dark-mode .about-detail-card,
+.app.dark-mode .methodology-card,
+.app.dark-mode .method-card,
+.app.dark-mode .tech-card,
+.app.dark-mode .suitability-method-card,
+.app.dark-mode .dashboard-highlight-card,
+.app.dark-mode .recent-analysis-preview-card,
+.app.dark-mode .classification-method-card,
+.app.dark-mode .risk-preview-card,
+.app.dark-mode .trend-card,
+.app.dark-mode .empty-tips div,
+.app.dark-mode .account-summary-card,
+.app.dark-mode .account-storage-card {
+  background: #111827;
+  border-color: #334155;
+  color: #e5e7eb;
+}
+
+body.dark-mode h1,
+body.dark-mode h2,
+body.dark-mode h3,
+body.dark-mode h4,
+body.dark-mode strong,
+.app.dark-mode h1,
+.app.dark-mode h2,
+.app.dark-mode h3,
+.app.dark-mode h4,
+.app.dark-mode strong {
+  color: #f9fafb;
+}
+
+body.dark-mode p,
+body.dark-mode span,
+body.dark-mode label,
+body.dark-mode small,
+.app.dark-mode p,
+.app.dark-mode span,
+.app.dark-mode label,
+.app.dark-mode small {
+  color: #cbd5e1;
+}
+
+body.dark-mode input,
+body.dark-mode select,
+body.dark-mode textarea,
+.app.dark-mode input,
+.app.dark-mode select,
+.app.dark-mode textarea {
+  background: #111827;
+  color: #f9fafb;
+  border-color: #334155;
+}
+
+body.dark-mode .home-hero,
+body.dark-mode .analyze-hero,
+body.dark-mode .compare-hero,
+body.dark-mode .watchlist-hero,
+body.dark-mode .profile-hero,
+body.dark-mode .history-hero,
+body.dark-mode .account-hero,
+body.dark-mode .about-hero,
+body.dark-mode .auth-hero,
+body.dark-mode .home-cta,
+.app.dark-mode .home-hero,
+.app.dark-mode .analyze-hero,
+.app.dark-mode .compare-hero,
+.app.dark-mode .watchlist-hero,
+.app.dark-mode .profile-hero,
+.app.dark-mode .history-hero,
+.app.dark-mode .account-hero,
+.app.dark-mode .about-hero,
+.app.dark-mode .auth-hero,
+.app.dark-mode .home-cta {
+  background: linear-gradient(135deg, #020617, #111827);
+  color: #ffffff;
+}
+
+body.dark-mode .topbar-theme-selector select,
+.app.dark-mode .topbar-theme-selector select {
+  background: #020617;
+  color: #f9fafb;
+  border-color: #1f2937;
+  box-shadow: none;
+}
+
+body.dark-mode .auth-topbar .topbar-register,
+.app.dark-mode .auth-topbar .topbar-register,
+body.dark-mode .primary-link-button,
+body.dark-mode .dark-link-button,
+body.dark-mode .profile-button,
+body.dark-mode .watchlist-button,
+body.dark-mode .watchlist-analyse-button,
+body.dark-mode .compare-selected-button,
+body.dark-mode .comparison-inputs button,
+body.dark-mode .search-section > button,
+body.dark-mode .history-analyse-button,
+body.dark-mode .report-button,
+body.dark-mode .refresh-watchlist-button,
+body.dark-mode .account-actions .primary-account-link,
+body.dark-mode .auth-form button,
+.app.dark-mode .primary-link-button,
+.app.dark-mode .dark-link-button,
+.app.dark-mode .profile-button,
+.app.dark-mode .watchlist-button,
+.app.dark-mode .watchlist-analyse-button,
+.app.dark-mode .compare-selected-button,
+.app.dark-mode .comparison-inputs button,
+.app.dark-mode .search-section > button,
+.app.dark-mode .history-analyse-button,
+.app.dark-mode .report-button,
+.app.dark-mode .refresh-watchlist-button,
+.app.dark-mode .account-actions .primary-account-link,
+.app.dark-mode .auth-form button {
+  background: #f9fafb;
+  color: #111827;
+}
+
+body.dark-mode .navbar-links a.active,
+.app.dark-mode .navbar-links a.active {
+  background: #020617;
+  color: #ffffff;
+}
+
+body.dark-mode .account-status.guest,
+.app.dark-mode .account-status.guest {
+  background: #1f2937;
+  color: #e5e7eb;
+}
+
+body.dark-mode .account-status.logged-in,
+body.dark-mode .cloud-save-text,
+body.dark-mode .live-badge,
+.app.dark-mode .account-status.logged-in,
+.app.dark-mode .cloud-save-text,
+.app.dark-mode .live-badge {
+  background: #14532d;
+  color: #bbf7d0;
+}
+
+/* =========================================================
+   EYE PROTECTION MODE - Minimalist
+========================================================= */
+
+body.eye-mode,
+body.eye-mode .app,
+.app.eye-mode {
+  background: #eef6e8;
+  color: #243424;
+}
+
+body.eye-mode .navbar,
+.app.eye-mode .navbar,
+body.eye-mode .page-header,
+body.eye-mode .trending-section,
+body.eye-mode .dashboard-highlight-section,
+body.eye-mode .recent-analysis-preview-section,
+body.eye-mode .how-section,
+body.eye-mode .risk-preview-section,
+body.eye-mode .search-card,
+body.eye-mode .dashboard-title,
+body.eye-mode .stock-header,
+body.eye-mode .chart-section,
+body.eye-mode .summary-section,
+body.eye-mode .table-section,
+body.eye-mode .metric-explanation-section,
+body.eye-mode .risk-insight-summary-section,
+body.eye-mode .comparison-section,
+body.eye-mode .comparison-recommendation-section,
+body.eye-mode .comparison-interpretation,
+body.eye-mode .comparison-summary,
+body.eye-mode .compare-empty-card,
+body.eye-mode .watchlist-section,
+body.eye-mode .watchlist-empty-card,
+body.eye-mode .watchlist-risk-distribution,
+body.eye-mode .watchlist-compare-panel,
+body.eye-mode .history-section,
+body.eye-mode .history-empty-card,
+body.eye-mode .history-filter-empty,
+body.eye-mode .watchlist-filter-empty,
+body.eye-mode .profile-explanation-section,
+body.eye-mode .risk-profile-section,
+body.eye-mode .profile-result,
+body.eye-mode .suitability-section,
+body.eye-mode .suitability-text,
+body.eye-mode .about-card,
+body.eye-mode .about-overview-section,
+body.eye-mode .about-detail-section,
+body.eye-mode .method-section,
+body.eye-mode .tech-section,
+body.eye-mode .methodology-section,
+body.eye-mode .classification-method-section,
+body.eye-mode .suitability-method-section,
+body.eye-mode .empty-state,
+body.eye-mode .auth-card,
+body.eye-mode .guest-note,
+body.eye-mode .account-section,
+body.eye-mode .account-storage-section,
+body.eye-mode .account-status-card,
+body.eye-mode .about-disclaimer-section,
+.app.eye-mode .page-header,
+.app.eye-mode .trending-section,
+.app.eye-mode .dashboard-highlight-section,
+.app.eye-mode .recent-analysis-preview-section,
+.app.eye-mode .how-section,
+.app.eye-mode .risk-preview-section,
+.app.eye-mode .search-card,
+.app.eye-mode .dashboard-title,
+.app.eye-mode .stock-header,
+.app.eye-mode .chart-section,
+.app.eye-mode .summary-section,
+.app.eye-mode .table-section,
+.app.eye-mode .metric-explanation-section,
+.app.eye-mode .risk-insight-summary-section,
+.app.eye-mode .comparison-section,
+.app.eye-mode .comparison-recommendation-section,
+.app.eye-mode .comparison-interpretation,
+.app.eye-mode .comparison-summary,
+.app.eye-mode .compare-empty-card,
+.app.eye-mode .watchlist-section,
+.app.eye-mode .watchlist-empty-card,
+.app.eye-mode .watchlist-risk-distribution,
+.app.eye-mode .watchlist-compare-panel,
+.app.eye-mode .history-section,
+.app.eye-mode .history-empty-card,
+.app.eye-mode .history-filter-empty,
+.app.eye-mode .watchlist-filter-empty,
+.app.eye-mode .profile-explanation-section,
+.app.eye-mode .risk-profile-section,
+.app.eye-mode .profile-result,
+.app.eye-mode .suitability-section,
+.app.eye-mode .suitability-text,
+.app.eye-mode .about-card,
+.app.eye-mode .about-overview-section,
+.app.eye-mode .about-detail-section,
+.app.eye-mode .method-section,
+.app.eye-mode .tech-section,
+.app.eye-mode .methodology-section,
+.app.eye-mode .classification-method-section,
+.app.eye-mode .suitability-method-section,
+.app.eye-mode .empty-state,
+.app.eye-mode .auth-card,
+.app.eye-mode .guest-note,
+.app.eye-mode .account-section,
+.app.eye-mode .account-storage-section,
+.app.eye-mode .account-status-card,
+.app.eye-mode .about-disclaimer-section {
+  background: #f8fbf2;
+  border-color: #d8e7c8;
+  color: #243424;
+}
+
+body.eye-mode .feature-card,
+body.eye-mode .how-card,
+body.eye-mode .guide-card,
+body.eye-mode .card,
+body.eye-mode .metric-card,
+body.eye-mode .risk-insight-card,
+body.eye-mode .metric-explanation-card,
+body.eye-mode .comparison-card,
+body.eye-mode .comparison-metric,
+body.eye-mode .comparison-recommendation-card,
+body.eye-mode .comparison-interpretation-card,
+body.eye-mode .watchlist-card,
+body.eye-mode .watchlist-info-card,
+body.eye-mode .watchlist-summary-card,
+body.eye-mode .watchlist-metrics div,
+body.eye-mode .history-card,
+body.eye-mode .history-summary-card,
+body.eye-mode .history-info-card,
+body.eye-mode .profile-info-card,
+body.eye-mode .profile-type-card,
+body.eye-mode .question-card,
+body.eye-mode .option-item,
+body.eye-mode .suitability-grid div,
+body.eye-mode .about-overview-card,
+body.eye-mode .about-detail-card,
+body.eye-mode .methodology-card,
+body.eye-mode .method-card,
+body.eye-mode .tech-card,
+body.eye-mode .suitability-method-card,
+body.eye-mode .dashboard-highlight-card,
+body.eye-mode .recent-analysis-preview-card,
+body.eye-mode .classification-method-card,
+body.eye-mode .risk-preview-card,
+body.eye-mode .trend-card,
+body.eye-mode .empty-tips div,
+body.eye-mode .account-summary-card,
+body.eye-mode .account-storage-card,
+.app.eye-mode .feature-card,
+.app.eye-mode .how-card,
+.app.eye-mode .guide-card,
+.app.eye-mode .card,
+.app.eye-mode .metric-card,
+.app.eye-mode .risk-insight-card,
+.app.eye-mode .metric-explanation-card,
+.app.eye-mode .comparison-card,
+.app.eye-mode .comparison-metric,
+.app.eye-mode .comparison-recommendation-card,
+.app.eye-mode .comparison-interpretation-card,
+.app.eye-mode .watchlist-card,
+.app.eye-mode .watchlist-info-card,
+.app.eye-mode .watchlist-summary-card,
+.app.eye-mode .watchlist-metrics div,
+.app.eye-mode .history-card,
+.app.eye-mode .history-summary-card,
+.app.eye-mode .history-info-card,
+.app.eye-mode .profile-info-card,
+.app.eye-mode .profile-type-card,
+.app.eye-mode .question-card,
+.app.eye-mode .option-item,
+.app.eye-mode .suitability-grid div,
+.app.eye-mode .about-overview-card,
+.app.eye-mode .about-detail-card,
+.app.eye-mode .methodology-card,
+.app.eye-mode .method-card,
+.app.eye-mode .tech-card,
+.app.eye-mode .suitability-method-card,
+.app.eye-mode .dashboard-highlight-card,
+.app.eye-mode .recent-analysis-preview-card,
+.app.eye-mode .classification-method-card,
+.app.eye-mode .risk-preview-card,
+.app.eye-mode .trend-card,
+.app.eye-mode .empty-tips div,
+.app.eye-mode .account-summary-card,
+.app.eye-mode .account-storage-card {
+  background: #eef6e8;
+  border-color: #cfe2c1;
+  color: #243424;
+}
+
+body.eye-mode .home-hero,
+body.eye-mode .analyze-hero,
+body.eye-mode .compare-hero,
+body.eye-mode .watchlist-hero,
+body.eye-mode .profile-hero,
+body.eye-mode .history-hero,
+body.eye-mode .account-hero,
+body.eye-mode .about-hero,
+body.eye-mode .auth-hero,
+body.eye-mode .home-cta,
+.app.eye-mode .home-hero,
+.app.eye-mode .analyze-hero,
+.app.eye-mode .compare-hero,
+.app.eye-mode .watchlist-hero,
+.app.eye-mode .profile-hero,
+.app.eye-mode .history-hero,
+.app.eye-mode .account-hero,
+.app.eye-mode .about-hero,
+.app.eye-mode .auth-hero,
+.app.eye-mode .home-cta {
+  background: linear-gradient(135deg, #315f34, #3f6f3a);
+  color: #ffffff;
+}
+
+body.eye-mode .topbar-theme-selector select,
+.app.eye-mode .topbar-theme-selector select {
+  background: #f8fbf2;
+  color: #1f3320;
+  border-color: #cfe3c0;
+  box-shadow: none;
+}
+
+body.eye-mode .navbar-links a.active,
+body.eye-mode .auth-topbar .topbar-register,
+body.eye-mode .primary-link-button,
+body.eye-mode .dark-link-button,
+body.eye-mode .profile-button,
+body.eye-mode .watchlist-button,
+body.eye-mode .watchlist-analyse-button,
+body.eye-mode .compare-selected-button,
+body.eye-mode .comparison-inputs button,
+body.eye-mode .search-section > button,
+body.eye-mode .history-analyse-button,
+body.eye-mode .report-button,
+body.eye-mode .refresh-watchlist-button,
+body.eye-mode .account-actions .primary-account-link,
+body.eye-mode .auth-form button,
+.app.eye-mode .navbar-links a.active,
+.app.eye-mode .auth-topbar .topbar-register,
+.app.eye-mode .primary-link-button,
+.app.eye-mode .dark-link-button,
+.app.eye-mode .profile-button,
+.app.eye-mode .watchlist-button,
+.app.eye-mode .watchlist-analyse-button,
+.app.eye-mode .compare-selected-button,
+.app.eye-mode .comparison-inputs button,
+.app.eye-mode .search-section > button,
+.app.eye-mode .history-analyse-button,
+.app.eye-mode .report-button,
+.app.eye-mode .refresh-watchlist-button,
+.app.eye-mode .account-actions .primary-account-link,
+.app.eye-mode .auth-form button {
+  background: #3f6f3a;
+  color: #ffffff;
+}
+
+/* Responsive navigation */
+@media (max-width: 1050px) {
+  .nav-wrapper {
+    margin: 0 auto 24px auto;
+  }
+
+  .nav-topbar {
+    justify-content: flex-end;
+    padding: 0 8px;
+  }
+
+  .navbar {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 26px 22px;
+    gap: 20px;
+  }
+
+  .navbar-logo {
+    font-size: 38px;
+  }
+
+  .navbar-links {
+    justify-content: center;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .navbar-links a {
+    font-size: 15px;
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 760px) {
+  .nav-topbar {
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .topbar-theme-selector select {
+    font-size: 13px;
+    padding: 8px 28px 8px 12px;
+  }
+
+  .auth-topbar {
+    gap: 6px;
+  }
+
+  .auth-topbar a,
+  .auth-topbar button {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  .auth-topbar .topbar-register {
+    padding: 9px 15px;
+  }
+
+  .navbar {
+    border-radius: 20px;
+    padding: 24px 18px;
+  }
+
+  .navbar-logo {
+    font-size: 34px;
+  }
+
+  .navbar-links {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .navbar-links a {
+    width: 100%;
+    text-align: center;
+    font-size: 14px;
+    padding: 11px 12px;
+  }
+
+  .home-hero,
+  .analyze-hero,
+  .compare-hero,
+  .watchlist-hero,
+  .profile-hero,
+  .history-hero,
+  .account-hero,
+  .about-hero,
+  .auth-hero {
+    padding: 36px 22px;
+    text-align: center;
+  }
+
+  .home-hero h1,
+  .analyze-hero h1,
+  .compare-hero h1,
+  .watchlist-hero h1,
+  .profile-hero h1,
+  .history-hero h1,
+  .account-hero h1,
+  .about-hero h1,
+  .auth-hero h1 {
+    color: #ffffff;
+    font-size: 32px;
+    line-height: 1.2;
+  }
+
+  .home-hero p,
+  .analyze-hero p,
+  .compare-hero p,
+  .watchlist-hero p,
+  .profile-hero p,
+  .history-hero p,
+  .account-hero p,
+  .about-hero p,
+  .auth-hero p {
+    color: #f3f4f6;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+}
+
+@media (max-width: 480px) {
+  .nav-topbar {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .auth-topbar {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .navbar {
+    padding: 22px 14px;
+  }
+
+  .navbar-logo {
+    font-size: 30px;
+  }
+
+  .navbar-links {
+    grid-template-columns: 1fr;
+  }
 }
