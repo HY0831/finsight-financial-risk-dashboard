@@ -1,7 +1,14 @@
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 
-function RegisterPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisState, resetComparisonState, }) {
+function RegisterPage({
+  apiBaseUrl,
+  setCurrentUser,
+  setAuthToken,
+  resetAnalysisState,
+  resetComparisonState,
+  showToast,
+}) {
   const navigate = useNavigate();
 
   const [registerForm, setRegisterForm] = useState({
@@ -13,6 +20,8 @@ function RegisterPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisS
 
   const [registerLoading, setRegisterLoading] = useState(false);
   const [registerError, setRegisterError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleRegisterChange = (event) => {
     const { name, value } = event.target;
@@ -29,19 +38,23 @@ function RegisterPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisS
     if (
       !registerForm.fullName.trim() ||
       !registerForm.email.trim() ||
-      !registerForm.password.trim()
+      !registerForm.password.trim() ||
+      !registerForm.confirmPassword.trim()
     ) {
       setRegisterError("Please complete all required fields.");
+      showToast("Please complete all required fields.", "error");
       return;
     }
 
     if (registerForm.password.length < 6) {
       setRegisterError("Password must be at least 6 characters long.");
+      showToast("Password must be at least 6 characters long.", "error");
       return;
     }
 
     if (registerForm.password !== registerForm.confirmPassword) {
       setRegisterError("Passwords do not match.");
+      showToast("Passwords do not match.", "error");
       return;
     }
 
@@ -76,9 +89,11 @@ function RegisterPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisS
       resetAnalysisState();
       resetComparisonState();
 
+      showToast("Account created successfully.", "success");
       navigate("/");
     } catch (error) {
       setRegisterError(error.message);
+      showToast("Registration failed. Please try again.", "error");
     } finally {
       setRegisterLoading(false);
     }
@@ -91,8 +106,8 @@ function RegisterPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisS
           <span className="page-tag">Create Account</span>
           <h1>Create Your FinSight Account</h1>
           <p>
-            Register an account to prepare for future cloud-based watchlist,
-            risk profile, and analysis history storage.
+            Register an account to save your watchlist, risk profile, and
+            analysis history in the cloud.
           </p>
         </div>
       </section>
@@ -131,24 +146,48 @@ function RegisterPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisS
 
             <div>
               <label>Password</label>
-              <input
-                type="password"
-                name="password"
-                value={registerForm.password}
-                onChange={handleRegisterChange}
-                placeholder="Minimum 6 characters"
-              />
+
+              <div className="password-field">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={registerForm.password}
+                  onChange={handleRegisterChange}
+                  placeholder="Minimum 6 characters"
+                />
+
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
 
             <div>
               <label>Confirm Password</label>
-              <input
-                type="password"
-                name="confirmPassword"
-                value={registerForm.confirmPassword}
-                onChange={handleRegisterChange}
-                placeholder="Re-enter your password"
-              />
+
+              <div className="password-field">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  value={registerForm.confirmPassword}
+                  onChange={handleRegisterChange}
+                  placeholder="Re-enter your password"
+                />
+
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() =>
+                    setShowConfirmPassword(!showConfirmPassword)
+                  }
+                >
+                  {showConfirmPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
 
             <button type="submit" disabled={registerLoading}>
@@ -161,11 +200,11 @@ function RegisterPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisS
           </p>
 
           <div className="guest-note">
-            <strong>Current Note:</strong>
+            <strong>Guest Mode:</strong>
             <p>
-              In this version, account login is available, but watchlist and
-              history are still stored locally. Cloud saving will be added in the
-              next phase.
+              You can still use FinSight without creating an account. Guest data
+              is saved only in this browser. Create an account to save your data
+              to the database.
             </p>
           </div>
         </div>

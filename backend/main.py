@@ -41,6 +41,14 @@ def home():
         "example": "/analyze/AAPL"
     }
 
+@app.get("/health")
+def health_check():
+    return{
+        "status": "ok",
+        "service": "FinSight API",
+        "database": "connected"
+    }
+
 @app.get("/search-stocks")
 def search_stock_endpoint(query: str = Query(..., min_length=1)):
     results = search_stocks(query)

@@ -108,6 +108,32 @@ body {
   transform: translateY(-1px);
 }
 
+.password-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-field input {
+  flex: 1;
+}
+
+.password-toggle {
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  color: #374151;
+  padding: 11px 13px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.password-toggle:hover {
+  background: #f3f4f6;
+}
+
 /* Cloud save badge */
 .cloud-save-text {
   color: #166534;
@@ -223,6 +249,53 @@ body {
 
 .home-actions{
   justify-content: center;
+}
+
+/* =========================================================
+   Toast Message
+========================================================= */
+
+.toast-message {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  z-index: 9999;
+  padding: 14px 18px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.18);
+  animation: toastSlideIn 0.25s ease;
+}
+
+.toast-message.success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.toast-message.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.toast-message.info {
+  background: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+@keyframes toastSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* =========================================================
@@ -5069,6 +5142,18 @@ body.dark-mode .auth-topbar .topbar-register:hover,
   color: #020617;
 }
 
+body.dark-mode .password-toggle,
+.app.dark-mode .password-toggle {
+  background: #020617;
+  border-color: #334155;
+  color: #e5e7eb;
+}
+
+body.dark-mode .password-toggle:hover,
+.app.dark-mode .password-toggle:hover {
+  background: #1f2937;
+}
+
 /* Cloud save badge */
 body.dark-mode .cloud-save-text,
 .app.dark-mode .cloud-save-text {
@@ -5664,6 +5749,27 @@ body.dark-mode .account-summary-card span,
   color: #cbd5e1;
 }
 
+body.dark-mode .toast-message.success,
+.app.dark-mode .toast-message.success {
+  background: #14532d;
+  color: #bbf7d0;
+  border-color: #166534;
+}
+
+body.dark-mode .toast-message.error,
+.app.dark-mode .toast-message.error {
+  background: #7f1d1d;
+  color: #fecaca;
+  border-color: #991b1b;
+}
+
+body.dark-mode .toast-message.info,
+.app.dark-mode .toast-message.info {
+  background: #1e3a8a;
+  color: #dbeafe;
+  border-color: #2563eb;
+}
+
 /* =========================================================
    Eye Protection Mode
 ========================================================= */
@@ -5743,6 +5849,18 @@ body.eye-mode .auth-topbar .topbar-register:hover,
 .app.eye-mode .auth-topbar .topbar-register:hover {
   background: #315f34;
   color: #ffffff;
+}
+
+body.eye-mode .password-toggle,
+.app.eye-mode .password-toggle {
+  background: #eef7e7;
+  border-color: #cfe3c0;
+  color: #2f4a2d;
+}
+
+body.eye-mode .password-toggle:hover,
+.app.eye-mode .password-toggle:hover {
+  background: #e4efd8;
 }
 
 /* Cloud save badge */
@@ -6448,4 +6566,25 @@ body.eye-mode .account-summary-card span,
 .app.eye-mode .account-storage-card p,
 .app.eye-mode .account-summary-card span {
   color: #4b5f45;
+}
+
+body.eye-mode .toast-message.success,
+.app.eye-mode .toast-message.success {
+  background: #dceccd;
+  color: #2f5f2f;
+  border-color: #c0d9aa;
+}
+
+body.eye-mode .toast-message.error,
+.app.eye-mode .toast-message.error {
+  background: #f5d6d6;
+  color: #7f1d1d;
+  border-color: #e8b6b6;
+}
+
+body.eye-mode .toast-message.info,
+.app.eye-mode .toast-message.info {
+  background: #dbe8d4;
+  color: #315f34;
+  border-color: #bdd6ae;
 }

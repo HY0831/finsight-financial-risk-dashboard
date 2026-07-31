@@ -68,6 +68,8 @@ function App() {
     return savedUser ? JSON.parse(savedUser) : null;
   })
 
+  const [toast, setToast] = useState(null);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -546,6 +548,7 @@ const analyzeStock = async () => {
 
   setUserRiskProfile(profileResult);
   saveRiskProfileToDatabase(profileResult, riskAnswers);
+  showToast("Risk profile saved successfully.", "success");
 };
 
 const saveRiskProfileToDatabase = async (profileResult, answers) => {
@@ -579,6 +582,7 @@ const resetRiskProfile = async () => {
 
   setRiskAnswers({});
   setUserRiskProfile(null);
+  showToast("Risk profile reset successfully.", "info");
 
   if (authToken && currentUser) {
     try {
@@ -635,6 +639,7 @@ const clearSearchHistory = async () => {
   }
 
   setSearchHistory([]);
+  showToast("Analysis history cleared successfully.", "success");
 
   if (authToken && currentUser) {
     try {
@@ -1611,6 +1616,7 @@ const toggleWatchlist = async (stock) => {
     );
 
     setWatchlist(updatedWatchlist);
+    showToast(`${stock.ticker} removed from watchlist.`, "info");
 
     if (authToken && currentUser) {
       try {
@@ -1638,6 +1644,7 @@ const toggleWatchlist = async (stock) => {
   };
 
   setWatchlist([newWatchlistItem, ...watchlist]);
+  showToast(`${stock.ticker} added to watchlist.`, "success");
 
   if (authToken && currentUser) {
     try {
@@ -1668,6 +1675,7 @@ const clearWatchlist = async () => {
   }
 
   setWatchlist([]);
+  showToast("Watchlist cleared successfully.", "success");
 
   if (authToken && currentUser) {
     try {
@@ -1735,6 +1743,7 @@ const refreshWatchlist = async () => {
   }
 
   setWatchlist(updatedWatchlist);
+  showToast("Watchlist refreshed successfully.", "success");
 };
 
 const handleLogout = () => {
@@ -1760,6 +1769,7 @@ const handleLogout = () => {
   setSearchHistory(guestSearchHistory ? JSON.parse(guestSearchHistory) : []);
 
   navigate("/");
+  showToast("Logged out successfully.", "info");
 };
 
 const getAuthHeaders = () => {
@@ -1824,9 +1834,25 @@ const saveHistoryToDatabase = async (historyItem) => {
   }
 };
 
+const showToast = (message, type = "success") => {
+  setToast({
+    message,
+    type,
+  });
+
+  setTimeout(() => {
+    setToast(null);
+  }, 3000);
+};
+
     return (
     <div className={`app ${theme === "dark" ? "dark-mode" : theme === "eye" ? "eye-mode" : ""}`}>
       <Navbar theme={theme} setTheme={setTheme} currentUser={currentUser} handleLogout={handleLogout} />
+      {toast && (
+        <div className={`toast-message ${toast.type}`}>
+          {toast.message}
+        </div>
+      )}
 
       <Routes>
         <Route
@@ -1947,6 +1973,7 @@ const saveHistoryToDatabase = async (historyItem) => {
               setAuthToken={setAuthToken}
               resetAnalysisState={resetAnalysisState}
               resetComparisonState={resetComparisonState}
+              showToast={showToast}
               />
           }
         />
@@ -1960,6 +1987,7 @@ const saveHistoryToDatabase = async (historyItem) => {
               setAuthToken={setAuthToken}
               resetAnalysisState={resetAnalysisState}
               resetComparisonState={resetComparisonState}
+              showToast={showToast}
             />
           }
         />

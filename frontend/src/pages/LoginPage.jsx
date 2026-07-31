@@ -1,7 +1,14 @@
 import { Link, useNavigate } from "react-router";
 import { useState } from "react";
 
-function LoginPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisState, resetComparisonState, }) {
+function LoginPage({
+  apiBaseUrl,
+  setCurrentUser,
+  setAuthToken,
+  resetAnalysisState,
+  resetComparisonState,
+  showToast,
+}) {
   const navigate = useNavigate();
 
   const [loginForm, setLoginForm] = useState({
@@ -11,6 +18,7 @@ function LoginPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisStat
 
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLoginChange = (event) => {
     const { name, value } = event.target;
@@ -26,6 +34,7 @@ function LoginPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisStat
 
     if (!loginForm.email.trim() || !loginForm.password.trim()) {
       setLoginError("Please enter your email and password.");
+      showToast("Please enter your email and password.", "error");
       return;
     }
 
@@ -59,9 +68,11 @@ function LoginPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisStat
       resetAnalysisState();
       resetComparisonState();
 
+      showToast("Login successful.", "success");
       navigate("/");
     } catch (error) {
       setLoginError(error.message);
+      showToast("Login failed. Please check your email and password.", "error");
     } finally {
       setLoginLoading(false);
     }
@@ -74,8 +85,8 @@ function LoginPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisStat
           <span className="page-tag">Account Login</span>
           <h1>Welcome Back to FinSight</h1>
           <p>
-            Login to your FinSight account to prepare for saving your watchlist,
-            risk profile, and analysis history in the cloud.
+            Login to your FinSight account to save your watchlist, risk profile,
+            and analysis history in the cloud.
           </p>
         </div>
       </section>
@@ -103,13 +114,24 @@ function LoginPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisStat
 
             <div>
               <label>Password</label>
-              <input
-                type="password"
-                name="password"
-                value={loginForm.password}
-                onChange={handleLoginChange}
-                placeholder="Enter your password"
-              />
+
+              <div className="password-field">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  value={loginForm.password}
+                  onChange={handleLoginChange}
+                  placeholder="Enter your password"
+                />
+
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
             </div>
 
             <button type="submit" disabled={loginLoading}>
@@ -124,8 +146,8 @@ function LoginPage({ apiBaseUrl, setCurrentUser, setAuthToken, resetAnalysisStat
           <div className="guest-note">
             <strong>Guest Mode:</strong>
             <p>
-              You can still use FinSight without logging in. Login is prepared
-              for future cloud saving features.
+              You can still use FinSight without logging in. Guest data is saved
+              only in this browser. Login to save your data to the database.
             </p>
           </div>
         </div>
