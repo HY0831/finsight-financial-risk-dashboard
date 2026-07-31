@@ -4461,6 +4461,42 @@ th {
 }
 
 /* =========================================================
+   Storage Mode Notice
+========================================================= */
+
+.storage-mode-notice {
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-left: 5px solid #111827;
+  padding: 18px 22px;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.storage-mode-notice.cloud {
+  border-left-color: #166534;
+}
+
+.storage-mode-notice.guest {
+  border-left-color: #334155;
+}
+
+.storage-mode-notice h3 {
+  margin: 0 0 6px 0;
+  color: #111827;
+  font-size: 18px;
+}
+
+.storage-mode-notice p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+/* =========================================================
   Responsive Design
 ========================================================= */
 
@@ -5944,6 +5980,34 @@ body.dark-mode .toast-message.info,
   border-color: #2563eb;
 }
 
+/* Storage mode Notice Dark */
+body.dark-mode .storage-mode-notice,
+.app.dark-mode .storage-mode-notice {
+  background: #0f172a;
+  border-color: #1f2937;
+  color: #e5e7eb;
+}
+
+body.dark-mode .storage-mode-notice.cloud,
+.app.dark-mode .storage-mode-notice.cloud {
+  border-left-color: #22c55e;
+}
+
+body.dark-mode .storage-mode-notice.guest,
+.app.dark-mode .storage-mode-notice.guest {
+  border-left-color: #94a3b8;
+}
+
+body.dark-mode .storage-mode-notice h3,
+.app.dark-mode .storage-mode-notice h3 {
+  color: #f9fafb;
+}
+
+body.dark-mode .storage-mode-notice p,
+.app.dark-mode .storage-mode-notice p {
+  color: #cbd5e1;
+}
+
 /* =========================================================
    Eye Protection Mode
 ========================================================= */
@@ -6761,6 +6825,34 @@ body.eye-mode .toast-message.info,
   background: #dbe8d4;
   color: #315f34;
   border-color: #bdd6ae;
+}
+
+/* Storage Mode Notice Eye Protection */
+body.eye-mode .storage-mode-notice,
+.app.eye-mode .storage-mode-notice {
+  background: #f8fbf2;
+  border-color: #d8e7c8;
+  color: #243424;
+}
+
+body.eye-mode .storage-mode-notice.cloud,
+.app.eye-mode .storage-mode-notice.cloud {
+  border-left-color: #3f6f3a;
+}
+
+body.eye-mode .storage-mode-notice.guest,
+.app.eye-mode .storage-mode-notice.guest {
+  border-left-color: #5f7357;
+}
+
+body.eye-mode .storage-mode-notice h3,
+.app.eye-mode .storage-mode-notice h3 {
+  color: #1f3320;
+}
+
+body.eye-mode .storage-mode-notice p,
+.app.eye-mode .storage-mode-notice p {
+  color: #4b5f45;
 }
 
 /* =========================================================

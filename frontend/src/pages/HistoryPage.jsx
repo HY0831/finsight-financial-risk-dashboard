@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-function HistoryPage({ searchHistory, analyseFromHistory, clearSearchHistory }) {
+function HistoryPage({ 
+  searchHistory, 
+  analyseFromHistory, 
+  clearSearchHistory,
+  storageModeText,
+  isCloudSaveOn,
+  currentUser, 
+}) {
   const navigate = useNavigate();
 
   const [historySearchText, setHistorySearchText] = useState("");
@@ -70,6 +77,14 @@ function HistoryPage({ searchHistory, analyseFromHistory, clearSearchHistory }) 
             re-analyse previous stocks easily.
           </p>
         </div>
+      </section>
+
+      <section className={`storage-mode-notice ${
+        isCloudSaveOn ? "cloud" : "guest"
+      }`}
+      >
+        <h3>{isCloudSaveOn ? "Cloud Save On" : "Guest Mode"}</h3>
+        <p>{storageModeText}</p>
       </section>
 
       {searchHistory.length > 0 && (

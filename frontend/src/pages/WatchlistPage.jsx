@@ -11,6 +11,9 @@ function WatchlistPage({
   setCompareTickerTwo,
   setComparisonData,
   setComparisonError,
+  storageModeText,
+  isCloudSaveOn,
+  currentUser,
 }) {
   const navigate = useNavigate();
 
@@ -130,6 +133,14 @@ function WatchlistPage({
             storage.
           </p>
         </div>
+      </section>
+
+      <section className={`storage-mode-notice ${
+        isCloudSaveOn ? "cloud" : "guest"
+      }`}
+      >
+        <h3>{isCloudSaveOn ? "Cloud Save On" : "Guest Mode"}</h3>
+        <p>{storageModeText}</p>
       </section>
 
       <section className="watchlist-info-grid">

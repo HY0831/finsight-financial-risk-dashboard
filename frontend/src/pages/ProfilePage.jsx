@@ -7,6 +7,9 @@ function ProfilePage({
   calculateRiskProfile,
   userRiskProfile,
   resetRiskProfile,
+  storageModeText,
+  isCloudSaveOn,
+  currentUser,
 }) {
   return (
     <>
@@ -20,6 +23,14 @@ function ProfilePage({
             also improve the suitability insight in your PDF report.
           </p>
         </div>
+      </section>
+
+      <section className={`storage-mode-notice ${
+        isCloudSaveOn ? "cloud" : "guest"
+      }`}
+      >
+        <h3>{isCloudSaveOn ? "Cloud Save On" : "Guest Mode"}</h3>
+        <p>{storageModeText}</p>
       </section>
 
       <section className="profile-info-grid">

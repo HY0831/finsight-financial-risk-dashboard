@@ -66,7 +66,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState(() => {
     const savedUser = localStorage.getItem("finsightCurrentUser");
     return savedUser ? JSON.parse(savedUser) : null;
-  })
+  });
 
   const [toast, setToast] = useState(null);
 
@@ -1826,9 +1826,7 @@ const saveHistoryToDatabase = async (historyItem) => {
       console.error("History save failed:", errorData);
       throw new Error(errorData.detail || "Unable to save history.");
     }
-
-    const savedItem = await response.json();
-    console.log("History saved to database:", savedItem);
+    await response.json();
   } catch (error) {
     console.error("Save history error:", error);
   }
@@ -1844,6 +1842,17 @@ const showToast = (message, type = "success") => {
     setToast(null);
   }, 3000);
 };
+
+
+const getStorageModeText = () => {
+  if (currentUser) {
+    return "Cloud Save On: Your watchlist, risk profile, and analysis history are saved to your account database.";
+  }
+
+  return "Guest Mode: Your data is saved only in this browser. Login or create an account to save it to the database.";
+};
+
+const isCloudSaveOn = Boolean(authToken && currentUser);
 
     return (
     <div className={`app ${theme === "dark" ? "dark-mode" : theme === "eye" ? "eye-mode" : ""}`}>
@@ -1933,6 +1942,9 @@ const showToast = (message, type = "success") => {
               setCompareTickerTwo={setCompareTickerTwo}
               setComparisonData={setComparisonData}
               setComparisonError={setComparisonError}
+              storageModeText={getStorageModeText()}
+              isCloudSaveOn={isCloudSaveOn}
+              currentUser={currentUser}
             />
           }
         />
@@ -1947,6 +1959,9 @@ const showToast = (message, type = "success") => {
               calculateRiskProfile={calculateRiskProfile}
               userRiskProfile={userRiskProfile}
               resetRiskProfile={resetRiskProfile}
+              storageModeText={getStorageModeText()}
+              isCloudSaveOn={isCloudSaveOn}
+              currentUser={currentUser}
             />
           }
         />
@@ -1958,6 +1973,9 @@ const showToast = (message, type = "success") => {
               searchHistory={searchHistory}
               analyseFromHistory={analyseFromHistory}
               clearSearchHistory={clearSearchHistory}
+              storageModeText={getStorageModeText()}
+              isCloudSaveOn={isCloudSaveOn}
+              currentUser={currentUser}
             />
           }
         />
@@ -2001,6 +2019,9 @@ const showToast = (message, type = "success") => {
               searchHistory={searchHistory}
               userRiskProfile={userRiskProfile}
               handleLogout={handleLogout}
+              storageModeText={getStorageModeText()}
+              isCloudSaveOn={isCloudSaveOn}
+              apiBaseUrl={API_BASE_URL}
             />
           }
         />

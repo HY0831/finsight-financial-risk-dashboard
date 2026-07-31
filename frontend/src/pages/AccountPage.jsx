@@ -1,4 +1,5 @@
 import { Link } from "react-router";
+import { useEffect, useState } from "react";
 
 function AccountPage({
   currentUser,
@@ -6,8 +7,35 @@ function AccountPage({
   searchHistory,
   userRiskProfile,
   handleLogout,
+  storageModeText,
+  isCloudSaveOn,
+  apiBaseUrl,
 }) {
-  const isLoggedIn = Boolean(currentUser);
+  const [apiStatus, setApiStatus] = useState("Checking...");
+
+  useEffect(() => {
+    const checkApiStatus = async () => {
+      try {
+        const response = await fetch(`${apiBaseUrl}/health`);
+
+        if (!response.ok) {
+          throw new Error("API unavailable");
+        }
+
+        const data = await response.json();
+
+        if (data.status === "ok") {
+          setApiStatus("Connected");
+        } else {
+          setApiStatus("Unavailable");
+        }
+      } catch {
+        setApiStatus("Unavailable");
+      }
+    };
+
+    checkApiStatus();
+  }, [apiBaseUrl]);
 
   return (
     <>
@@ -16,58 +44,56 @@ function AccountPage({
           <span className="page-tag">Account</span>
           <h1>Your FinSight Account</h1>
           <p>
-            View your current login status and understand how FinSight stores
-            your watchlist, risk profile, and analysis history.
+            View your login status, storage mode, and saved FinSight activity.
           </p>
         </div>
       </section>
 
       <section className="account-section">
         <div className="account-status-card">
-          <span className={isLoggedIn ? "account-status logged-in" : "account-status guest"}>
-            {isLoggedIn ? "Logged In" : "Guest Mode"}
+          <span
+            className={`account-status ${
+              isCloudSaveOn ? "logged-in" : "guest"
+            }`}
+          >
+            {isCloudSaveOn ? "Cloud Save On" : "Guest Mode"}
           </span>
 
           <h2>
-            {isLoggedIn
+            {currentUser
               ? `Hi, ${currentUser.full_name}`
-              : "You are currently using FinSight as a guest"}
+              : "You are using FinSight as a guest"}
           </h2>
 
-          <p>
-            {isLoggedIn
-              ? "Your watchlist, risk profile, and analysis history are saved to your account database."
-              : "Your watchlist, risk profile, and analysis history are saved only in this browser using localStorage."}
-          </p>
+          <p>{storageModeText}</p>
 
-          {isLoggedIn ? (
+          {currentUser ? (
             <button type="button" onClick={handleLogout}>
               Logout
             </button>
           ) : (
             <div className="account-actions">
-              <Link to="/login">Login</Link>
-              <Link to="/register" className="primary-account-link">
-                Create Account
+              <Link to="/login" className="primary-account-link">
+                Login
               </Link>
+
+              <Link to="/register">Create Account</Link>
             </div>
           )}
         </div>
 
         <div className="account-summary-grid">
           <div className="account-summary-card">
-            <span>Saved Stocks</span>
+            <span>Watchlist Items</span>
             <strong>{watchlist.length}</strong>
-            <p>
-              {isLoggedIn
-                ? "Stocks saved in your account watchlist."
-                : "Stocks saved in guest browser storage."}
-            </p>
+            <p>Stocks currently saved in your watchlist.</p>
           </div>
 
           <div className="account-summary-card">
             <span>Risk Profile</span>
-            <strong>{userRiskProfile ? userRiskProfile.profile : "Not Set"}</strong>
+            <strong>
+              {userRiskProfile ? userRiskProfile.profile : "Not Set"}
+            </strong>
             <p>
               {userRiskProfile
                 ? `Current score: ${userRiskProfile.score}`
@@ -78,11 +104,31 @@ function AccountPage({
           <div className="account-summary-card">
             <span>Analysis History</span>
             <strong>{searchHistory.length}</strong>
+            <p>Stocks saved in your recent analysis history.</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="account-storage-section">
+        <div className="section-heading">
+          <h2>System Status</h2>
+          <p>
+            FinSight uses a FastAPI backend and database storage for logged-in
+            users.
+          </p>
+        </div>
+
+        <div className="account-storage-grid">
+          <div className="account-storage-card">
+            <h3>API Status</h3>
             <p>
-              {isLoggedIn
-                ? "History records saved under your account."
-                : "History records saved locally in this browser."}
+              Current backend connection: <strong>{apiStatus}</strong>
             </p>
+          </div>
+
+          <div className="account-storage-card">
+            <h3>Storage Mode</h3>
+            <p>{storageModeText}</p>
           </div>
         </div>
       </section>
@@ -100,16 +146,16 @@ function AccountPage({
           <div className="account-storage-card">
             <h3>Guest Mode</h3>
             <p>
-              Data is stored in the browser only. If the browser data is cleared
-              or another device is used, the saved data may not appear.
+              Data is stored in this browser only. If browser data is cleared or
+              another device is used, the saved data may not appear.
             </p>
           </div>
 
           <div className="account-storage-card">
-            <h3>Logged-in Mode</h3>
+            <h3>Cloud Save Mode</h3>
             <p>
               Data is saved to the backend database and linked to the user
-              account. This supports more persistent and personalised usage.
+              account. This provides more persistent and personalised usage.
             </p>
           </div>
         </div>
