@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from risk_analysis import analyze_stock, search_stocks
+from risk_analysis import analyze_stock, search_stocks, analyze_gold
 from auth_routes import router as auth_router
 from database import Base, engine
 from watchlist_routes import router as watchlist_router
@@ -71,3 +71,14 @@ def analyze(ticker: str, period: str = Query(default="1y")):
             status_code=500,
             detail="Something went wrong while analysing the stock."
         )
+
+@app.get("/gold-price")
+def gold_price_endpoint(period: str="1y"):
+    try:
+        result = analyze_gold(period)
+        return result
+    except Exception as error:
+        raise HTTPException(
+            status_code=500,
+            detail=str(error))
+        

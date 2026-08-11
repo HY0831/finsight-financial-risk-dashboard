@@ -21,6 +21,7 @@ function AnalyzePage({
   suitabilityResult,
   watchlist,
   toggleWatchlist,
+  theme,
 }) {
   return (
     <>
@@ -117,6 +118,7 @@ function AnalyzePage({
         suitabilityResult={suitabilityResult}
         watchlist={watchlist}
         toggleWatchlist={toggleWatchlist}
+        theme={theme}
       />
     </>
   );

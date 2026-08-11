@@ -1,11 +1,11 @@
 import {
-  LineChart,
+  CartesianGrid,
   Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  Tooltip,
-  CartesianGrid,
-  ResponsiveContainer,
 } from "recharts";
 import SuitabilitySection from "./SuitabilitySection";
 
@@ -17,6 +17,7 @@ function StockDashboard({
   suitabilityResult,
   watchlist=[],
   toggleWatchlist=() => {},
+  theme,
 }) {
   if (!stockData) {
     return null;
@@ -56,6 +57,23 @@ function StockDashboard({
       )}, while the annualized volatility is ${formatPercent(
         stockData.annualized_volatility
       )}. Annualized volatility is the main metric FinSight uses to classify the stock risk level.`;
+    };
+
+    const chartLineColor =
+      theme === "dark" ? "#f9fafb" : theme === "eye" ? "#315f34" : "#111827";
+
+    const chartGridColor =
+      theme === "dark" ? "#334155" : theme === "eye" ? "#cfe2c1" : "#e5e7eb";
+
+    const chartTextColor =
+      theme === "dark" ? "#cbd5e1" : theme === "eye" ? "#4b5f45" : "#6b7280";
+
+    const chartTooltipStyle = {
+      backgroundColor:
+        theme === "dark" ? "#111827" : theme === "eye" ? "#f8fbf2" : "#ffffff",
+      borderColor:
+        theme === "dark" ? "#334155" : theme === "eye" ? "#cfe2c1" : "#e5e7eb",
+      color: theme === "dark" ? "#f9fafb" : theme === "eye" ? "#1f3320" : "#111827",
     };
 
   return (
@@ -232,26 +250,96 @@ function StockDashboard({
 
       <section className="chart-section">
         <h3>Stock Price Trend</h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={340}>
           <LineChart data={stockData.price_data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="close" strokeWidth={2} />
+            <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
+
+            <XAxis
+              dataKey="date"
+              minTickGap={28}
+              tick={{ fill: chartTextColor, fontSize: 12 }}
+              axisLine={{ stroke: chartGridColor }}
+              tickLine={{ stroke: chartGridColor }}
+            />
+
+            <YAxis
+              domain={["auto", "auto"]}
+              tick={{ fill: chartTextColor, fontSize: 12 }}
+              axisLine={{ stroke: chartGridColor }}
+              tickLine={{ stroke: chartGridColor }}
+            />
+
+            <Tooltip
+              formatter={(value) => [`$${Number(value).toFixed(2)}`, "Close Price"]}
+              contentStyle={chartTooltipStyle}
+              labelStyle={{
+                color:
+                  theme === "dark"
+                    ? "#f9fafb"
+                    : theme === "eye"
+                    ? "#1f3320"
+                    : "#111827",
+              }}
+            />
+
+            <Line
+              type="monotone"
+              dataKey="close"
+              stroke={chartLineColor}
+              strokeWidth={3}
+              dot={false}
+              activeDot={{ r: 5 }}
+            />
           </LineChart>
         </ResponsiveContainer>
       </section>
 
       <section className="chart-section">
         <h3>Daily Return Trend</h3>
-        <ResponsiveContainer width="100%" height={300}>
+        <ResponsiveContainer width="100%" height={340}>
           <LineChart data={stockData.price_data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="date" tick={{ fontSize: 12 }} />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="daily_return" strokeWidth={2} />
+            <CartesianGrid strokeDasharray="3 3" stroke={chartGridColor} />
+
+            <XAxis
+              dataKey="date"
+              minTickGap={28}
+              tick={{ fill: chartTextColor, fontSize: 12 }}
+              axisLine={{ stroke: chartGridColor }}
+              tickLine={{ stroke: chartGridColor }}
+            />
+
+            <YAxis
+              tickFormatter={(value) => `${(value * 100).toFixed(1)}%`}
+              domain={["auto", "auto"]}
+              tick={{ fill: chartTextColor, fontSize: 12 }}
+              axisLine={{ stroke: chartGridColor }}
+              tickLine={{ stroke: chartGridColor }}
+            />
+
+            <Tooltip
+              formatter={(value) => [
+                `${(Number(value) * 100).toFixed(2)}%`,
+                "Daily Return",
+              ]}
+              contentStyle={chartTooltipStyle}
+              labelStyle={{
+                color:
+                  theme === "dark"
+                    ? "#f9fafb"
+                    : theme === "eye"
+                    ? "#1f3320"
+                    : "#111827",
+              }}
+            />
+
+            <Line
+              type="monotone"
+              dataKey="daily_return"
+              stroke={chartLineColor}
+              strokeWidth={3}
+              dot={false}
+              activeDot={{ r: 5 }}
+            />
           </LineChart>
         </ResponsiveContainer>
       </section>

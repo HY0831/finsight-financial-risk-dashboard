@@ -149,3 +149,86 @@ def analyze_stock(ticker, period="1y"):
     }
 
     return result
+
+def analyze_gold(period="1y"):
+    """
+    Download gold futures data and calculate gold price metrics.
+    Gold data uses Yahoo Finance ticker GC=F.
+    """
+    valid_periods = {
+        "1w": "7d",
+        "1mo": "1mo",
+        "3mo": "3mo",
+        "1y": "1y",
+        "5y": "5y",
+    }
+
+    yf_period = valid_periods.get(period, "1y")
+
+    gold_ticker = "GC=F"
+    gold = yf.Ticker(gold_ticker)
+
+    data = gold.history(period=yf_period)
+
+    if data.empty:
+        raise ValueError("Gold price data not found.")
+
+    data = data[["Open", "High", "Low", "Close", "Volume"]].copy()
+    data["Daily Return"] = data["Close"].pct_change()
+    data = data.dropna()
+
+    if data.empty:
+        raise ValueError("Not enough gold price data found.")
+
+    latest_price = data["Close"].iloc[-1]
+    previous_price = data["Close"].iloc[-2] if len(data) > 1 else latest_price
+
+    price_change = latest_price - previous_price
+    price_change_percent = price_change / previous_price if previous_price else 0
+
+    highest_price = data["Close"].max()
+    lowest_price = data["Close"].min()
+    average_price = data["Close"].mean()
+
+    volatility = data["Daily Return"].std()
+    annualized_volatility = volatility * np.sqrt(252)
+
+    data["running_max"] = data["Close"].cummax()
+    data["drawdown"] = (data["Close"] - data["running_max"]) / data["running_max"]
+    maximum_drawdown = data["drawdown"].min()
+
+    if maximum_drawdown is None or pd.isna(maximum_drawdown):
+        maximum_drawdown = 0
+
+    price_data = []
+
+    for date, row in data.iterrows():
+        price_data.append({
+            "date": date.strftime("%Y-%m-%d"),
+            "close": round(float(row["Close"]), 2),
+            "daily_return": round(float(row["Daily Return"]), 4),
+        })
+
+    summary = (
+        "Gold is commonly viewed as a safe-haven asset. Its price can move due "
+        "to inflation expectations, interest rates, currency strength, central "
+        "bank activity, and global uncertainty. This page uses gold futures data "
+        "from Yahoo Finance ticker GC=F."
+    )
+
+    return {
+        "ticker": gold_ticker,
+        "asset_name": "Gold Futures",
+        "period": period,
+        "latest_price": round(float(latest_price), 2),
+        "price_change": round(float(price_change), 2),
+        "price_change_percent": round(float(price_change_percent), 4),
+        "highest_price": round(float(highest_price), 2),
+        "lowest_price": round(float(lowest_price), 2),
+        "average_price": round(float(average_price), 2),
+        "volatility": round(float(volatility), 4),
+        "annualized_volatility": round(float(annualized_volatility), 4),
+        "maximum_drawdown": round(float(maximum_drawdown), 4),
+        "summary": summary,
+        "price_data": price_data,
+    }

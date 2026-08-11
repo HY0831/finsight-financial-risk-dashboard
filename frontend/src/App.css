@@ -1125,6 +1125,192 @@ body {
 }
 
 /* =========================================================
+   Gold Price Dashboard
+========================================================= */
+
+.gold-hero {
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  background: linear-gradient(135deg, #111827, #1f2937);
+  color: #ffffff;
+  padding: 42px 34px;
+  border-radius: 22px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gold-hero > div {
+  width: 100%;
+  max-width: 850px;
+  margin: 0 auto;
+}
+
+.gold-hero h1 {
+  max-width: 820px;
+  margin: 0 auto 14px auto;
+  color: #ffffff;
+  font-size: 42px;
+  line-height: 1.15;
+}
+
+.gold-hero p {
+  max-width: 850px;
+  margin: 0 auto;
+  color: #f3f4f6;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.gold-control-section,
+.gold-chart-section,
+.gold-risk-section,
+.gold-insight-section {
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+.gold-control-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+
+.gold-control-section h2 {
+  margin: 0 0 8px 0;
+  color: #111827;
+  font-size: 28px;
+}
+
+.gold-control-section p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+.gold-period-select-wrapper {
+  min-width: 220px;
+  display: grid;
+  gap: 8px;
+}
+
+.gold-period-select-wrapper label {
+  color: #374151;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.gold-period-select-wrapper select {
+  width: 100%;
+  min-height: 50px;
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.gold-period-select-wrapper select:focus {
+  outline: none;
+  border-color: #111827;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.1);
+}
+
+.gold-price-overview {
+  max-width: 1100px;
+  margin: 0 auto 24px auto;
+  display: grid;
+  grid-template-columns: 1.4fr repeat(3, 1fr);
+  gap: 16px;
+}
+
+.gold-main-price-card,
+.gold-metric-card,
+.gold-insight-card {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  padding: 22px;
+  border-radius: 16px;
+}
+
+.gold-main-price-card {
+  background: #ffffff;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+}
+
+.gold-main-price-card span,
+.gold-metric-card span {
+  display: block;
+  color: #6b7280;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.gold-main-price-card h2 {
+  margin: 0 0 8px 0;
+  color: #111827;
+  font-size: 38px;
+}
+
+.gold-main-price-card p {
+  margin: 0 0 8px 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.gold-main-price-card small {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.positive-change {
+  color: #166534;
+}
+
+.negative-change {
+  color: #991b1b;
+}
+
+.gold-metric-card strong {
+  display: block;
+  color: #111827;
+  font-size: 26px;
+  margin-bottom: 8px;
+}
+
+.gold-metric-card p,
+.gold-insight-card p {
+  margin: 0;
+  color: #6b7280;
+  line-height: 1.6;
+  font-size: 14px;
+}
+
+.gold-risk-grid,
+.gold-insight-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.gold-insight-card h3 {
+  margin: 0 0 10px 0;
+  color: #111827;
+  font-size: 20px;
+}
+
+/* =========================================================
   Compare Page
 ========================================================= */
 
@@ -4748,6 +4934,76 @@ th {
   }
 }
 
+@media (max-width: 1000px) {
+  .gold-price-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .gold-risk-grid,
+  .gold-insight-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gold-control-section {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .gold-control-section > div:first-child {
+    max-width: 760px;
+  }
+
+  .gold-period-select-wrapper {
+    width: 100%;
+    max-width: 420px;
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .gold-hero {
+    padding: 34px 24px;
+  }
+
+  .gold-hero h1 {
+    font-size: 30px;
+  }
+
+  .gold-control-section {
+    padding: 24px 18px;
+  }
+
+  .gold-control-section h2 {
+    font-size: 26px;
+  }
+
+  .gold-control-section p {
+    font-size: 15px;
+  }
+
+  .gold-period-select-wrapper {
+    max-width: 100%;
+  }
+
+  .gold-period-select-wrapper label {
+    text-align: center;
+  }
+
+  .gold-period-select-wrapper select {
+    min-height: 52px;
+    font-size: 15px;
+  }
+
+  .gold-price-overview {
+    grid-template-columns: 1fr;
+  }
+
+  .gold-main-price-card h2 {
+    font-size: 32px;
+  }
+}
+
 @media (max-width: 900px) {
   .compare-guide {
     grid-template-columns: 1fr;
@@ -6008,6 +6264,81 @@ body.dark-mode .storage-mode-notice p,
   color: #cbd5e1;
 }
 
+/* Gold Page */
+
+body.dark-mode .gold-control-section,
+body.dark-mode .gold-chart-section,
+body.dark-mode .gold-risk-section,
+body.dark-mode .gold-insight-section,
+body.dark-mode .gold-main-price-card,
+body.dark-mode .gold-metric-card,
+body.dark-mode .gold-insight-card,
+.app.dark-mode .gold-control-section,
+.app.dark-mode .gold-chart-section,
+.app.dark-mode .gold-risk-section,
+.app.dark-mode .gold-insight-section,
+.app.dark-mode .gold-main-price-card,
+.app.dark-mode .gold-metric-card,
+.app.dark-mode .gold-insight-card {
+  background: #0f172a;
+  border-color: #1f2937;
+  color: #e5e7eb;
+  box-shadow: none;
+}
+
+body.dark-mode .gold-metric-card,
+body.dark-mode .gold-insight-card,
+.app.dark-mode .gold-metric-card,
+.app.dark-mode .gold-insight-card {
+  background: #111827;
+  border-color: #334155;
+}
+
+body.dark-mode .gold-control-section h2,
+body.dark-mode .gold-main-price-card h2,
+body.dark-mode .gold-metric-card strong,
+body.dark-mode .gold-insight-card h3,
+.app.dark-mode .gold-control-section h2,
+.app.dark-mode .gold-main-price-card h2,
+.app.dark-mode .gold-metric-card strong,
+.app.dark-mode .gold-insight-card h3 {
+  color: #f9fafb;
+}
+
+body.dark-mode .gold-control-section p,
+body.dark-mode .gold-main-price-card span,
+body.dark-mode .gold-main-price-card small,
+body.dark-mode .gold-metric-card span,
+body.dark-mode .gold-metric-card p,
+body.dark-mode .gold-insight-card p,
+.app.dark-mode .gold-control-section p,
+.app.dark-mode .gold-main-price-card span,
+.app.dark-mode .gold-main-price-card small,
+.app.dark-mode .gold-metric-card span,
+.app.dark-mode .gold-metric-card p,
+.app.dark-mode .gold-insight-card p {
+  color: #cbd5e1;
+}
+
+body.dark-mode .gold-period-select-wrapper label,
+.app.dark-mode .gold-period-select-wrapper label {
+  color: #cbd5e1;
+}
+
+body.dark-mode .gold-period-select-wrapper select,
+.app.dark-mode .gold-period-select-wrapper select {
+  background: #111827;
+  color: #f9fafb;
+  border-color: #334155;
+}
+
+body.dark-mode .gold-period-select-wrapper select:focus,
+.app.dark-mode .gold-period-select-wrapper select:focus {
+  border-color: #f9fafb;
+  box-shadow: 0 0 0 3px rgba(249, 250, 251, 0.12);
+}
+
+
 /* =========================================================
    Eye Protection Mode
 ========================================================= */
@@ -6853,6 +7184,84 @@ body.eye-mode .storage-mode-notice h3,
 body.eye-mode .storage-mode-notice p,
 .app.eye-mode .storage-mode-notice p {
   color: #4b5f45;
+}
+
+/* Gold Page */
+
+body.eye-mode .gold-hero,
+.app.eye-mode .gold-hero {
+  background: linear-gradient(135deg, #315f34, #3f6f3a);
+}
+
+body.eye-mode .gold-control-section,
+body.eye-mode .gold-chart-section,
+body.eye-mode .gold-risk-section,
+body.eye-mode .gold-insight-section,
+body.eye-mode .gold-main-price-card,
+body.eye-mode .gold-metric-card,
+body.eye-mode .gold-insight-card,
+.app.eye-mode .gold-control-section,
+.app.eye-mode .gold-chart-section,
+.app.eye-mode .gold-risk-section,
+.app.eye-mode .gold-insight-section,
+.app.eye-mode .gold-main-price-card,
+.app.eye-mode .gold-metric-card,
+.app.eye-mode .gold-insight-card {
+  background: #f8fbf2;
+  border-color: #d8e7c8;
+  color: #243424;
+}
+
+body.eye-mode .gold-metric-card,
+body.eye-mode .gold-insight-card,
+.app.eye-mode .gold-metric-card,
+.app.eye-mode .gold-insight-card {
+  background: #eef6e8;
+  border-color: #cfe2c1;
+}
+
+body.eye-mode .gold-control-section h2,
+body.eye-mode .gold-main-price-card h2,
+body.eye-mode .gold-metric-card strong,
+body.eye-mode .gold-insight-card h3,
+.app.eye-mode .gold-control-section h2,
+.app.eye-mode .gold-main-price-card h2,
+.app.eye-mode .gold-metric-card strong,
+.app.eye-mode .gold-insight-card h3 {
+  color: #1f3320;
+}
+
+body.eye-mode .gold-control-section p,
+body.eye-mode .gold-main-price-card span,
+body.eye-mode .gold-main-price-card small,
+body.eye-mode .gold-metric-card span,
+body.eye-mode .gold-metric-card p,
+body.eye-mode .gold-insight-card p,
+.app.eye-mode .gold-control-section p,
+.app.eye-mode .gold-main-price-card span,
+.app.eye-mode .gold-main-price-card small,
+.app.eye-mode .gold-metric-card span,
+.app.eye-mode .gold-metric-card p,
+.app.eye-mode .gold-insight-card p {
+  color: #4b5f45;
+}
+
+body.eye-mode .gold-period-select-wrapper label,
+.app.eye-mode .gold-period-select-wrapper label {
+  color: #4b5f45;
+}
+
+body.eye-mode .gold-period-select-wrapper select,
+.app.eye-mode .gold-period-select-wrapper select {
+  background: #f8fbf2;
+  color: #1f3320;
+  border-color: #cfe2c1;
+}
+
+body.eye-mode .gold-period-select-wrapper select:focus,
+.app.eye-mode .gold-period-select-wrapper select:focus {
+  border-color: #3f6f3a;
+  box-shadow: 0 0 0 3px rgba(63, 111, 58, 0.16);
 }
 
 /* =========================================================

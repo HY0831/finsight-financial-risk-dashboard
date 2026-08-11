@@ -4,6 +4,7 @@ import jsPDF from "jspdf";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
 import AnalyzePage from "./pages/AnalyzePage";
+import GoldPage from "./pages/GoldPage";
 import ComparePage from "./pages/ComparePage";
 import WatchlistPage from "./pages/WatchlistPage";
 import ProfilePage from "./pages/ProfilePage";
@@ -1828,6 +1829,7 @@ const saveHistoryToDatabase = async (historyItem) => {
         latest_price: historyItem.latest_price,
         risk_level: historyItem.risk_level,
         annualized_volatility: historyItem.annualized_volatility,
+        maximum_drawdown: historyItem.maximum_drawdown,
         average_daily_return: historyItem.average_daily_return,
         volatility: historyItem.volatility,
         period: historyItem.period,
@@ -1912,6 +1914,18 @@ const isCloudSaveOn = Boolean(authToken && currentUser);
               suitabilityResult={suitabilityResult}
               watchlist={watchlist}
               toggleWatchlist={toggleWatchlist}
+              theme={theme}
+            />
+          }
+        />
+
+        <Route
+          path="/gold"
+          element={
+            <GoldPage
+              apiBaseUrl={API_BASE_URL}
+              formatPercent={formatPercent}
+              theme={theme}
             />
           }
         />

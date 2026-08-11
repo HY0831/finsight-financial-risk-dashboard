@@ -47,6 +47,7 @@ function Navbar({ theme, setTheme, currentUser, handleLogout }) {
           </NavLink>
 
           <NavLink to="/analyze">Analyze</NavLink>
+          <NavLink to="/gold">Gold</NavLink>
           <NavLink to="/compare">Compare</NavLink>
           <NavLink to="/watchlist">Watchlist</NavLink>
           <NavLink to="/profile">Risk Profile</NavLink>
