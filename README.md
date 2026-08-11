@@ -1,8 +1,8 @@
 # FinSight: AI-Powered Financial Risk Dashboard
 
-FinSight is a full-stack financial risk analysis dashboard that helps users analyse stock risk using historical market data. The system converts stock price data into simple risk insights such as average daily return, daily volatility, annualized volatility, and risk level.
+FinSight is a full-stack financial risk analysis dashboard that helps users understand stock and gold price risk using historical market data. The system converts financial market data into simple risk insights such as average daily return, daily volatility, annualized volatility, maximum drawdown, risk level, and price trend movement.
 
-The project also includes stock comparison, dynamic stock search, watchlist management, user risk profile analysis, analysis history, PDF report generation, user authentication, and database-backed user storage.
+The project includes stock risk analysis, stock comparison, dynamic stock search, watchlist management, user risk profile analysis, analysis history, gold price dashboard, PDF report generation, user authentication, and database-backed user storage.
 
 FinSight supports both guest users and logged-in users. Guest users can try the system using browser localStorage, while logged-in users can save their watchlist, risk profile, and analysis history to a PostgreSQL database.
 
@@ -18,18 +18,19 @@ Backend API: https://finsight-financial-risk-dashboard.onrender.com
 
 ## Project Purpose
 
-The purpose of FinSight is to make stock risk analysis easier for beginner users to understand. Instead of only showing stock price data, FinSight explains stock risk using simple metrics, charts, and beginner-friendly summaries.
+The purpose of FinSight is to make financial risk analysis easier for beginner users to understand. Instead of only showing market prices, FinSight explains risk using simple metrics, charts, and beginner-friendly summaries.
 
 This project was developed as a personal portfolio project to demonstrate skills in:
 
 - Full-stack web development
 - React frontend development
 - FastAPI backend development
-- API development
+- REST API development
 - Database-backed user features
 - JWT authentication
 - Financial risk analysis
 - Data processing
+- Data visualization
 - Dashboard UI design
 - PDF report generation
 - Full-stack deployment
@@ -48,9 +49,10 @@ Users can search for a stock by ticker or company name. FinSight retrieves histo
 - Average daily return
 - Daily volatility
 - Annualized volatility
+- Maximum drawdown
 - Stock risk level
-- Historical price chart
-- Daily return chart
+- Historical price line chart
+- Daily return line chart
 - Risk insight summary
 
 The stock is classified into Low Risk, Medium Risk, or High Risk based on annualized volatility.
@@ -60,6 +62,14 @@ The stock is classified into Low Risk, Medium Risk, or High Risk based on annual
 | Low Risk | Below 20% | Smaller price movements |
 | Medium Risk | 20% to 40% | Moderate price movements |
 | High Risk | Above 40% | Larger price movements and higher uncertainty |
+
+---
+
+### Maximum Drawdown Analysis
+
+FinSight calculates maximum drawdown to show the largest peak-to-bottom loss during the selected period.
+
+Maximum drawdown helps users understand downside risk, not only price movement. A larger negative value means the stock experienced a deeper loss from a previous high point.
 
 ---
 
@@ -100,6 +110,7 @@ After analysing a stock, FinSight provides a simple explanation of the result, i
 - Risk level explanation
 - Return explanation
 - Volatility explanation
+- Maximum drawdown explanation
 - Suitability notes based on user risk profile
 
 This helps beginner users understand the meaning behind the financial metrics.
@@ -131,6 +142,34 @@ The recommendation summary highlights:
 
 ---
 
+### Gold Price Dashboard
+
+FinSight includes an independent Gold Price Dashboard page.
+
+The Gold page uses Yahoo Finance ticker `GC=F`, which represents gold futures data. The page is designed to help users track gold price movement and understand gold-related risk metrics.
+
+The Gold Price Dashboard includes:
+
+- Latest gold futures price
+- Daily price change
+- Daily percentage change
+- Historical gold price line chart
+- Time range dropdown
+- 1 Week, 1 Month, 3 Months, 1 Year, and 5 Years trend selection
+- Highest price in the selected period
+- Lowest price in the selected period
+- Average price in the selected period
+- Daily volatility
+- Annualized volatility
+- Maximum drawdown
+- Beginner-friendly gold market insight
+
+Gold is commonly viewed as a safe-haven asset. Its price may be affected by inflation expectations, interest rates, USD strength, central bank activity, and global uncertainty.
+
+Important note: this feature uses gold futures data, not physical gold jewellery or local retail gold shop prices.
+
+---
+
 ### Watchlist
 
 Users can save analysed stocks into a personal watchlist.
@@ -153,7 +192,7 @@ The Watchlist page includes:
 Guest users:
 
 - Watchlist is saved in browser localStorage
-- Data remains only on the same browser/device
+- Data remains only on the same browser or device
 
 Logged-in users:
 
@@ -289,11 +328,12 @@ The Account page shows the user's current account and storage status.
 
 It displays:
 
-- Guest Mode or Logged-in Mode
+- Guest Mode or Cloud Save On
 - User name when logged in
 - Watchlist count
 - Risk profile status
 - Analysis history count
+- Backend API status
 - Explanation of localStorage and database storage
 
 ---
@@ -344,6 +384,7 @@ The PDF report includes:
 - Average daily return
 - Daily volatility
 - Annualized volatility
+- Maximum drawdown
 - Stock risk level
 - Price trend chart
 - Daily return chart
@@ -364,6 +405,7 @@ FinSight provides clearer error messages for common issues such as:
 - Not enough data
 - Invalid comparison input
 - Same stock selected for comparison
+- Gold price data loading error
 
 The messages include suggestions to help users understand and solve the issue.
 
@@ -379,7 +421,8 @@ The messages include suggestions to help users understand and solve the issue.
 | Watchlist | Allows users to save, refresh, remove, filter, sort, and compare saved stocks |
 | Risk Profile | Provides a questionnaire to classify user risk tolerance |
 | History | Displays previous stock analysis records |
-| Account | Shows login status and storage mode |
+| Gold | Displays gold futures price, trend, volatility, and drawdown |
+| Account | Shows login status, storage mode, and API status |
 | About | Explains project overview, methodology, formulas, and disclaimer |
 | Login | Allows registered users to log in |
 | Register | Allows new users to create an account |
@@ -406,6 +449,8 @@ The messages include suggestions to help users understand and solve the issue.
 - JWT Authentication
 - passlib bcrypt
 - yfinance
+- pandas
+- NumPy
 
 ### Database
 
@@ -471,6 +516,9 @@ finsight-dashboard/
 │   └── requirements.txt
 │
 ├── frontend/
+│   ├── public/
+│   │   └── screenshots/
+│   │
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── Navbar.jsx
@@ -489,6 +537,7 @@ finsight-dashboard/
 │   │   │   ├── WatchlistPage.jsx
 │   │   │   ├── ProfilePage.jsx
 │   │   │   ├── HistoryPage.jsx
+│   │   │   ├── GoldPage.jsx
 │   │   │   ├── AccountPage.jsx
 │   │   │   ├── AboutPage.jsx
 │   │   │   ├── LoginPage.jsx
@@ -510,7 +559,7 @@ finsight-dashboard/
 
 ## Risk Calculation Method
 
-FinSight uses historical closing price data to calculate stock return and volatility.
+FinSight uses historical closing price data to calculate stock return, volatility, and downside risk.
 
 ### Daily Return
 
@@ -549,6 +598,22 @@ annualized_volatility = volatility * np.sqrt(252)
 ```
 
 The value 252 is used because there are approximately 252 trading days in one year.
+
+### Maximum Drawdown
+
+```text
+Maximum Drawdown = (Lowest price after peak - Previous peak price) / Previous peak price
+```
+
+In Python:
+
+```python
+data["running_max"] = data["Close"].cummax()
+data["drawdown"] = (data["Close"] - data["running_max"]) / data["running_max"]
+maximum_drawdown = data["drawdown"].min()
+```
+
+Maximum drawdown shows the largest loss from a previous high point to a later low point during the selected period.
 
 ---
 
@@ -608,6 +673,12 @@ Each question is scored from 1 to 5. A lower score represents lower risk toleran
 GET /
 ```
 
+### Health Check
+
+```text
+GET /health
+```
+
 ### Stock Analysis
 
 ```text
@@ -615,13 +686,29 @@ GET /analyze/{ticker}?period={period}
 GET /search-stocks?query={searchText}
 ```
 
-Supported periods:
+Supported stock analysis periods:
 
 | Period | Meaning |
 |---|---|
 | 6mo | 6 months |
 | 1y | 1 year |
 | 3y | 3 years |
+| 5y | 5 years |
+
+### Gold Price
+
+```text
+GET /gold-price?period={period}
+```
+
+Supported gold periods:
+
+| Period | Meaning |
+|---|---|
+| 1w | 1 week |
+| 1mo | 1 month |
+| 3mo | 3 months |
+| 1y | 1 year |
 | 5y | 5 years |
 
 ### Authentication
@@ -684,6 +771,12 @@ Create and activate a virtual environment:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
+```
+
+For Windows:
+
+```bash
+.venv\Scripts\activate
 ```
 
 Install Python dependencies:
@@ -798,7 +891,11 @@ VITE_API_BASE_URL=https://finsight-financial-risk-dashboard.onrender.com
 
 ## Screenshots
 
-Screenshots are stored in the `screenshots` folder.
+Screenshots can be stored in:
+
+```text
+frontend/public/screenshots/
+```
 
 Suggested screenshots:
 
@@ -813,6 +910,7 @@ watchlist-page.png
 risk-profile-page.png
 risk-profile-result.png
 history-page.png
+gold-page.png
 account-page.png
 about-page.png
 login-page.png
@@ -826,9 +924,10 @@ api-docs.png
 Example:
 
 ```markdown
-![Home Page](screenshots/home-page.png)
-![Analyze Page](screenshots/analyze-page.png)
-![Watchlist Page](screenshots/watchlist-page.png)
+![Home Page](frontend/public/screenshots/home-page.png)
+![Analyze Page](frontend/public/screenshots/analyze-page.png)
+![Gold Page](frontend/public/screenshots/gold-page.png)
+![Watchlist Page](frontend/public/screenshots/watchlist-page.png)
 ```
 
 ---
@@ -860,6 +959,9 @@ Example:
 | Version 21 | Added cloud analysis history storage |
 | Version 22 | Configured PostgreSQL deployment database |
 | Version 23 | Added account storage status page |
+| Version 24 | Added maximum drawdown risk metric |
+| Version 25 | Added gold price dashboard |
+| Version 26 | Refined minimalist UI and chart styling |
 
 ---
 
@@ -872,6 +974,8 @@ Possible future improvements include:
 - Portfolio-level risk score
 - Portfolio weight calculation
 - Watchlist PDF summary report
+- Sharpe Ratio analysis
+- Beta analysis
 - More advanced financial indicators
 - Sector and industry analysis
 - AI-generated personalised explanation
@@ -889,9 +993,9 @@ Through this project, I practised:
 
 - Building a full-stack web application
 - Creating backend APIs using FastAPI
-- Fetching stock market data using yfinance
+- Fetching stock and gold futures market data using yfinance
 - Processing financial data using pandas and NumPy
-- Calculating return and volatility
+- Calculating return, volatility, annualized volatility, and maximum drawdown
 - Designing a dashboard using React and Recharts
 - Creating a multi-page React application using React Router
 - Creating a user risk profile questionnaire
@@ -913,7 +1017,9 @@ Through this project, I practised:
 
 FinSight is designed for educational and portfolio demonstration purposes.
 
-The analysis is based mainly on historical stock price data and volatility. It does not include full fundamental analysis, macroeconomic analysis, company financial statements, or real-time professional investment advice.
+The analysis is based mainly on historical market price data and volatility. It does not include full fundamental analysis, macroeconomic analysis, company financial statements, or real-time professional investment advice.
+
+The Gold Price Dashboard uses gold futures data from Yahoo Finance ticker `GC=F`. It does not represent physical gold jewellery price, local gold shop price, or official spot gold trading price.
 
 Users should not make investment decisions based only on this dashboard.
 
@@ -925,7 +1031,7 @@ This project is developed for educational and portfolio purposes only.
 
 FinSight does not provide financial advice, investment recommendations, trading instructions, or professional financial planning services. Users should not rely on this system as the only basis for making investment decisions.
 
-Stock market data may be delayed, incomplete, or affected by third-party data availability. Users should verify information from official financial sources before making investment decisions.
+Stock and gold market data may be delayed, incomplete, or affected by third-party data availability. Users should verify information from official financial sources before making investment decisions.
 
 ---
 
