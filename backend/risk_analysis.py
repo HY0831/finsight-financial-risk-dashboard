@@ -117,6 +117,11 @@ def analyze_stock(ticker, period="1y"):
     risk_level = classify_risk(annualized_volatility)
     summary = generate_summary(ticker,annualized_volatility,risk_level)
 
+    #Calculate Maximum Drawdown
+    data["running_max"] = data["Close"].cummax()
+    data["drawdown"] = (data["Close"] - data["running_max"]) / data["running_max"]
+    maximum_drawdown = data["drawdown"].min()
+
     #Prepare chart data for frontend
     price_data = []
 
@@ -137,6 +142,7 @@ def analyze_stock(ticker, period="1y"):
         "average_daily_return": round(float(average_daily_return), 4),
         "volatility": round(float(volatility), 4),
         "annualized_volatility": round(float(annualized_volatility), 4),
+        "maximum_drawdown": round(float(maximum_drawdown), 4),
         "risk_level": risk_level,
         "summary": summary,
         "price_data": price_data

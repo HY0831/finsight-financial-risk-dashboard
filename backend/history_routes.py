@@ -38,6 +38,7 @@ def save_history_item(
         latest_price=history_data.latest_price,
         risk_level=history_data.risk_level,
         annualized_volatility=history_data.annualized_volatility,
+        maximum_drawdown=history_data.maximum_drawdown,
         average_daily_return=history_data.average_daily_return,
         volatility=history_data.volatility,
         period=history_data.period,

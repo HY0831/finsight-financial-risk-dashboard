@@ -267,6 +267,7 @@ useEffect(() => {
         latest_price: item.latest_price,
         risk_level: item.risk_level,
         annualized_volatility: item.annualized_volatility,
+        maximum_drawdown: item.maximum_drawdown,
         average_daily_return: item.average_daily_return,
         volatility: item.volatility,
         period: item.period,
@@ -375,6 +376,7 @@ useEffect(() => {
       latest_price: data.latest_price,
       risk_level: data.risk_level,
       annualized_volatility: data.annualized_volatility,
+      maximum_drawdown: data.maximum_drawdown,
       average_daily_return: data.average_daily_return,
       volatility: data.volatility,
       period: period,
@@ -1103,7 +1105,7 @@ const generatePDFReport = () => {
   addSectionTitle("Key Risk Metrics", 90);
 
   const cardGap = 7;
-  const cardW = (contentWidth - cardGap * 3) / 4;
+  const cardW = (contentWidth - cardGap * 4) / 5;
 
   addMetricCard(
     margin,
@@ -1147,6 +1149,17 @@ const generatePDFReport = () => {
     formatPDFPercent(stockData.annualized_volatility),
     "Main risk metric",
     riskTheme.accent
+  );
+
+  addMetricCard(
+    margin + (cardW + cardGap) * 4,
+    101,
+    cardW,
+    31,
+    "Max Drawdown",
+    formatPDFPercent(stockData.maximum_drawdown),
+    "Largest peak-to-bottom loss",
+    red
   );
 
   addSectionTitle("Price Overview", 145);

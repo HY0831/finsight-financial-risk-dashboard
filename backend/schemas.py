@@ -69,6 +69,7 @@ class SearchHistoryCreate(BaseModel):
     latest_price: Optional[float] = None
     risk_level: Optional[str] = None
     annualized_volatility: Optional[float] = None
+    maximum_drawdown: Optional[float] = None
     average_daily_return: Optional[float] = None
     volatility: Optional[float] = None
     period: Optional[str] = None
@@ -81,6 +82,7 @@ class SearchHistoryResponse(BaseModel):
     latest_price: Optional[float] = None
     risk_level: Optional[str] = None
     annualized_volatility: Optional[float] = None
+    maximum_drawdown: Optional[float] = None
     average_daily_return: Optional[float] = None
     volatility: Optional[float] = None
     period: Optional[str] = None

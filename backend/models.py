@@ -60,6 +60,7 @@ class SearchHistoryItem(Base):
     latest_price = Column(Float, nullable=True)
     risk_level = Column(String, nullable=True)
     annualized_volatility = Column(Float, nullable=True)
+    maximum_drawdown = Column(Float, nullable=True)
     average_daily_return = Column(Float, nullable=True)
     volatility = Column(Float, nullable=True)
     period = Column(String, nullable=True)

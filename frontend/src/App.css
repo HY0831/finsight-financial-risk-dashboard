@@ -2407,7 +2407,7 @@ body {
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 18px;
   margin-bottom: 20px;
 }
@@ -2471,7 +2471,7 @@ body {
 
 .metric-explanation-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 16px;
 }
 

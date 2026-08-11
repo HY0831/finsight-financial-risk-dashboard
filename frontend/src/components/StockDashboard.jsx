@@ -125,6 +125,12 @@ function StockDashboard({
           </p>
           <span>Lowest and highest closing price in the selected period.</span>
         </div>
+
+        <div className="card">
+          <h3>Maximum Drawdown</h3>
+          <p>{formatPercent(stockData.maximum_drawdown)}</p>
+          <span>The largest peak-to-bottom loss during the selected period.</span>
+        </div>
       </section>
 
       <section className= "metric-explanation-section">
@@ -169,6 +175,15 @@ function StockDashboard({
             <p>
                 Risk level is classified based on annualized volatility. Below 20% is
                 Low Risk, 20% to 40% is Medium Risk, and above 40% is High Risk.
+            </p>
+          </div>
+
+          <div className="metric-explanation-card">
+            <h3>Maximum Drawdown</h3>
+            <p>
+              Maximum drawdown shows the biggest fall from a previous high point to a later
+              low point. A larger negative value means the stock had a deeper loss during
+              the selected period.
             </p>
           </div>
         </div>
