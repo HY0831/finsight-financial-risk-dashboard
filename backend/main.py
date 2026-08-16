@@ -88,4 +88,9 @@ def gold_price_endpoint(period: str="1y"):
         raise HTTPException(
             status_code=500,
             detail=str(error))
-        
+
+@app.get("/debug/routes")
+def debug_routes():
+    return {
+        "routes": [route.path for route in app.routes]
+    }
