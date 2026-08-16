@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -14,6 +14,7 @@ import {
   addCloudHistoryItem,
   addCloudWatchlistItem,
   analyzeStock,
+  searchStocks,
 } from "../api/finsightApi";
 import { getAuthToken } from "../api/authStorage";
 import { addToWatchlist } from "../api/watchlistStorage";
@@ -21,20 +22,56 @@ import { addToHistory } from "../api/historyStorage";
 import SimpleLineChart from "../components/SimpleLineChart";
 import { colors } from "../theme/colors";
 
-const periods = [
-  { label: "6 Months", value: "6mo" },
-  { label: "1 Year", value: "1y" },
-  { label: "3 Years", value: "3y" },
-  { label: "5 Years", value: "5y" },
+const periodOptions = [
+  { label: "6M", value: "6mo" },
+  { label: "1Y", value: "1y" },
+  { label: "3Y", value: "3y" },
+  { label: "5Y", value: "5y" },
 ];
 
 export default function AnalyzeScreen() {
   const [ticker, setTicker] = useState("");
   const [period, setPeriod] = useState("1y");
   const [stockData, setStockData] = useState(null);
+
+  const [suggestions, setSuggestions] = useState([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [saveMessage, setSaveMessage] = useState("");
+
+  useEffect(() => {
+    const searchText = ticker.trim();
+
+    if (searchText.length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        setSearchLoading(true);
+
+        const data = await searchStocks(searchText);
+
+        const results = Array.isArray(data.results) ? data.results : [];
+
+        setSuggestions(results);
+        setShowSuggestions(results.length > 0);
+      } catch (searchError) {
+        console.log("Stock suggestion search error:", searchError);
+        setSuggestions([]);
+        setShowSuggestions(false);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timeoutId);
+  }, [ticker]);
 
   const formatMoney = (value) => {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
@@ -52,86 +89,96 @@ export default function AnalyzeScreen() {
     return `${(Number(value) * 100).toFixed(2)}%`;
   };
 
+  const handleSelectSuggestion = (item) => {
+    setTicker(item.ticker);
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setError("");
+    setSaveMessage("");
+  };
+
   const handleAnalyze = async () => {
-  if (!ticker.trim()) {
-    setError("Please enter a stock ticker, for example AAPL or TSLA.");
-    return;
-  }
-
-  setLoading(true);
-  setError("");
-  setSaveMessage("");
-  setStockData(null);
-
-  try {
-    const selectedTicker = ticker.trim().toUpperCase();
-
-    const result = await analyzeStock(selectedTicker, period);
-
-    setStockData(result);
-
-  try {
-    const token = await getAuthToken();
-
-    if (token) {
-      await addCloudHistoryItem(token, {
-        ...result,
-        period,
-      });
-    } else {
-      await addToHistory(result, period);
+    if (!ticker.trim()) {
+      setError("Please enter a stock ticker, for example AAPL or TSLA.");
+      return;
     }
-  } catch (historyError) {
-    console.log("History save error:", historyError);
+
+    setLoading(true);
+    setError("");
+    setSaveMessage("");
+    setStockData(null);
+    setSuggestions([]);
+    setShowSuggestions(false);
 
     try {
-      await addToHistory(result, period);
-    } catch (localHistoryError) {
-      console.log("Local history fallback error:", localHistoryError);
+      const selectedTicker = ticker.trim().toUpperCase();
+
+      const result = await analyzeStock(selectedTicker, period);
+
+      setStockData(result);
+
+      try {
+        const token = await getAuthToken();
+
+        if (token) {
+          await addCloudHistoryItem(token, {
+            ...result,
+            period,
+          });
+        } else {
+          await addToHistory(result, period);
+        }
+      } catch (historyError) {
+        console.log("History save error:", historyError);
+
+        try {
+          await addToHistory(result, period);
+        } catch (localHistoryError) {
+          console.log("Local history fallback error:", localHistoryError);
+        }
+      }
+    } catch (err) {
+      console.log("Analyze error:", err);
+      setError(err.message || "Unable to analyze stock. Please try again.");
+    } finally {
+      setLoading(false);
     }
-  }
-  } catch (err) {
-    console.log("Analyze error:", err);
-    setError(err.message || "Something went wrong while analysing the stock.");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleSaveToWatchlist = async () => {
-  if (!stockData) {
-    setSaveMessage("No stock data to save.");
-    return;
-  }
-
-  try {
-    const token = await getAuthToken();
-
-    if (token) {
-      try {
-        await addCloudWatchlistItem(token, {
-          ...stockData,
-          period,
-        });
-
-        setSaveMessage(`${stockData.ticker} saved to cloud Watchlist.`);
-        return;
-      } catch (cloudError) {
-        console.log("Cloud watchlist save error:", cloudError);
-      }
+    if (!stockData) {
+      setSaveMessage("No stock data to save.");
+      return;
     }
 
-    await addToWatchlist({
-      ...stockData,
-      period,
-    });
+    try {
+      const token = await getAuthToken();
 
-    setSaveMessage(`${stockData.ticker} saved to local Watchlist.`);
-  } catch (error) {
-    console.log("Local watchlist save error:", error);
-    setSaveMessage(error.message || "Unable to save stock to Watchlist.");
-  }
-};
+      if (token) {
+        try {
+          await addCloudWatchlistItem(token, {
+            ...stockData,
+            period,
+          });
+
+          setSaveMessage(`${stockData.ticker} saved to cloud Watchlist.`);
+          return;
+        } catch (cloudError) {
+          console.log("Cloud watchlist save error:", cloudError);
+        }
+      }
+
+      await addToWatchlist({
+        ...stockData,
+        period,
+      });
+
+      setSaveMessage(`${stockData.ticker} saved to local Watchlist.`);
+    } catch (watchlistError) {
+      console.log("Watchlist save error:", watchlistError);
+      setSaveMessage("Unable to save stock to Watchlist.");
+    }
+  };
 
   const getRiskStyle = (riskLevel) => {
     if (riskLevel === "Low Risk") {
@@ -154,32 +201,69 @@ export default function AnalyzeScreen() {
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <View style={styles.hero}>
-          <Text style={styles.tag}>Analyze</Text>
-          <Text style={styles.title}>Stock Risk Analysis</Text>
+          <Text style={styles.tag}>Stock Analysis</Text>
+          <Text style={styles.title}>Analyze Stock Risk</Text>
           <Text style={styles.description}>
-            Enter a stock ticker and FinSight will calculate risk metrics using
-            historical market data.
+            Search by ticker or company name. FinSight will calculate volatility,
+            maximum drawdown, and risk level.
           </Text>
         </View>
 
         <View style={styles.formCard}>
-          <Text style={styles.label}>Stock Ticker</Text>
+          <Text style={styles.label}>Stock Search</Text>
 
-          <TextInput
-            style={styles.input}
-            value={ticker}
-            onChangeText={setTicker}
-            placeholder="Example: AAPL"
-            placeholderTextColor="#9ca3af"
-            autoCapitalize="characters"
-          />
+          <View style={styles.searchWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Example: AAP, Apple, TSLA"
+              placeholderTextColor="#9ca3af"
+              value={ticker}
+              autoCapitalize="characters"
+              onChangeText={(value) => {
+                setTicker(value);
+                setError("");
+                setSaveMessage("");
+              }}
+            />
+
+            {searchLoading ? (
+              <View style={styles.searchLoadingRow}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={styles.searchLoadingText}>Searching...</Text>
+              </View>
+            ) : null}
+
+            {showSuggestions ? (
+              <View style={styles.suggestionBox}>
+                {suggestions.map((item) => (
+                  <Pressable
+                    key={`${item.ticker}-${item.exchange}`}
+                    style={styles.suggestionItem}
+                    onPress={() => handleSelectSuggestion(item)}
+                  >
+                    <View>
+                      <Text style={styles.suggestionTicker}>{item.ticker}</Text>
+                      <Text style={styles.suggestionName}>
+                        {item.name || "N/A"}
+                      </Text>
+                    </View>
+
+                    <Text style={styles.suggestionExchange}>
+                      {item.exchange || "N/A"}
+                    </Text>
+                  </Pressable>
+                ))}
+              </View>
+            ) : null}
+          </View>
 
           <Text style={styles.label}>Analysis Period</Text>
 
-          <View style={styles.periodGrid}>
-            {periods.map((item) => (
+          <View style={styles.periodRow}>
+            {periodOptions.map((item) => (
               <Pressable
                 key={item.value}
                 style={[
@@ -201,32 +285,42 @@ export default function AnalyzeScreen() {
           </View>
 
           <Pressable
-            style={[styles.analyzeButton, loading && styles.buttonDisabled]}
+            style={[styles.analyzeButton, loading && styles.disabledButton]}
             onPress={handleAnalyze}
             disabled={loading}
           >
-            {loading ? (
-              <ActivityIndicator color="#ffffff" />
-            ) : (
-              <Text style={styles.analyzeButtonText}>Analyze Stock</Text>
-            )}
+            <Text style={styles.analyzeButtonText}>
+              {loading ? "Analyzing..." : "Analyze Stock"}
+            </Text>
           </Pressable>
         </View>
 
         {error ? (
           <View style={styles.errorCard}>
-            <Text style={styles.errorTitle}>Unable to Analyze</Text>
             <Text style={styles.errorText}>{error}</Text>
+          </View>
+        ) : null}
+
+        {saveMessage ? (
+          <View style={styles.messageCard}>
+            <Text style={styles.messageText}>{saveMessage}</Text>
+          </View>
+        ) : null}
+
+        {loading ? (
+          <View style={styles.loadingCard}>
+            <ActivityIndicator color={colors.primary} />
+            <Text style={styles.loadingText}>Loading stock analysis...</Text>
           </View>
         ) : null}
 
         {stockData ? (
           <View style={styles.resultSection}>
-            <View style={styles.resultHeader}>
+            <View style={styles.resultHeaderCard}>
               <View>
-                <Text style={styles.resultTicker}>{stockData.ticker}</Text>
-                <Text style={styles.resultCompany}>
-                  {stockData.company_name}
+                <Text style={styles.ticker}>{stockData.ticker}</Text>
+                <Text style={styles.companyName}>
+                  {stockData.company_name || "N/A"}
                 </Text>
               </View>
 
@@ -235,32 +329,11 @@ export default function AnalyzeScreen() {
               </View>
             </View>
 
-            <SimpleLineChart
-              title="Stock Price Trend"
-              data={stockData.price_data}
-              dataKey="close"
-              valuePrefix="$"
-            />
-
             <View style={styles.metricGrid}>
               <View style={styles.metricCard}>
                 <Text style={styles.metricLabel}>Latest Price</Text>
                 <Text style={styles.metricValue}>
                   {formatMoney(stockData.latest_price)}
-                </Text>
-              </View>
-
-              <View style={styles.metricCard}>
-                <Text style={styles.metricLabel}>Average Return</Text>
-                <Text style={styles.metricValue}>
-                  {formatPercent(stockData.average_daily_return)}
-                </Text>
-              </View>
-
-              <View style={styles.metricCard}>
-                <Text style={styles.metricLabel}>Daily Volatility</Text>
-                <Text style={styles.metricValue}>
-                  {formatPercent(stockData.volatility)}
                 </Text>
               </View>
 
@@ -279,25 +352,29 @@ export default function AnalyzeScreen() {
               </View>
 
               <View style={styles.metricCard}>
-                <Text style={styles.metricLabel}>Period</Text>
-                <Text style={styles.metricValue}>{stockData.period}</Text>
+                <Text style={styles.metricLabel}>Average Daily Return</Text>
+                <Text style={styles.metricValue}>
+                  {formatPercent(stockData.average_daily_return)}
+                </Text>
               </View>
             </View>
 
-            <Pressable style={styles.saveButton} onPress={handleSaveToWatchlist}>
-                <Text style={styles.saveButtonText}>Save to Watchlist</Text>
-            </Pressable>
-
-            {saveMessage ? (
-                <View style={styles.saveMessageCard}>
-                    <Text style={styles.saveMessageText}>{saveMessage}</Text>
-                </View>
-            ) : null}
+            <View style={styles.chartCard}>
+              <Text style={styles.sectionTitle}>Price Trend</Text>
+              <SimpleLineChart data={stockData.price_data || []} />
+            </View>
 
             <View style={styles.summaryCard}>
-              <Text style={styles.summaryTitle}>Risk Summary</Text>
+              <Text style={styles.sectionTitle}>Risk Summary</Text>
               <Text style={styles.summaryText}>{stockData.summary}</Text>
             </View>
+
+            <Pressable
+              style={styles.watchlistButton}
+              onPress={handleSaveToWatchlist}
+            >
+              <Text style={styles.watchlistButtonText}>Save to Watchlist</Text>
+            </Pressable>
           </View>
         ) : null}
       </ScrollView>
@@ -348,8 +425,8 @@ const styles = StyleSheet.create({
 
   formCard: {
     backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 22,
+    padding: 18,
     borderWidth: 1,
     borderColor: colors.border,
     marginBottom: 18,
@@ -357,37 +434,95 @@ const styles = StyleSheet.create({
 
   label: {
     color: colors.primary,
-    fontSize: 15,
-    fontWeight: "800",
+    fontSize: 14,
+    fontWeight: "900",
     marginBottom: 8,
+  },
+
+  searchWrapper: {
+    position: "relative",
+    marginBottom: 16,
+    zIndex: 10,
   },
 
   input: {
     backgroundColor: "#f9fafb",
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 14,
     paddingHorizontal: 14,
-    paddingVertical: 14,
-    fontSize: 16,
+    paddingVertical: 13,
     color: colors.primary,
-    marginBottom: 18,
+    fontSize: 16,
+    fontWeight: "700",
   },
 
-  periodGrid: {
+  searchLoadingRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 8,
+  },
+
+  searchLoadingText: {
+    color: colors.muted,
+    fontSize: 13,
+    fontWeight: "700",
+  },
+
+  suggestionBox: {
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginTop: 8,
+    overflow: "hidden",
+  },
+
+  suggestionItem: {
+    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    flexDirection: "row",
+    justifyContent: "space-between",
     gap: 10,
-    marginBottom: 18,
+  },
+
+  suggestionTicker: {
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  suggestionName: {
+    color: colors.muted,
+    fontSize: 13,
+    fontWeight: "600",
+    maxWidth: 220,
+  },
+
+  suggestionExchange: {
+    color: colors.secondary,
+    fontSize: 12,
+    fontWeight: "800",
+    alignSelf: "center",
+  },
+
+  periodRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 16,
   },
 
   periodButton: {
+    flex: 1,
     backgroundColor: "#f9fafb",
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 999,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    paddingVertical: 12,
+    alignItems: "center",
   },
 
   periodButtonActive: {
@@ -397,8 +532,8 @@ const styles = StyleSheet.create({
 
   periodButtonText: {
     color: colors.secondary,
-    fontSize: 14,
-    fontWeight: "800",
+    fontSize: 13,
+    fontWeight: "900",
   },
 
   periodButtonTextActive: {
@@ -407,13 +542,13 @@ const styles = StyleSheet.create({
 
   analyzeButton: {
     backgroundColor: colors.primary,
-    borderRadius: 14,
+    borderRadius: 16,
     paddingVertical: 15,
     alignItems: "center",
   },
 
-  buttonDisabled: {
-    opacity: 0.7,
+  disabledButton: {
+    opacity: 0.6,
   },
 
   analyzeButtonText: {
@@ -426,32 +561,57 @@ const styles = StyleSheet.create({
     backgroundColor: "#fef2f2",
     borderWidth: 1,
     borderColor: "#fecaca",
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 18,
-  },
-
-  errorTitle: {
-    color: colors.danger,
-    fontSize: 17,
-    fontWeight: "900",
-    marginBottom: 6,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 14,
   },
 
   errorText: {
-    color: "#7f1d1d",
+    color: colors.danger,
     fontSize: 14,
-    lineHeight: 21,
+    fontWeight: "800",
+  },
+
+  messageCard: {
+    backgroundColor: "#ecfdf5",
+    borderWidth: 1,
+    borderColor: "#bbf7d0",
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 14,
+  },
+
+  messageText: {
+    color: colors.success,
+    fontSize: 14,
+    fontWeight: "800",
+  },
+
+  loadingCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 18,
+    alignItems: "center",
+    gap: 10,
+  },
+
+  loadingText: {
+    color: colors.muted,
+    fontSize: 14,
+    fontWeight: "700",
   },
 
   resultSection: {
     gap: 16,
   },
 
-  resultHeader: {
+  resultHeaderCard: {
     backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 22,
+    padding: 18,
     borderWidth: 1,
     borderColor: colors.border,
     flexDirection: "row",
@@ -459,17 +619,17 @@ const styles = StyleSheet.create({
     gap: 12,
   },
 
-  resultTicker: {
+  ticker: {
     color: colors.primary,
     fontSize: 28,
     fontWeight: "900",
     marginBottom: 4,
   },
 
-  resultCompany: {
+  companyName: {
     color: colors.muted,
     fontSize: 14,
-    lineHeight: 20,
+    fontWeight: "600",
     maxWidth: 190,
   },
 
@@ -519,30 +679,38 @@ const styles = StyleSheet.create({
 
   metricLabel: {
     color: colors.muted,
-    fontSize: 13,
+    fontSize: 12,
     fontWeight: "700",
     marginBottom: 8,
   },
 
   metricValue: {
     color: colors.primary,
-    fontSize: 19,
+    fontSize: 18,
     fontWeight: "900",
   },
 
-  summaryCard: {
+  chartCard: {
     backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 22,
+    padding: 18,
     borderWidth: 1,
     borderColor: colors.border,
   },
 
-  summaryTitle: {
+  sectionTitle: {
     color: colors.primary,
     fontSize: 19,
     fontWeight: "900",
-    marginBottom: 8,
+    marginBottom: 12,
+  },
+
+  summaryCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 22,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
   },
 
   summaryText: {
@@ -551,30 +719,16 @@ const styles = StyleSheet.create({
     lineHeight: 23,
   },
 
-  saveButton: {
-  backgroundColor: colors.primary,
-  borderRadius: 16,
-  paddingVertical: 15,
-  alignItems: "center",
-},
+  watchlistButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 16,
+    paddingVertical: 15,
+    alignItems: "center",
+  },
 
-saveButtonText: {
-  color: "#ffffff",
-  fontSize: 16,
-  fontWeight: "900",
-},
-
-saveMessageCard: {
-  backgroundColor: "#ecfdf5",
-  borderWidth: 1,
-  borderColor: "#bbf7d0",
-  borderRadius: 16,
-  padding: 14,
-},
-
-saveMessageText: {
-  color: colors.success,
-  fontSize: 14,
-  fontWeight: "800",
-},
+  watchlistButtonText: {
+    color: "#ffffff",
+    fontSize: 16,
+    fontWeight: "900",
+  },
 });

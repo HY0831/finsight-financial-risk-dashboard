@@ -71,6 +71,14 @@ export async function analyzeStock(ticker, period = "1y") {
   return await parseResponse(response, "Unable to analyze stock.");
 }
 
+export async function searchStocks(query) {
+  const cleanQuery = encodeURIComponent(query);
+
+  const response = await fetch(`${API_BASE_URL}/search-stocks?query=${cleanQuery}`);
+
+  return await parseResponse(response, "Unable to search stocks.");
+}
+
 export async function getGoldPrice(period = "1y") {
   const cleanPeriod = encodeURIComponent(period);
 
