@@ -31,6 +31,8 @@ export default function AccountScreen() {
   const { theme, colors, setTheme } = useAppTheme();
   const styles = createStyles(colors);
 
+  const [screenMode, setScreenMode] = useState("account");
+
   const [apiStatus, setApiStatus] = useState("Checking...");
   const [user, setUser] = useState(null);
   const [storageMode, setStorageMode] = useState("Local");
@@ -102,6 +104,20 @@ export default function AccountScreen() {
     }, [])
   );
 
+  const resetAuthForms = () => {
+    setLoginEmail("");
+    setLoginPassword("");
+    setRegisterName("");
+    setRegisterEmail("");
+    setRegisterPassword("");
+  };
+
+  const goBackToAccount = () => {
+    resetAuthForms();
+    setScreenMode("account");
+    setMessage("");
+  };
+
   const handleLogin = async () => {
     if (!loginEmail.trim() || !loginPassword.trim()) {
       setMessage("Please enter email and password.");
@@ -120,8 +136,8 @@ export default function AccountScreen() {
 
       setUser(currentUser);
       setStorageMode("Cloud");
-      setLoginEmail("");
-      setLoginPassword("");
+      resetAuthForms();
+      setScreenMode("account");
       setMessage("Login successful. Cloud save is now enabled.");
     } catch (error) {
       console.log("Login error:", error);
@@ -159,9 +175,8 @@ export default function AccountScreen() {
 
       setUser(currentUser);
       setStorageMode("Cloud");
-      setRegisterName("");
-      setRegisterEmail("");
-      setRegisterPassword("");
+      resetAuthForms();
+      setScreenMode("account");
       setMessage("Registration successful. Cloud save is now enabled.");
     } catch (error) {
       console.log("Register error:", error);
@@ -176,6 +191,7 @@ export default function AccountScreen() {
 
     setUser(null);
     setStorageMode("Local");
+    setScreenMode("account");
     setMessage("Logged out. Guest mode is now using local storage.");
   };
 
@@ -197,13 +213,92 @@ export default function AccountScreen() {
     },
   ];
 
-  return (
-    <SafeAreaView style={styles.safe}>
-      <ScrollView
-        contentContainerStyle={styles.container}
-        showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
-      >
+  const renderThemeSelector = () => {
+    return (
+      <View style={styles.themeCard}>
+        <Text style={styles.sectionTitle}>App Theme</Text>
+        <Text style={styles.sectionDescription}>
+          Choose the visual mode for the mobile app.
+        </Text>
+
+        <View style={styles.themeOptionList}>
+          {themeOptions.map((item) => {
+            const isSelected = theme === item.value;
+
+            return (
+              <Pressable
+                key={item.value}
+                style={[
+                  styles.themeOption,
+                  isSelected && styles.themeOptionSelected,
+                ]}
+                onPress={() => setTheme(item.value)}
+              >
+                <View>
+                  <Text
+                    style={[
+                      styles.themeOptionTitle,
+                      isSelected && styles.themeOptionTitleSelected,
+                    ]}
+                  >
+                    {item.label}
+                  </Text>
+
+                  <Text
+                    style={[
+                      styles.themeOptionDescription,
+                      isSelected && styles.themeOptionDescriptionSelected,
+                    ]}
+                  >
+                    {item.description}
+                  </Text>
+                </View>
+
+                <Text
+                  style={[
+                    styles.themeCheck,
+                    isSelected && styles.themeCheckSelected,
+                  ]}
+                >
+                  {isSelected ? "✓" : ""}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </View>
+    );
+  };
+
+  const renderStatusCards = () => {
+    return (
+      <View style={styles.statusGrid}>
+        <View style={styles.statusCard}>
+          <Text style={styles.statusLabel}>Backend API</Text>
+          <Text style={styles.statusValue}>{apiStatus}</Text>
+        </View>
+
+        <View style={styles.statusCard}>
+          <Text style={styles.statusLabel}>Storage Mode</Text>
+          <Text style={styles.statusValue}>{storageMode}</Text>
+        </View>
+
+        <View style={styles.statusCard}>
+          <Text style={styles.statusLabel}>Local Watchlist</Text>
+          <Text style={styles.statusValue}>{watchlistCount}</Text>
+        </View>
+
+        <View style={styles.statusCard}>
+          <Text style={styles.statusLabel}>Local History</Text>
+          <Text style={styles.statusValue}>{historyCount}</Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderAccountOverview = () => {
+    return (
+      <>
         <View style={styles.hero}>
           <Text style={styles.tag}>Account</Text>
           <Text style={styles.title}>Account & App Settings</Text>
@@ -213,79 +308,8 @@ export default function AccountScreen() {
           </Text>
         </View>
 
-        <View style={styles.statusGrid}>
-          <View style={styles.statusCard}>
-            <Text style={styles.statusLabel}>Backend API</Text>
-            <Text style={styles.statusValue}>{apiStatus}</Text>
-          </View>
-
-          <View style={styles.statusCard}>
-            <Text style={styles.statusLabel}>Storage Mode</Text>
-            <Text style={styles.statusValue}>{storageMode}</Text>
-          </View>
-
-          <View style={styles.statusCard}>
-            <Text style={styles.statusLabel}>Local Watchlist</Text>
-            <Text style={styles.statusValue}>{watchlistCount}</Text>
-          </View>
-
-          <View style={styles.statusCard}>
-            <Text style={styles.statusLabel}>Local History</Text>
-            <Text style={styles.statusValue}>{historyCount}</Text>
-          </View>
-        </View>
-
-        <View style={styles.themeCard}>
-          <Text style={styles.sectionTitle}>App Theme</Text>
-          <Text style={styles.sectionDescription}>
-            Choose the visual mode for the mobile app.
-          </Text>
-
-          <View style={styles.themeOptionList}>
-            {themeOptions.map((item) => {
-              const isSelected = theme === item.value;
-
-              return (
-                <Pressable
-                  key={item.value}
-                  style={[
-                    styles.themeOption,
-                    isSelected && styles.themeOptionSelected,
-                  ]}
-                  onPress={() => setTheme(item.value)}
-                >
-                  <View>
-                    <Text
-                      style={[
-                        styles.themeOptionTitle,
-                        isSelected && styles.themeOptionTitleSelected,
-                      ]}
-                    >
-                      {item.label}
-                    </Text>
-                    <Text
-                      style={[
-                        styles.themeOptionDescription,
-                        isSelected && styles.themeOptionDescriptionSelected,
-                      ]}
-                    >
-                      {item.description}
-                    </Text>
-                  </View>
-
-                  <Text
-                    style={[
-                      styles.themeCheck,
-                      isSelected && styles.themeCheckSelected,
-                    ]}
-                  >
-                    {isSelected ? "✓" : ""}
-                  </Text>
-                </Pressable>
-              );
-            })}
-          </View>
-        </View>
+        {renderStatusCards()}
+        {renderThemeSelector()}
 
         <View style={styles.accountCard}>
           <Text style={styles.sectionTitle}>Login Status</Text>
@@ -299,8 +323,8 @@ export default function AccountScreen() {
               <Text style={styles.userSubText}>{user.email}</Text>
 
               <Text style={styles.infoText}>
-                Your watchlist, analysis history, and risk profile can be saved
-                to cloud database when logged in.
+                Cloud save is enabled. Your watchlist, analysis history, and
+                risk profile can be stored in the backend database.
               </Text>
 
               <Pressable style={styles.logoutButton} onPress={handleLogout}>
@@ -310,9 +334,29 @@ export default function AccountScreen() {
           ) : (
             <>
               <Text style={styles.infoText}>
-                You are currently using guest mode. Guest data is saved locally
-                on this device only.
+                You are currently using guest mode. Sign in to sync your
+                watchlist, analysis history, and risk profile across devices.
               </Text>
+
+              <Pressable
+                style={styles.primaryButton}
+                onPress={() => {
+                  setScreenMode("login");
+                  setMessage("");
+                }}
+              >
+                <Text style={styles.primaryButtonText}>Login</Text>
+              </Pressable>
+
+              <Pressable
+                style={styles.secondaryButton}
+                onPress={() => {
+                  setScreenMode("register");
+                  setMessage("");
+                }}
+              >
+                <Text style={styles.secondaryButtonText}>Create Account</Text>
+              </Pressable>
             </>
           )}
         </View>
@@ -322,81 +366,71 @@ export default function AccountScreen() {
           <Text style={styles.statusValueLarge}>{riskProfileStatus}</Text>
         </View>
 
-        {!user ? (
-          <>
-            <View style={styles.formCard}>
-              <Text style={styles.sectionTitle}>Login</Text>
-
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor={colors.muted}
-                autoCapitalize="none"
-                value={loginEmail}
-                onChangeText={setLoginEmail}
-              />
-
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor={colors.muted}
-                secureTextEntry
-                value={loginPassword}
-                onChangeText={setLoginPassword}
-              />
-
-              <Pressable
-                style={[styles.primaryButton, loading && styles.disabledButton]}
-                onPress={handleLogin}
-                disabled={loading}
-              >
-                <Text style={styles.primaryButtonText}>
-                  {loading ? "Loading..." : "Login"}
-                </Text>
-              </Pressable>
-            </View>
-
-            <View style={styles.formCard}>
-              <Text style={styles.sectionTitle}>Register</Text>
-
-              <TextInput
-                style={styles.input}
-                placeholder="Full Name"
-                placeholderTextColor={colors.muted}
-                value={registerName}
-                onChangeText={setRegisterName}
-              />
-
-              <TextInput
-                style={styles.input}
-                placeholder="Email"
-                placeholderTextColor={colors.muted}
-                autoCapitalize="none"
-                value={registerEmail}
-                onChangeText={setRegisterEmail}
-              />
-
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                placeholderTextColor={colors.muted}
-                secureTextEntry
-                value={registerPassword}
-                onChangeText={setRegisterPassword}
-              />
-
-              <Pressable
-                style={[styles.primaryButton, loading && styles.disabledButton]}
-                onPress={handleRegister}
-                disabled={loading}
-              >
-                <Text style={styles.primaryButtonText}>
-                  {loading ? "Loading..." : "Register"}
-                </Text>
-              </Pressable>
-            </View>
-          </>
+        {message ? (
+          <View style={styles.messageCard}>
+            <Text style={styles.messageText}>{message}</Text>
+          </View>
         ) : null}
+
+        <View style={styles.noteCard}>
+          <Text style={styles.noteTitle}>Storage Explanation</Text>
+          <Text style={styles.noteText}>
+            Local mode stores data only on this device. Cloud mode stores user
+            data in the backend database after login.
+          </Text>
+        </View>
+      </>
+    );
+  };
+
+  const renderLoginScreen = () => {
+    return (
+      <>
+        <View style={styles.hero}>
+          <Text style={styles.tag}>Login</Text>
+          <Text style={styles.title}>Welcome Back</Text>
+          <Text style={styles.description}>
+            Login to enable cloud save for your watchlist, history, and risk
+            profile.
+          </Text>
+        </View>
+
+        <View style={styles.formCard}>
+          <Text style={styles.sectionTitle}>Login</Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor={colors.muted}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            value={loginEmail}
+            onChangeText={setLoginEmail}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor={colors.muted}
+            secureTextEntry
+            value={loginPassword}
+            onChangeText={setLoginPassword}
+          />
+
+          <Pressable
+            style={[styles.primaryButton, loading && styles.disabledButton]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.primaryButtonText}>
+              {loading ? "Logging in..." : "Login"}
+            </Text>
+          </Pressable>
+
+          <Pressable style={styles.backButton} onPress={goBackToAccount}>
+            <Text style={styles.backButtonText}>Back to Account</Text>
+          </Pressable>
+        </View>
 
         {message ? (
           <View style={styles.messageCard}>
@@ -410,14 +444,92 @@ export default function AccountScreen() {
             <Text style={styles.loadingText}>Processing...</Text>
           </View>
         ) : null}
+      </>
+    );
+  };
 
-        <View style={styles.noteCard}>
-          <Text style={styles.noteTitle}>Storage Explanation</Text>
-          <Text style={styles.noteText}>
-            Local mode stores data only on this device. Cloud mode stores user
-            data in the backend database after login.
+  const renderRegisterScreen = () => {
+    return (
+      <>
+        <View style={styles.hero}>
+          <Text style={styles.tag}>Register</Text>
+          <Text style={styles.title}>Create Account</Text>
+          <Text style={styles.description}>
+            Create an account to sync your FinSight data with cloud storage.
           </Text>
         </View>
+
+        <View style={styles.formCard}>
+          <Text style={styles.sectionTitle}>Create Account</Text>
+
+          <TextInput
+            style={styles.input}
+            placeholder="Full Name"
+            placeholderTextColor={colors.muted}
+            value={registerName}
+            onChangeText={setRegisterName}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            placeholderTextColor={colors.muted}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            value={registerEmail}
+            onChangeText={setRegisterEmail}
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Password"
+            placeholderTextColor={colors.muted}
+            secureTextEntry
+            value={registerPassword}
+            onChangeText={setRegisterPassword}
+          />
+
+          <Pressable
+            style={[styles.primaryButton, loading && styles.disabledButton]}
+            onPress={handleRegister}
+            disabled={loading}
+          >
+            <Text style={styles.primaryButtonText}>
+              {loading ? "Creating..." : "Create Account"}
+            </Text>
+          </Pressable>
+
+          <Pressable style={styles.backButton} onPress={goBackToAccount}>
+            <Text style={styles.backButtonText}>Back to Account</Text>
+          </Pressable>
+        </View>
+
+        {message ? (
+          <View style={styles.messageCard}>
+            <Text style={styles.messageText}>{message}</Text>
+          </View>
+        ) : null}
+
+        {loading ? (
+          <View style={styles.loadingCard}>
+            <ActivityIndicator color={colors.primary} />
+            <Text style={styles.loadingText}>Processing...</Text>
+          </View>
+        ) : null}
+      </>
+    );
+  };
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+      >
+        {screenMode === "account" ? renderAccountOverview() : null}
+        {screenMode === "login" ? renderLoginScreen() : null}
+        {screenMode === "register" ? renderRegisterScreen() : null}
       </ScrollView>
     </SafeAreaView>
   );
@@ -662,6 +774,38 @@ function createStyles(colors) {
     primaryButtonText: {
       color: colors.surface,
       fontSize: 16,
+      fontWeight: "900",
+    },
+
+    secondaryButton: {
+      backgroundColor: colors.inputBackground,
+      borderRadius: 16,
+      paddingVertical: 15,
+      alignItems: "center",
+      marginTop: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+
+    secondaryButtonText: {
+      color: colors.primary,
+      fontSize: 16,
+      fontWeight: "900",
+    },
+
+    backButton: {
+      backgroundColor: colors.inputBackground,
+      borderRadius: 16,
+      paddingVertical: 15,
+      alignItems: "center",
+      marginTop: 4,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+
+    backButtonText: {
+      color: colors.primary,
+      fontSize: 15,
       fontWeight: "900",
     },
 
