@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -10,24 +10,94 @@ import {
   View,
 } from "react-native";
 
-import { analyzeStock } from "../api/finsightApi";
+import { analyzeStock, searchStocks } from "../api/finsightApi";
 import { colors } from "../theme/colors";
 
-const periods = [
-  { label: "6 Months", value: "6mo" },
-  { label: "1 Year", value: "1y" },
-  { label: "3 Years", value: "3y" },
-  { label: "5 Years", value: "5y" },
+const periodOptions = [
+  { label: "6M", value: "6mo" },
+  { label: "1Y", value: "1y" },
+  { label: "3Y", value: "3y" },
+  { label: "5Y", value: "5y" },
 ];
 
 export default function CompareScreen() {
-  const [tickerOne, setTickerOne] = useState("");
-  const [tickerTwo, setTickerTwo] = useState("");
+  const [firstTicker, setFirstTicker] = useState("");
+  const [secondTicker, setSecondTicker] = useState("");
   const [period, setPeriod] = useState("1y");
-  const [stockOne, setStockOne] = useState(null);
-  const [stockTwo, setStockTwo] = useState(null);
+
+  const [firstSuggestions, setFirstSuggestions] = useState([]);
+  const [secondSuggestions, setSecondSuggestions] = useState([]);
+  const [firstSearchLoading, setFirstSearchLoading] = useState(false);
+  const [secondSearchLoading, setSecondSearchLoading] = useState(false);
+  const [activeSearchBox, setActiveSearchBox] = useState(null);
+
+  const [firstStock, setFirstStock] = useState(null);
+  const [secondStock, setSecondStock] = useState(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const searchText = firstTicker.trim();
+
+    if (activeSearchBox !== "first") {
+      return;
+    }
+
+    if (searchText.length < 2) {
+      setFirstSuggestions([]);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        setFirstSearchLoading(true);
+
+        const data = await searchStocks(searchText);
+        const results = Array.isArray(data.results) ? data.results : [];
+
+        setFirstSuggestions(results);
+      } catch (searchError) {
+        console.log("First stock suggestion error:", searchError);
+        setFirstSuggestions([]);
+      } finally {
+        setFirstSearchLoading(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timeoutId);
+  }, [firstTicker, activeSearchBox]);
+
+  useEffect(() => {
+    const searchText = secondTicker.trim();
+
+    if (activeSearchBox !== "second") {
+      return;
+    }
+
+    if (searchText.length < 2) {
+      setSecondSuggestions([]);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        setSecondSearchLoading(true);
+
+        const data = await searchStocks(searchText);
+        const results = Array.isArray(data.results) ? data.results : [];
+
+        setSecondSuggestions(results);
+      } catch (searchError) {
+        console.log("Second stock suggestion error:", searchError);
+        setSecondSuggestions([]);
+      } finally {
+        setSecondSearchLoading(false);
+      }
+    }, 400);
+
+    return () => clearTimeout(timeoutId);
+  }, [secondTicker, activeSearchBox]);
 
   const formatMoney = (value) => {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
@@ -45,123 +115,171 @@ export default function CompareScreen() {
     return `${(Number(value) * 100).toFixed(2)}%`;
   };
 
-  const handleCompare = async () => {
-    const firstTicker = tickerOne.trim().toUpperCase();
-    const secondTicker = tickerTwo.trim().toUpperCase();
+  const handleSelectFirstSuggestion = (item) => {
+    setFirstTicker(item.ticker);
+    setFirstSuggestions([]);
+    setActiveSearchBox(null);
+    setError("");
+  };
 
-    if (!firstTicker || !secondTicker) {
-      setError("Please enter two stock tickers, for example AAPL and TSLA.");
+  const handleSelectSecondSuggestion = (item) => {
+    setSecondTicker(item.ticker);
+    setSecondSuggestions([]);
+    setActiveSearchBox(null);
+    setError("");
+  };
+
+  const handleCompare = async () => {
+    const cleanFirstTicker = firstTicker.trim().toUpperCase();
+    const cleanSecondTicker = secondTicker.trim().toUpperCase();
+
+    if (!cleanFirstTicker || !cleanSecondTicker) {
+      setError("Please enter two stock tickers to compare.");
       return;
     }
 
-    if (firstTicker === secondTicker) {
-      setError("Please enter two different stock tickers.");
+    if (cleanFirstTicker === cleanSecondTicker) {
+      setError("Please enter two different stocks.");
       return;
     }
 
     setLoading(true);
     setError("");
-    setStockOne(null);
-    setStockTwo(null);
+    setFirstStock(null);
+    setSecondStock(null);
+    setFirstSuggestions([]);
+    setSecondSuggestions([]);
+    setActiveSearchBox(null);
 
     try {
       const [firstResult, secondResult] = await Promise.all([
-        analyzeStock(firstTicker, period),
-        analyzeStock(secondTicker, period),
+        analyzeStock(cleanFirstTicker, period),
+        analyzeStock(cleanSecondTicker, period),
       ]);
 
-      setStockOne(firstResult);
-      setStockTwo(secondResult);
-    } catch (err) {
-      setError(err.message || "Unable to compare stocks.");
+      setFirstStock(firstResult);
+      setSecondStock(secondResult);
+    } catch (compareError) {
+      console.log("Compare error:", compareError);
+      setError(compareError.message || "Unable to compare stocks.");
     } finally {
       setLoading(false);
     }
   };
 
-  const getRiskStyle = (riskLevel) => {
-    if (riskLevel === "Low Risk") {
-      return styles.lowRisk;
+  const getLowerRiskStock = () => {
+    if (!firstStock || !secondStock) {
+      return null;
     }
 
-    if (riskLevel === "Medium Risk") {
-      return styles.mediumRisk;
+    if (
+      Number(firstStock.annualized_volatility) <
+      Number(secondStock.annualized_volatility)
+    ) {
+      return firstStock;
     }
 
-    if (riskLevel === "High Risk") {
-      return styles.highRisk;
+    if (
+      Number(secondStock.annualized_volatility) <
+      Number(firstStock.annualized_volatility)
+    ) {
+      return secondStock;
     }
 
-    return styles.neutralRisk;
+    return null;
   };
 
-  const getComparisonSummary = () => {
-    if (!stockOne || !stockTwo) {
-      return "";
+  const getHigherReturnStock = () => {
+    if (!firstStock || !secondStock) {
+      return null;
     }
 
-    const lowerVolatilityStock =
-      stockOne.annualized_volatility <= stockTwo.annualized_volatility
-        ? stockOne
-        : stockTwo;
+    if (
+      Number(firstStock.average_daily_return) >
+      Number(secondStock.average_daily_return)
+    ) {
+      return firstStock;
+    }
 
-    const higherReturnStock =
-      stockOne.average_daily_return >= stockTwo.average_daily_return
-        ? stockOne
-        : stockTwo;
+    if (
+      Number(secondStock.average_daily_return) >
+      Number(firstStock.average_daily_return)
+    ) {
+      return secondStock;
+    }
 
-    const smallerDrawdownStock =
-      stockOne.maximum_drawdown >= stockTwo.maximum_drawdown
-        ? stockOne
-        : stockTwo;
-
-    return `${lowerVolatilityStock.ticker} has lower annualized volatility, while ${higherReturnStock.ticker} has higher average daily return. Based on maximum drawdown, ${smallerDrawdownStock.ticker} had a smaller peak-to-bottom loss during the selected period.`;
+    return null;
   };
 
-  const renderStockCard = (stockData) => {
+  const lowerRiskStock = getLowerRiskStock();
+  const higherReturnStock = getHigherReturnStock();
+
+  const renderSuggestionBox = (suggestions, onSelect) => {
+    if (!suggestions || suggestions.length === 0) {
+      return null;
+    }
+
+    return (
+      <View style={styles.suggestionBox}>
+        {suggestions.map((item) => (
+          <Pressable
+            key={`${item.ticker}-${item.exchange}`}
+            style={styles.suggestionItem}
+            onPress={() => onSelect(item)}
+          >
+            <View>
+              <Text style={styles.suggestionTicker}>{item.ticker}</Text>
+              <Text style={styles.suggestionName}>{item.name || "N/A"}</Text>
+            </View>
+
+            <Text style={styles.suggestionExchange}>
+              {item.exchange || "N/A"}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+    );
+  };
+
+  const renderStockCard = (stock) => {
+    if (!stock) {
+      return null;
+    }
+
     return (
       <View style={styles.stockCard}>
-        <View style={styles.stockHeader}>
-          <View>
-            <Text style={styles.ticker}>{stockData.ticker}</Text>
-            <Text style={styles.companyName}>{stockData.company_name}</Text>
-          </View>
+        <Text style={styles.stockTicker}>{stock.ticker}</Text>
+        <Text style={styles.companyName}>{stock.company_name || "N/A"}</Text>
 
-          <View style={[styles.riskBadge, getRiskStyle(stockData.risk_level)]}>
-            <Text style={styles.riskBadgeText}>{stockData.risk_level}</Text>
-          </View>
+        <View style={styles.metricRow}>
+          <Text style={styles.metricLabel}>Latest Price</Text>
+          <Text style={styles.metricValue}>{formatMoney(stock.latest_price)}</Text>
         </View>
 
         <View style={styles.metricRow}>
-          <View style={styles.metricBox}>
-            <Text style={styles.metricLabel}>Latest Price</Text>
-            <Text style={styles.metricValue}>
-              {formatMoney(stockData.latest_price)}
-            </Text>
-          </View>
-
-          <View style={styles.metricBox}>
-            <Text style={styles.metricLabel}>Avg Return</Text>
-            <Text style={styles.metricValue}>
-              {formatPercent(stockData.average_daily_return)}
-            </Text>
-          </View>
+          <Text style={styles.metricLabel}>Average Daily Return</Text>
+          <Text style={styles.metricValue}>
+            {formatPercent(stock.average_daily_return)}
+          </Text>
         </View>
 
         <View style={styles.metricRow}>
-          <View style={styles.metricBox}>
-            <Text style={styles.metricLabel}>Annual Volatility</Text>
-            <Text style={styles.metricValue}>
-              {formatPercent(stockData.annualized_volatility)}
-            </Text>
-          </View>
+          <Text style={styles.metricLabel}>Annual Volatility</Text>
+          <Text style={styles.metricValue}>
+            {formatPercent(stock.annualized_volatility)}
+          </Text>
+        </View>
 
-          <View style={styles.metricBox}>
-            <Text style={styles.metricLabel}>Max Drawdown</Text>
-            <Text style={styles.metricValue}>
-              {formatPercent(stockData.maximum_drawdown)}
-            </Text>
-          </View>
+        <View style={styles.metricRow}>
+          <Text style={styles.metricLabel}>Maximum Drawdown</Text>
+          <Text style={styles.metricValue}>
+            {formatPercent(stock.maximum_drawdown)}
+          </Text>
+        </View>
+
+        <View style={styles.metricRow}>
+          <Text style={styles.metricLabel}>Risk Level</Text>
+          <Text style={styles.metricValue}>{stock.risk_level}</Text>
         </View>
       </View>
     );
@@ -172,41 +290,86 @@ export default function CompareScreen() {
       <ScrollView
         contentContainerStyle={styles.container}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
         <View style={styles.hero}>
           <Text style={styles.tag}>Compare</Text>
-          <Text style={styles.title}>Stock Comparison</Text>
+          <Text style={styles.title}>Compare Two Stocks</Text>
           <Text style={styles.description}>
-            Compare two stocks side by side using the same analysis period and
-            risk metrics.
+            Search by ticker or company name. Compare volatility, return,
+            maximum drawdown, and risk level side by side.
           </Text>
         </View>
 
         <View style={styles.formCard}>
           <Text style={styles.label}>First Stock</Text>
-          <TextInput
-            style={styles.input}
-            value={tickerOne}
-            onChangeText={setTickerOne}
-            placeholder="Example: AAPL"
-            placeholderTextColor="#9ca3af"
-            autoCapitalize="characters"
-          />
+
+          <View style={styles.searchWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Example: AAP, Apple"
+              placeholderTextColor="#9ca3af"
+              value={firstTicker}
+              autoCapitalize="characters"
+              onFocus={() => setActiveSearchBox("first")}
+              onChangeText={(value) => {
+                setFirstTicker(value);
+                setActiveSearchBox("first");
+                setError("");
+              }}
+            />
+
+            {firstSearchLoading && activeSearchBox === "first" ? (
+              <View style={styles.searchLoadingRow}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={styles.searchLoadingText}>Searching...</Text>
+              </View>
+            ) : null}
+
+            {activeSearchBox === "first"
+              ? renderSuggestionBox(
+                  firstSuggestions,
+                  handleSelectFirstSuggestion
+                )
+              : null}
+          </View>
 
           <Text style={styles.label}>Second Stock</Text>
-          <TextInput
-            style={styles.input}
-            value={tickerTwo}
-            onChangeText={setTickerTwo}
-            placeholder="Example: TSLA"
-            placeholderTextColor="#9ca3af"
-            autoCapitalize="characters"
-          />
 
-          <Text style={styles.label}>Analysis Period</Text>
+          <View style={styles.searchWrapper}>
+            <TextInput
+              style={styles.input}
+              placeholder="Example: TSLA, Tesla"
+              placeholderTextColor="#9ca3af"
+              value={secondTicker}
+              autoCapitalize="characters"
+              onFocus={() => setActiveSearchBox("second")}
+              onChangeText={(value) => {
+                setSecondTicker(value);
+                setActiveSearchBox("second");
+                setError("");
+              }}
+            />
 
-          <View style={styles.periodGrid}>
-            {periods.map((item) => (
+            {secondSearchLoading && activeSearchBox === "second" ? (
+              <View style={styles.searchLoadingRow}>
+                <ActivityIndicator size="small" color={colors.primary} />
+                <Text style={styles.searchLoadingText}>Searching...</Text>
+              </View>
+            ) : null}
+
+            {activeSearchBox === "second"
+              ? renderSuggestionBox(
+                  secondSuggestions,
+                  handleSelectSecondSuggestion
+                )
+              : null}
+          </View>
+
+          <Text style={styles.label}>Comparison Period</Text>
+
+          <View style={styles.periodRow}>
+            {periodOptions.map((item) => (
               <Pressable
                 key={item.value}
                 style={[
@@ -228,33 +391,60 @@ export default function CompareScreen() {
           </View>
 
           <Pressable
-            style={[styles.compareButton, loading && styles.buttonDisabled]}
+            style={[styles.compareButton, loading && styles.disabledButton]}
             onPress={handleCompare}
             disabled={loading}
           >
-            {loading ? (
-              <ActivityIndicator color="#ffffff" />
-            ) : (
-              <Text style={styles.compareButtonText}>Compare Stocks</Text>
-            )}
+            <Text style={styles.compareButtonText}>
+              {loading ? "Comparing..." : "Compare Stocks"}
+            </Text>
           </Pressable>
         </View>
 
         {error ? (
           <View style={styles.errorCard}>
-            <Text style={styles.errorTitle}>Unable to Compare</Text>
             <Text style={styles.errorText}>{error}</Text>
           </View>
         ) : null}
 
-        {stockOne && stockTwo ? (
+        {loading ? (
+          <View style={styles.loadingCard}>
+            <ActivityIndicator color={colors.primary} />
+            <Text style={styles.loadingText}>Loading comparison...</Text>
+          </View>
+        ) : null}
+
+        {firstStock && secondStock ? (
           <View style={styles.resultSection}>
-            {renderStockCard(stockOne)}
-            {renderStockCard(stockTwo)}
+            <Text style={styles.sectionTitle}>Comparison Result</Text>
+
+            {renderStockCard(firstStock)}
+            {renderStockCard(secondStock)}
 
             <View style={styles.summaryCard}>
-              <Text style={styles.summaryTitle}>Comparison Summary</Text>
-              <Text style={styles.summaryText}>{getComparisonSummary()}</Text>
+              <Text style={styles.sectionTitle}>Comparison Summary</Text>
+
+              <Text style={styles.summaryText}>
+                Lower Risk Stock:{" "}
+                <Text style={styles.boldText}>
+                  {lowerRiskStock ? lowerRiskStock.ticker : "Both are similar"}
+                </Text>
+              </Text>
+
+              <Text style={styles.summaryText}>
+                Higher Average Return:{" "}
+                <Text style={styles.boldText}>
+                  {higherReturnStock
+                    ? higherReturnStock.ticker
+                    : "Both are similar"}
+                </Text>
+              </Text>
+
+              <Text style={styles.summaryNote}>
+                This comparison is based on historical price movement during the
+                selected period. It is for educational purposes only and should
+                not be treated as financial advice.
+              </Text>
             </View>
           </View>
         ) : null}
@@ -306,8 +496,8 @@ const styles = StyleSheet.create({
 
   formCard: {
     backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 22,
+    padding: 18,
     borderWidth: 1,
     borderColor: colors.border,
     marginBottom: 18,
@@ -315,37 +505,95 @@ const styles = StyleSheet.create({
 
   label: {
     color: colors.primary,
-    fontSize: 15,
-    fontWeight: "800",
+    fontSize: 14,
+    fontWeight: "900",
     marginBottom: 8,
+  },
+
+  searchWrapper: {
+    position: "relative",
+    marginBottom: 16,
+    zIndex: 10,
   },
 
   input: {
     backgroundColor: "#f9fafb",
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 14,
     paddingHorizontal: 14,
-    paddingVertical: 14,
-    fontSize: 16,
+    paddingVertical: 13,
     color: colors.primary,
-    marginBottom: 18,
+    fontSize: 16,
+    fontWeight: "700",
   },
 
-  periodGrid: {
+  searchLoadingRow: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 8,
+  },
+
+  searchLoadingText: {
+    color: colors.muted,
+    fontSize: 13,
+    fontWeight: "700",
+  },
+
+  suggestionBox: {
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginTop: 8,
+    overflow: "hidden",
+  },
+
+  suggestionItem: {
+    padding: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    flexDirection: "row",
+    justifyContent: "space-between",
     gap: 10,
-    marginBottom: 18,
+  },
+
+  suggestionTicker: {
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: "900",
+    marginBottom: 3,
+  },
+
+  suggestionName: {
+    color: colors.muted,
+    fontSize: 13,
+    fontWeight: "600",
+    maxWidth: 220,
+  },
+
+  suggestionExchange: {
+    color: colors.secondary,
+    fontSize: 12,
+    fontWeight: "800",
+    alignSelf: "center",
+  },
+
+  periodRow: {
+    flexDirection: "row",
+    gap: 8,
+    marginBottom: 16,
   },
 
   periodButton: {
+    flex: 1,
     backgroundColor: "#f9fafb",
+    borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 999,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    paddingVertical: 12,
+    alignItems: "center",
   },
 
   periodButtonActive: {
@@ -355,8 +603,8 @@ const styles = StyleSheet.create({
 
   periodButtonText: {
     color: colors.secondary,
-    fontSize: 14,
-    fontWeight: "800",
+    fontSize: 13,
+    fontWeight: "900",
   },
 
   periodButtonTextActive: {
@@ -365,13 +613,13 @@ const styles = StyleSheet.create({
 
   compareButton: {
     backgroundColor: colors.primary,
-    borderRadius: 14,
+    borderRadius: 16,
     paddingVertical: 15,
     alignItems: "center",
   },
 
-  buttonDisabled: {
-    opacity: 0.7,
+  disabledButton: {
+    opacity: 0.6,
   },
 
   compareButtonText: {
@@ -384,26 +632,43 @@ const styles = StyleSheet.create({
     backgroundColor: "#fef2f2",
     borderWidth: 1,
     borderColor: "#fecaca",
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 18,
-  },
-
-  errorTitle: {
-    color: colors.danger,
-    fontSize: 17,
-    fontWeight: "900",
-    marginBottom: 6,
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 14,
   },
 
   errorText: {
-    color: "#7f1d1d",
+    color: colors.danger,
     fontSize: 14,
-    lineHeight: 21,
+    fontWeight: "800",
+  },
+
+  loadingCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 18,
+    alignItems: "center",
+    gap: 10,
+  },
+
+  loadingText: {
+    color: colors.muted,
+    fontSize: 14,
+    fontWeight: "700",
   },
 
   resultSection: {
     gap: 16,
+  },
+
+  sectionTitle: {
+    color: colors.primary,
+    fontSize: 20,
+    fontWeight: "900",
+    marginBottom: 4,
   },
 
   stockCard: {
@@ -414,102 +679,69 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
 
-  stockHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 14,
-  },
-
-  ticker: {
+  stockTicker: {
     color: colors.primary,
-    fontSize: 25,
+    fontSize: 26,
     fontWeight: "900",
     marginBottom: 4,
   },
 
   companyName: {
     color: colors.muted,
-    fontSize: 13,
-    lineHeight: 19,
-    maxWidth: 190,
-  },
-
-  riskBadge: {
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    alignSelf: "flex-start",
-  },
-
-  riskBadgeText: {
-    color: "#ffffff",
-    fontSize: 12,
-    fontWeight: "900",
-  },
-
-  lowRisk: {
-    backgroundColor: colors.success,
-  },
-
-  mediumRisk: {
-    backgroundColor: colors.warning,
-  },
-
-  highRisk: {
-    backgroundColor: colors.danger,
-  },
-
-  neutralRisk: {
-    backgroundColor: colors.secondary,
+    fontSize: 14,
+    fontWeight: "600",
+    marginBottom: 14,
   },
 
   metricRow: {
     flexDirection: "row",
-    gap: 10,
-    marginBottom: 10,
-  },
-
-  metricBox: {
-    flex: 1,
-    backgroundColor: "#f9fafb",
-    borderRadius: 14,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
+    justifyContent: "space-between",
+    gap: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    paddingTop: 10,
+    marginTop: 10,
   },
 
   metricLabel: {
     color: colors.muted,
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "700",
-    marginBottom: 6,
+    flex: 1,
   },
 
   metricValue: {
     color: colors.primary,
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "900",
+    textAlign: "right",
+    flex: 1,
   },
 
   summaryCard: {
     backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 20,
+    borderRadius: 22,
+    padding: 18,
     borderWidth: 1,
     borderColor: colors.border,
   },
 
-  summaryTitle: {
-    color: colors.primary,
-    fontSize: 19,
-    fontWeight: "900",
-    marginBottom: 8,
-  },
-
   summaryText: {
-    color: colors.muted,
+    color: colors.secondary,
     fontSize: 15,
     lineHeight: 23,
+    marginTop: 8,
+  },
+
+  boldText: {
+    color: colors.primary,
+    fontWeight: "900",
+  },
+
+  summaryNote: {
+    color: colors.muted,
+    fontSize: 14,
+    lineHeight: 22,
+    marginTop: 14,
   },
 });
