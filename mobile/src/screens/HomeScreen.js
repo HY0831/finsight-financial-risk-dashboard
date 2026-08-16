@@ -1,4 +1,5 @@
 import {
+  Pressable,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -6,9 +7,12 @@ import {
   View,
 } from "react-native";
 
-import { colors } from "../theme/colors";
+import { useAppTheme } from "../theme/ThemeContext";
 
-export default function HomeScreen() {
+export default function HomeScreen({ navigation }) {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView
@@ -17,59 +21,49 @@ export default function HomeScreen() {
       >
         <View style={styles.hero}>
           <Text style={styles.tag}>FinSight Mobile</Text>
-
           <Text style={styles.title}>
-            AI-Powered Financial Risk Dashboard
+            Financial Risk Analysis in Your Pocket
+          </Text>
+          <Text style={styles.description}>
+            Analyze stock risk, compare companies, track gold prices, save
+            watchlists, and manage your investor risk profile.
           </Text>
 
-          <Text style={styles.description}>
-            Analyse stock risk, compare assets, track gold price trends, and
-            understand financial risk using simple metrics and charts.
-          </Text>
+          <Pressable
+            style={styles.heroButton}
+            onPress={() => navigation.navigate("Analyze")}
+          >
+            <Text style={styles.heroButtonText}>Start Analysis</Text>
+          </Pressable>
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Main Features</Text>
-          <Text style={styles.sectionText}>
-            FinSight Mobile brings the core features of the web dashboard into a
-            simple mobile experience.
-          </Text>
 
-          <View style={styles.featureGrid}>
-            <View style={styles.featureCard}>
-              <Text style={styles.featureIcon}>📈</Text>
-              <Text style={styles.featureTitle}>Stock Analysis</Text>
-              <Text style={styles.featureText}>
-                Check stock price, volatility, annualized volatility, risk
-                level, and maximum drawdown.
-              </Text>
-            </View>
+          <View style={styles.cardGrid}>
+            <FeatureCard
+              title="Stock Analysis"
+              description="Calculate return, volatility, maximum drawdown, and risk level."
+              colors={colors}
+            />
 
-            <View style={styles.featureCard}>
-              <Text style={styles.featureIcon}>🥇</Text>
-              <Text style={styles.featureTitle}>Gold Price</Text>
-              <Text style={styles.featureText}>
-                Track gold futures price, historical trend, volatility, and
-                drawdown.
-              </Text>
-            </View>
+            <FeatureCard
+              title="Stock Compare"
+              description="Compare two stocks side by side using the same time period."
+              colors={colors}
+            />
 
-            <View style={styles.featureCard}>
-              <Text style={styles.featureIcon}>⭐</Text>
-              <Text style={styles.featureTitle}>Watchlist</Text>
-              <Text style={styles.featureText}>
-                Save analysed assets for easier monitoring and future review.
-              </Text>
-            </View>
+            <FeatureCard
+              title="Gold Dashboard"
+              description="Track gold futures price trend and risk metrics."
+              colors={colors}
+            />
 
-            <View style={styles.featureCard}>
-              <Text style={styles.featureIcon}>👤</Text>
-              <Text style={styles.featureTitle}>Risk Profile</Text>
-              <Text style={styles.featureText}>
-                Understand your personal risk tolerance using a simple
-                questionnaire.
-              </Text>
-            </View>
+            <FeatureCard
+              title="Cloud Storage"
+              description="Save watchlist, history, and risk profile after login."
+              colors={colors}
+            />
           </View>
         </View>
 
@@ -79,23 +73,24 @@ export default function HomeScreen() {
           <View style={styles.metricCard}>
             <Text style={styles.metricTitle}>Annualized Volatility</Text>
             <Text style={styles.metricText}>
-              Measures how much the asset price may move in one year based on
-              historical daily returns.
+              Measures how much the stock price moves in a year. Higher
+              volatility means higher price movement.
             </Text>
           </View>
 
           <View style={styles.metricCard}>
             <Text style={styles.metricTitle}>Maximum Drawdown</Text>
             <Text style={styles.metricText}>
-              Shows the largest peak-to-bottom loss during the selected period.
+              Shows the largest drop from a previous high price to a later low
+              price during the selected period.
             </Text>
           </View>
 
           <View style={styles.metricCard}>
             <Text style={styles.metricTitle}>Risk Level</Text>
             <Text style={styles.metricText}>
-              Classifies assets into Low Risk, Medium Risk, or High Risk to make
-              the result easier to understand.
+              FinSight classifies stocks as Low Risk, Medium Risk, or High Risk
+              based on annualized volatility.
             </Text>
           </View>
         </View>
@@ -103,8 +98,8 @@ export default function HomeScreen() {
         <View style={styles.noticeCard}>
           <Text style={styles.noticeTitle}>Educational Use Only</Text>
           <Text style={styles.noticeText}>
-            FinSight is built for learning and portfolio demonstration. It does
-            not provide financial advice or investment recommendations.
+            FinSight is created for learning and portfolio demonstration. It
+            does not provide financial advice or investment recommendations.
           </Text>
         </View>
       </ScrollView>
@@ -112,140 +107,150 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+function FeatureCard({ title, description, colors }) {
+  const styles = createStyles(colors);
 
-  container: {
-    padding: 18,
-    paddingBottom: 36,
-  },
+  return (
+    <View style={styles.featureCard}>
+      <Text style={styles.featureTitle}>{title}</Text>
+      <Text style={styles.featureText}>{description}</Text>
+    </View>
+  );
+}
 
-  hero: {
-    backgroundColor: colors.primary,
-    borderRadius: 24,
-    padding: 26,
-    marginBottom: 20,
-  },
+function createStyles(colors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  tag: {
-    color: "#d1d5db",
-    fontSize: 13,
-    fontWeight: "800",
-    letterSpacing: 0.5,
-    marginBottom: 10,
-    textTransform: "uppercase",
-  },
+    container: {
+      padding: 18,
+      paddingBottom: 36,
+    },
 
-  title: {
-    color: "#ffffff",
-    fontSize: 30,
-    fontWeight: "900",
-    lineHeight: 38,
-    marginBottom: 12,
-  },
+    hero: {
+      backgroundColor: colors.heroBackground,
+      borderRadius: 26,
+      padding: 26,
+      marginBottom: 24,
+    },
 
-  description: {
-    color: "#e5e7eb",
-    fontSize: 15,
-    lineHeight: 23,
-  },
+    tag: {
+      color: colors.heroMuted,
+      fontSize: 13,
+      fontWeight: "800",
+      letterSpacing: 0.5,
+      marginBottom: 10,
+      textTransform: "uppercase",
+    },
 
-  section: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    title: {
+      color: colors.heroText,
+      fontSize: 30,
+      fontWeight: "900",
+      lineHeight: 38,
+      marginBottom: 12,
+    },
 
-  sectionTitle: {
-    color: colors.primary,
-    fontSize: 22,
-    fontWeight: "900",
-    marginBottom: 8,
-  },
+    description: {
+      color: colors.heroMuted,
+      fontSize: 15,
+      lineHeight: 24,
+      marginBottom: 20,
+    },
 
-  sectionText: {
-    color: colors.muted,
-    fontSize: 15,
-    lineHeight: 22,
-    marginBottom: 16,
-  },
+    heroButton: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      paddingVertical: 14,
+      alignItems: "center",
+    },
 
-  featureGrid: {
-    gap: 12,
-  },
+    heroButtonText: {
+      color: colors.primary,
+      fontSize: 15,
+      fontWeight: "900",
+    },
 
-  featureCard: {
-    backgroundColor: "#f9fafb",
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    section: {
+      marginBottom: 24,
+    },
 
-  featureIcon: {
-    fontSize: 26,
-    marginBottom: 8,
-  },
+    sectionTitle: {
+      color: colors.primary,
+      fontSize: 22,
+      fontWeight: "900",
+      marginBottom: 14,
+    },
 
-  featureTitle: {
-    color: colors.primary,
-    fontSize: 17,
-    fontWeight: "800",
-    marginBottom: 6,
-  },
+    cardGrid: {
+      gap: 14,
+    },
 
-  featureText: {
-    color: colors.muted,
-    fontSize: 14,
-    lineHeight: 21,
-  },
+    featureCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  metricCard: {
-    backgroundColor: "#f9fafb",
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginTop: 12,
-  },
+    featureTitle: {
+      color: colors.primary,
+      fontSize: 18,
+      fontWeight: "900",
+      marginBottom: 8,
+    },
 
-  metricTitle: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "800",
-    marginBottom: 6,
-  },
+    featureText: {
+      color: colors.muted,
+      fontSize: 14,
+      lineHeight: 22,
+    },
 
-  metricText: {
-    color: colors.muted,
-    fontSize: 14,
-    lineHeight: 21,
-  },
+    metricCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 12,
+    },
 
-  noticeCard: {
-    backgroundColor: "#fffbeb",
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: "#fde68a",
-  },
+    metricTitle: {
+      color: colors.primary,
+      fontSize: 17,
+      fontWeight: "900",
+      marginBottom: 8,
+    },
 
-  noticeTitle: {
-    color: colors.warning,
-    fontSize: 17,
-    fontWeight: "900",
-    marginBottom: 6,
-  },
+    metricText: {
+      color: colors.muted,
+      fontSize: 14,
+      lineHeight: 22,
+    },
 
-  noticeText: {
-    color: "#78350f",
-    fontSize: 14,
-    lineHeight: 21,
-  },
-});
+    noticeCard: {
+      backgroundColor: colors.noteBackground,
+      borderRadius: 20,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.noteBorder,
+    },
+
+    noticeTitle: {
+      color: colors.warning,
+      fontSize: 17,
+      fontWeight: "900",
+      marginBottom: 8,
+    },
+
+    noticeText: {
+      color: colors.secondary,
+      fontSize: 14,
+      lineHeight: 22,
+    },
+  });
+}
