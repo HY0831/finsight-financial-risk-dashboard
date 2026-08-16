@@ -1,10 +1,16 @@
-import yfinance as yf
-import pandas as pd
-import numpy as np
 import time
+from datetime import datetime, timedelta
+from io import StringIO
+
+import numpy as np
+import pandas as pd
+import requests
+import yfinance as yf
+
 
 analysis_cache = {}
 CACHE_DURATION_SECONDS = 600
+
 
 def get_cache_key(ticker, period):
     return f"{ticker.upper()}_{period}"
@@ -17,8 +23,7 @@ def get_cached_analysis(ticker, period):
     if not cached_item:
         return None
 
-    current_time = time.time()
-    cache_age = current_time - cached_item["timestamp"]
+    cache_age = time.time() - cached_item["timestamp"]
 
     if cache_age > CACHE_DURATION_SECONDS:
         del analysis_cache[cache_key]
@@ -35,6 +40,82 @@ def save_cached_analysis(ticker, period, data):
         "data": data,
     }
 
+
+def get_period_start_date(period):
+    today = datetime.today()
+
+    period_map = {
+        "1mo": today - timedelta(days=31),
+        "3mo": today - timedelta(days=92),
+        "6mo": today - timedelta(days=183),
+        "1y": today - timedelta(days=365),
+        "2y": today - timedelta(days=365 * 2),
+        "3y": today - timedelta(days=365 * 3),
+        "5y": today - timedelta(days=365 * 5),
+    }
+
+    return period_map.get(period, today - timedelta(days=365))
+
+
+def fetch_company_name(ticker):
+    try:
+        stock = yf.Ticker(ticker)
+        info = stock.info
+        return info.get("longName") or info.get("shortName") or ticker
+    except Exception as error:
+        print("Company name fetch failed:", error)
+        return ticker
+
+
+def fetch_stock_data_from_yfinance(ticker, period):
+    stock = yf.Ticker(ticker)
+    data = stock.history(period=period)
+
+    if data.empty:
+        raise ValueError("No data returned from Yahoo Finance.")
+
+    return data
+
+
+def fetch_stock_data_from_stooq(ticker, period):
+    stooq_symbol = f"{ticker.lower()}.us"
+    url = f"https://stooq.com/q/d/l/?s={stooq_symbol}&i=d"
+
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
+
+    response = requests.get(url, headers=headers, timeout=15)
+
+    if response.status_code != 200:
+        raise ValueError("Unable to fetch fallback data from Stooq.")
+
+    data = pd.read_csv(StringIO(response.text))
+
+    if data.empty or "Close" not in data.columns:
+        raise ValueError("Fallback stock data not found.")
+
+    data["Date"] = pd.to_datetime(data["Date"])
+    data = data.set_index("Date")
+    data = data.sort_index()
+
+    start_date = get_period_start_date(period)
+    data = data[data.index >= start_date]
+
+    if data.empty:
+        raise ValueError("Not enough fallback stock data for selected period.")
+
+    return data
+
+
+def fetch_stock_data(ticker, period):
+    try:
+        return fetch_stock_data_from_yfinance(ticker, period)
+    except Exception as yahoo_error:
+        print("Yahoo Finance failed, using Stooq fallback:", yahoo_error)
+        return fetch_stock_data_from_stooq(ticker, period)
+
+
 def classify_risk(annualized_volatility):
     """
     Classify stock risk based on annualized volatility.
@@ -45,12 +126,12 @@ def classify_risk(annualized_volatility):
         return "Medium Risk"
     else:
         return "High Risk"
-    
+
+
 def generate_summary(ticker, annualized_volatility, risk_level):
     """
-    Generate a simple beginner_friendly risk explanation.
+    Generate a simple beginner-friendly risk explanation.
     """
-
     volatility_percent = annualized_volatility * 100
 
     if risk_level == "Low Risk":
@@ -73,6 +154,8 @@ def generate_summary(ticker, annualized_volatility, risk_level):
             "This means the stock price has changed strongly during the selected period. "
             "It may involve higher short-term risk for users."
         )
+
+
 def search_stocks(query):
     if not query or not query.strip():
         return []
@@ -111,85 +194,86 @@ def search_stocks(query):
         print("Search error:", error)
         return []
 
+
 def analyze_stock(ticker, period="1y"):
     """
     Download stock data and calculate basic financial risk metrics.
+    Yahoo Finance is used first. If Yahoo is rate limited on Render,
+    Stooq is used as a fallback for common US tickers.
     """
-
-    cached_result = get_cached_analysis(ticker,period)
-
-    if cached_result:
-        return cached_result
-    
     ticker = ticker.upper()
-
-    #Download historical stock data for the specified period
-    stock = yf.Ticker(ticker)
-    company_name = stock.info.get("longName", ticker)  # Use ticker as fallback if longName is not available
 
     valid_periods = ["1mo", "3mo", "6mo", "1y", "2y", "3y", "5y"]
     if period not in valid_periods:
-        period = "1y"  # Default to 1 year if invalid period is provided
-    data = stock.history(period=period)
+        period = "1y"
+
+    cached_result = get_cached_analysis(ticker, period)
+
+    if cached_result:
+        return cached_result
+
+    company_name = fetch_company_name(ticker)
+
+    data = fetch_stock_data(ticker, period)
 
     if data.empty:
         raise ValueError("Invalid ticker or no data found.")
-    
-    #Keep only useful columns
-    data = data[["Open","High","Low","Close","Volume"]].copy()
 
-    #Calculate daily return
+    data = data[["Open", "High", "Low", "Close", "Volume"]].copy()
+
     data["Daily Return"] = data["Close"].pct_change()
-
-    #Remove first row because daily return will be empty
     data = data.dropna()
 
-    #Calculate metrics
+    if data.empty:
+        raise ValueError("Not enough stock data found.")
+
     average_daily_return = data["Daily Return"].mean()
     volatility = data["Daily Return"].std()
     annualized_volatility = volatility * np.sqrt(252)
-    
+
     highest_price = data["Close"].max()
     lowest_price = data["Close"].min()
     latest_price = data["Close"].iloc[-1]
 
-    risk_level = classify_risk(annualized_volatility)
-    summary = generate_summary(ticker,annualized_volatility,risk_level)
-
-    #Calculate Maximum Drawdown
     data["running_max"] = data["Close"].cummax()
     data["drawdown"] = (data["Close"] - data["running_max"]) / data["running_max"]
     maximum_drawdown = data["drawdown"].min()
 
-    #Prepare chart data for frontend
+    if maximum_drawdown is None or pd.isna(maximum_drawdown):
+        maximum_drawdown = 0
+
+    risk_level = classify_risk(annualized_volatility)
+    summary = generate_summary(ticker, annualized_volatility, risk_level)
+
     price_data = []
 
     for date, row in data.tail(120).iterrows():
         price_data.append({
             "date": date.strftime("%Y-%m-%d"),
-            "close": round(float(row["Close"]),2),
-            "daily_return": round(float(row["Daily Return"]),4)
+            "close": round(float(row["Close"]), 2),
+            "daily_return": round(float(row["Daily Return"]), 4),
         })
-    
+
     result = {
         "ticker": ticker,
         "company_name": company_name,
         "period": period,
-        "latest_price": round(float(latest_price),2),
-        "highest_price": round(float(highest_price),2),
-        "lowest_price": round(float(lowest_price),2),
+        "latest_price": round(float(latest_price), 2),
+        "highest_price": round(float(highest_price), 2),
+        "lowest_price": round(float(lowest_price), 2),
         "average_daily_return": round(float(average_daily_return), 4),
         "volatility": round(float(volatility), 4),
         "annualized_volatility": round(float(annualized_volatility), 4),
         "maximum_drawdown": round(float(maximum_drawdown), 4),
         "risk_level": risk_level,
         "summary": summary,
-        "price_data": price_data
+        "price_data": price_data,
     }
 
     save_cached_analysis(ticker, period, result)
 
     return result
+
 
 def analyze_gold(period="1y"):
     """
