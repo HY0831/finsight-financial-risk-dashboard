@@ -6,7 +6,8 @@ import AnalyzeScreen from "./src/screens/AnalyzeScreen";
 import CompareScreen from "./src/screens/CompareScreen";
 import GoldScreen from "./src/screens/GoldScreen";
 import WatchlistScreen from "./src/screens/WatchlistScreen";
-import RiskProfileScreen from "./src/screens/RiskProfileScreen";  
+import RiskProfileScreen from "./src/screens/RiskProfileScreen";
+import HistoryScreen from "./src/screens/HistoryScreen.js";
 import AccountScreen from "./src/screens/AccountScreen";
 
 const Tab = createBottomTabNavigator();
@@ -34,17 +35,18 @@ export default function App() {
             paddingTop: 8,
           },
           tabBarLabelStyle: {
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: "700",
           },
         }}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Analyze" component={AnalyzeScreen} />
+        <Tab.Screen name="Compare" component={CompareScreen} />
         <Tab.Screen name="Gold" component={GoldScreen} />
         <Tab.Screen name="Watchlist" component={WatchlistScreen} />
-        <Tab.Screen name="Compare" component={CompareScreen} />
-        <Tab.Screen name="Risk Profile" component={RiskProfileScreen} />
+        <Tab.Screen name="Profile" component={RiskProfileScreen} />
+        <Tab.Screen name="History" component={HistoryScreen} />
         <Tab.Screen name="Account" component={AccountScreen} />
       </Tab.Navigator>
     </NavigationContainer>

@@ -86,9 +86,9 @@ export default function AccountScreen() {
           </Text>
 
           <Text style={styles.statusText}>
-            This mobile version currently saves watchlist data locally on this
-            device. Login and cloud database storage can be added in the next
-            phase.
+            This mobile version currently saves watchlist, risk profile, and
+            analysis history data locally on this device. Login and cloud
+            database storage can be added in the next phase.
           </Text>
         </View>
 
@@ -102,7 +102,9 @@ export default function AccountScreen() {
               <Text
                 style={[
                   styles.summaryValue,
-                  isApiConnected ? styles.connectedText : styles.unavailableText,
+                  isApiConnected
+                    ? styles.connectedText
+                    : styles.unavailableText,
                 ]}
               >
                 {apiStatus}
@@ -150,7 +152,22 @@ export default function AccountScreen() {
 
           <View style={styles.featureRow}>
             <Text style={styles.featureIcon}>✅</Text>
+            <Text style={styles.featureText}>Stock comparison screen</Text>
+          </View>
+
+          <View style={styles.featureRow}>
+            <Text style={styles.featureIcon}>✅</Text>
+            <Text style={styles.featureText}>Risk profile questionnaire</Text>
+          </View>
+
+          <View style={styles.featureRow}>
+            <Text style={styles.featureIcon}>✅</Text>
             <Text style={styles.featureText}>Local watchlist storage</Text>
+          </View>
+
+          <View style={styles.featureRow}>
+            <Text style={styles.featureIcon}>✅</Text>
+            <Text style={styles.featureText}>Local analysis history</Text>
           </View>
 
           <View style={styles.featureRow}>
@@ -174,17 +191,12 @@ export default function AccountScreen() {
 
           <View style={styles.featureRow}>
             <Text style={styles.featureIcon}>⬜</Text>
-            <Text style={styles.featureText}>Risk profile questionnaire</Text>
+            <Text style={styles.featureText}>Cloud risk profile storage</Text>
           </View>
 
           <View style={styles.featureRow}>
             <Text style={styles.featureIcon}>⬜</Text>
-            <Text style={styles.featureText}>Stock comparison screen</Text>
-          </View>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>⬜</Text>
-            <Text style={styles.featureText}>Analysis history screen</Text>
+            <Text style={styles.featureText}>Cloud analysis history storage</Text>
           </View>
         </View>
 

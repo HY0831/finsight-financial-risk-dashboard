@@ -12,6 +12,7 @@ import {
 
 import { analyzeStock } from "../api/finsightApi";
 import { addToWatchlist } from "../api/watchlistStorage";
+import { addToHistory } from "../api/historyStorage";
 import SimpleLineChart from "../components/SimpleLineChart";
 import { colors } from "../theme/colors";
 
@@ -60,6 +61,7 @@ export default function AnalyzeScreen() {
     try {
       const result = await analyzeStock(ticker.trim().toUpperCase(), period);
       setStockData(result);
+      await addToHistory(result, period);
     } catch (err) {
       setError(err.message || "Unable to analyze stock.");
     } finally {
