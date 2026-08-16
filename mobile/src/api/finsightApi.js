@@ -27,3 +27,15 @@ export async function getGoldPrice(period = "1y") {
 
   return data;
 }
+
+export async function checkApiHealth() {
+  const response = await fetch(`${API_BASE_URL}/health`);
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.detail || "Unable to connect to backend API.");
+  }
+
+  return data;
+}

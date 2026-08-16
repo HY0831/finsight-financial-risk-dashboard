@@ -10,6 +10,7 @@ import {
 } from "react-native";
 
 import { getGoldPrice } from "../api/finsightApi";
+import SimpleLineChart from "../components/SimpleLineChart";
 import { colors } from "../theme/colors";
 
 const periods = [
@@ -142,6 +143,13 @@ export default function GoldScreen() {
                 Data source ticker: {goldData.ticker}
               </Text>
             </View>
+
+            <SimpleLineChart
+              title="Gold Price Trend"
+              data={goldData.price_data}
+              dataKey="close"
+              valuePrefix="$"
+            />
 
             <View style={styles.metricGrid}>
               <View style={styles.metricCard}>

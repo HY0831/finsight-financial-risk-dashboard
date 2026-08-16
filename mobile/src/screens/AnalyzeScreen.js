@@ -12,6 +12,7 @@ import {
 
 import { analyzeStock } from "../api/finsightApi";
 import { addToWatchlist } from "../api/watchlistStorage";
+import SimpleLineChart from "../components/SimpleLineChart";
 import { colors } from "../theme/colors";
 
 const periods = [
@@ -180,6 +181,13 @@ export default function AnalyzeScreen() {
                 <Text style={styles.riskBadgeText}>{stockData.risk_level}</Text>
               </View>
             </View>
+
+            <SimpleLineChart
+              title="Stock Price Trend"
+              data={stockData.price_data}
+              dataKey="close"
+              valuePrefix="$"
+            />
 
             <View style={styles.metricGrid}>
               <View style={styles.metricCard}>
