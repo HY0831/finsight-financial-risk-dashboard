@@ -58,18 +58,17 @@ def search_stock_endpoint(query: str = Query(..., min_length=1)):
     }
 
 @app.get("/analyze/{ticker}")
-def analyze(ticker: str, period: str = Query(default="1y")):
+def analyze_stock_endpoint(ticker: str, period: str = "1y"):
     try:
         result = analyze_stock(ticker, period)
         return result
 
-    except ValueError as error:
-        raise HTTPException(status_code=404, detail=str(error))
+    except Exception as error:
+        print("Analyze stock backend error:", error)
 
-    except Exception:
         raise HTTPException(
             status_code=500,
-            detail="Something went wrong while analysing the stock."
+            detail=str(error)
         )
 
 @app.get("/gold-price")
