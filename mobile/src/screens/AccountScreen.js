@@ -6,11 +6,22 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
-import { checkApiHealth } from "../api/finsightApi";
+import {
+  checkApiHealth,
+  getCurrentUser,
+  loginUser,
+  registerUser,
+} from "../api/finsightApi";
+import {
+  clearAuthToken,
+  getAuthToken,
+  saveAuthToken,
+} from "../api/authStorage";
 import { getWatchlist } from "../api/watchlistStorage";
 import { colors } from "../theme/colors";
 
@@ -19,9 +30,33 @@ export default function AccountScreen() {
   const [watchlistCount, setWatchlistCount] = useState(0);
   const [checkingApi, setCheckingApi] = useState(false);
 
+  const [mode, setMode] = useState("status");
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(false);
+  const [authMessage, setAuthMessage] = useState("");
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const loadAccountStatus = async () => {
     const savedWatchlist = await getWatchlist();
     setWatchlistCount(savedWatchlist.length);
+
+    const token = await getAuthToken();
+
+    if (!token) {
+      setUser(null);
+      return;
+    }
+
+    try {
+      const currentUser = await getCurrentUser(token);
+      setUser(currentUser);
+    } catch {
+      await clearAuthToken();
+      setUser(null);
+    }
   };
 
   const checkBackendStatus = async () => {
@@ -50,7 +85,77 @@ export default function AccountScreen() {
     }, [])
   );
 
+  const resetForm = () => {
+    setName("");
+    setEmail("");
+    setPassword("");
+    setAuthMessage("");
+  };
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
+      setAuthMessage("Please enter your email and password.");
+      return;
+    }
+
+    setAuthLoading(true);
+    setAuthMessage("");
+
+    try {
+      const result = await loginUser(email.trim(), password.trim());
+
+      await saveAuthToken(result.access_token);
+
+      const currentUser = await getCurrentUser(result.access_token);
+      setUser(currentUser);
+
+      resetForm();
+      setMode("status");
+      setAuthMessage("Login successful.");
+    } catch (error) {
+      setAuthMessage(error.message || "Unable to login.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleRegister = async () => {
+    if (!name.trim() || !email.trim() || !password.trim()) {
+      setAuthMessage("Please enter your name, email, and password.");
+      return;
+    }
+
+    setAuthLoading(true);
+    setAuthMessage("");
+
+    try {
+      await registerUser(name.trim(), email.trim(), password.trim());
+
+      const loginResult = await loginUser(email.trim(), password.trim());
+      await saveAuthToken(loginResult.access_token);
+
+      const currentUser = await getCurrentUser(loginResult.access_token);
+      setUser(currentUser);
+
+      resetForm();
+      setMode("status");
+      setAuthMessage("Account created and logged in.");
+    } catch (error) {
+      setAuthMessage(error.message || "Unable to register account.");
+    } finally {
+      setAuthLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    await clearAuthToken();
+    setUser(null);
+    setAuthMessage("Logged out successfully.");
+    setMode("status");
+  };
+
   const isApiConnected = apiStatus === "Connected";
+  const isLoggedIn = Boolean(user);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -62,8 +167,8 @@ export default function AccountScreen() {
           <Text style={styles.tag}>Account</Text>
           <Text style={styles.title}>FinSight Mobile Account</Text>
           <Text style={styles.description}>
-            View mobile app storage mode, backend connection status, and saved
-            activity summary.
+            Login, register, check backend connection, and view mobile storage
+            status.
           </Text>
         </View>
 
@@ -71,26 +176,177 @@ export default function AccountScreen() {
           <View
             style={[
               styles.statusBadge,
-              isApiConnected ? styles.connectedBadge : styles.guestBadge,
+              isLoggedIn
+                ? styles.connectedBadge
+                : isApiConnected
+                ? styles.connectedBadge
+                : styles.guestBadge,
             ]}
           >
             <Text style={styles.statusBadgeText}>
-              {isApiConnected ? "API Connected" : "Guest Mode"}
+              {isLoggedIn
+                ? "Logged In"
+                : isApiConnected
+                ? "API Connected"
+                : "Guest Mode"}
             </Text>
           </View>
 
           <Text style={styles.statusTitle}>
-            {isApiConnected
-              ? "FinSight backend is connected"
-              : "Using local mobile storage"}
+            {isLoggedIn
+              ? `Welcome, ${user.full_name || user.name || user.email}`
+              : "Using FinSight Mobile as guest"}
           </Text>
 
           <Text style={styles.statusText}>
             This mobile version currently saves watchlist, risk profile, and
-            analysis history data locally on this device. Login and cloud
-            database storage can be added in the next phase.
+            analysis history data locally on this device. Login is now available,
+            and cloud sync can be added in the next phase.
           </Text>
         </View>
+
+        {authMessage ? (
+          <View style={styles.messageCard}>
+            <Text style={styles.messageText}>{authMessage}</Text>
+          </View>
+        ) : null}
+
+        {!isLoggedIn && mode === "status" ? (
+          <View style={styles.authButtonRow}>
+            <Pressable
+              style={styles.primaryButton}
+              onPress={() => {
+                resetForm();
+                setMode("login");
+              }}
+            >
+              <Text style={styles.primaryButtonText}>Login</Text>
+            </Pressable>
+
+            <Pressable
+              style={styles.secondaryButton}
+              onPress={() => {
+                resetForm();
+                setMode("register");
+              }}
+            >
+              <Text style={styles.secondaryButtonText}>Register</Text>
+            </Pressable>
+          </View>
+        ) : null}
+
+        {isLoggedIn && mode === "status" ? (
+          <Pressable style={styles.logoutButton} onPress={handleLogout}>
+            <Text style={styles.logoutButtonText}>Logout</Text>
+          </Pressable>
+        ) : null}
+
+        {mode === "login" ? (
+          <View style={styles.formCard}>
+            <Text style={styles.formTitle}>Login</Text>
+
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter email"
+              placeholderTextColor="#9ca3af"
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Enter password"
+              placeholderTextColor="#9ca3af"
+              secureTextEntry
+            />
+
+            <Pressable
+              style={[styles.primaryButtonFull, authLoading && styles.disabled]}
+              onPress={handleLogin}
+              disabled={authLoading}
+            >
+              {authLoading ? (
+                <ActivityIndicator color="#ffffff" />
+              ) : (
+                <Text style={styles.primaryButtonText}>Login</Text>
+              )}
+            </Pressable>
+
+            <Pressable
+              style={styles.textButton}
+              onPress={() => {
+                resetForm();
+                setMode("status");
+              }}
+            >
+              <Text style={styles.textButtonText}>Back to Account</Text>
+            </Pressable>
+          </View>
+        ) : null}
+
+        {mode === "register" ? (
+          <View style={styles.formCard}>
+            <Text style={styles.formTitle}>Register</Text>
+
+            <Text style={styles.label}>Name</Text>
+            <TextInput
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+              placeholder="Enter name"
+              placeholderTextColor="#9ca3af"
+            />
+
+            <Text style={styles.label}>Email</Text>
+            <TextInput
+              style={styles.input}
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Enter email"
+              placeholderTextColor="#9ca3af"
+              autoCapitalize="none"
+              keyboardType="email-address"
+            />
+
+            <Text style={styles.label}>Password</Text>
+            <TextInput
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Enter password"
+              placeholderTextColor="#9ca3af"
+              secureTextEntry
+            />
+
+            <Pressable
+              style={[styles.primaryButtonFull, authLoading && styles.disabled]}
+              onPress={handleRegister}
+              disabled={authLoading}
+            >
+              {authLoading ? (
+                <ActivityIndicator color="#ffffff" />
+              ) : (
+                <Text style={styles.primaryButtonText}>Create Account</Text>
+              )}
+            </Pressable>
+
+            <Pressable
+              style={styles.textButton}
+              onPress={() => {
+                resetForm();
+                setMode("status");
+              }}
+            >
+              <Text style={styles.textButtonText}>Back to Account</Text>
+            </Pressable>
+          </View>
+        ) : null}
 
         <View style={styles.summaryGrid}>
           <View style={styles.summaryCard}>
@@ -124,81 +380,15 @@ export default function AccountScreen() {
 
           <View style={styles.summaryCard}>
             <Text style={styles.summaryLabel}>Login Status</Text>
-            <Text style={styles.summaryValue}>Guest</Text>
+            <Text style={styles.summaryValue}>
+              {isLoggedIn ? "Logged In" : "Guest"}
+            </Text>
           </View>
         </View>
 
         <Pressable style={styles.refreshButton} onPress={checkBackendStatus}>
           <Text style={styles.refreshButtonText}>Refresh API Status</Text>
         </Pressable>
-
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Current Mobile Features</Text>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>✅</Text>
-            <Text style={styles.featureText}>Home dashboard overview</Text>
-          </View>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>✅</Text>
-            <Text style={styles.featureText}>Stock risk analysis API</Text>
-          </View>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>✅</Text>
-            <Text style={styles.featureText}>Gold price dashboard API</Text>
-          </View>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>✅</Text>
-            <Text style={styles.featureText}>Stock comparison screen</Text>
-          </View>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>✅</Text>
-            <Text style={styles.featureText}>Risk profile questionnaire</Text>
-          </View>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>✅</Text>
-            <Text style={styles.featureText}>Local watchlist storage</Text>
-          </View>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>✅</Text>
-            <Text style={styles.featureText}>Local analysis history</Text>
-          </View>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>✅</Text>
-            <Text style={styles.featureText}>Simple mobile line charts</Text>
-          </View>
-        </View>
-
-        <View style={styles.sectionCard}>
-          <Text style={styles.sectionTitle}>Future Mobile Features</Text>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>⬜</Text>
-            <Text style={styles.featureText}>Login and registration</Text>
-          </View>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>⬜</Text>
-            <Text style={styles.featureText}>Cloud watchlist storage</Text>
-          </View>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>⬜</Text>
-            <Text style={styles.featureText}>Cloud risk profile storage</Text>
-          </View>
-
-          <View style={styles.featureRow}>
-            <Text style={styles.featureIcon}>⬜</Text>
-            <Text style={styles.featureText}>Cloud analysis history storage</Text>
-          </View>
-        </View>
 
         <View style={styles.noteCard}>
           <Text style={styles.noteTitle}>Educational Use Only</Text>
@@ -297,6 +487,131 @@ const styles = StyleSheet.create({
     lineHeight: 23,
   },
 
+  messageCard: {
+    backgroundColor: "#ecfdf5",
+    borderWidth: 1,
+    borderColor: "#bbf7d0",
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 14,
+  },
+
+  messageText: {
+    color: colors.success,
+    fontSize: 14,
+    fontWeight: "800",
+  },
+
+  authButtonRow: {
+    flexDirection: "row",
+    gap: 12,
+    marginBottom: 18,
+  },
+
+  primaryButton: {
+    flex: 1,
+    backgroundColor: colors.primary,
+    borderRadius: 16,
+    paddingVertical: 15,
+    alignItems: "center",
+  },
+
+  secondaryButton: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    paddingVertical: 15,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+
+  primaryButtonText: {
+    color: "#ffffff",
+    fontSize: 15,
+    fontWeight: "900",
+  },
+
+  secondaryButtonText: {
+    color: colors.primary,
+    fontSize: 15,
+    fontWeight: "900",
+  },
+
+  logoutButton: {
+    backgroundColor: "#fef2f2",
+    borderRadius: 16,
+    paddingVertical: 15,
+    alignItems: "center",
+    marginBottom: 18,
+    borderWidth: 1,
+    borderColor: "#fecaca",
+  },
+
+  logoutButtonText: {
+    color: colors.danger,
+    fontSize: 15,
+    fontWeight: "900",
+  },
+
+  formCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 20,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 18,
+  },
+
+  formTitle: {
+    color: colors.primary,
+    fontSize: 22,
+    fontWeight: "900",
+    marginBottom: 16,
+  },
+
+  label: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: "800",
+    marginBottom: 8,
+  },
+
+  input: {
+    backgroundColor: "#f9fafb",
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+    fontSize: 16,
+    color: colors.primary,
+    marginBottom: 16,
+  },
+
+  primaryButtonFull: {
+    backgroundColor: colors.primary,
+    borderRadius: 16,
+    paddingVertical: 15,
+    alignItems: "center",
+    marginTop: 4,
+  },
+
+  disabled: {
+    opacity: 0.7,
+  },
+
+  textButton: {
+    alignItems: "center",
+    marginTop: 16,
+  },
+
+  textButtonText: {
+    color: colors.muted,
+    fontSize: 14,
+    fontWeight: "800",
+  },
+
   summaryGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -348,41 +663,6 @@ const styles = StyleSheet.create({
     color: "#ffffff",
     fontSize: 15,
     fontWeight: "900",
-  },
-
-  sectionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 18,
-  },
-
-  sectionTitle: {
-    color: colors.primary,
-    fontSize: 20,
-    fontWeight: "900",
-    marginBottom: 14,
-  },
-
-  featureRow: {
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "flex-start",
-    marginBottom: 12,
-  },
-
-  featureIcon: {
-    fontSize: 18,
-    width: 24,
-  },
-
-  featureText: {
-    color: colors.muted,
-    fontSize: 15,
-    lineHeight: 22,
-    flex: 1,
   },
 
   noteCard: {
