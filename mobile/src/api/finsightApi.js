@@ -153,17 +153,44 @@ export async function getCurrentUser(token) {
 }
 
 export async function getCloudWatchlist(token) {
-  const response = await fetch(`${API_BASE_URL}/watchlist/`, {
+  const url = `${API_BASE_URL}/watchlist/`;
+
+  console.log("Cloud Watchlist URL:", url);
+  console.log("Cloud Watchlist Token Exists:", Boolean(token));
+
+  const response = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 
-  return await parseResponse(response, "Unable to load cloud watchlist.");
+  const text = await response.text();
+
+  console.log("Cloud Watchlist Status:", response.status);
+  console.log("Cloud Watchlist Raw Response:", text);
+
+  let data = null;
+
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    throw new Error(`Backend returned non-JSON response: ${text}`);
+  }
+
+  if (!response.ok) {
+    throw new Error(getErrorMessage(data, "Unable to load cloud watchlist."));
+  }
+
+  return data;
 }
 
 export async function addCloudWatchlistItem(token, stockData) {
-  const response = await fetch(`${API_BASE_URL}/watchlist/`, {
+  const url = `${API_BASE_URL}/watchlist/`;
+
+  console.log("Add Cloud Watchlist URL:", url);
+  console.log("Add Cloud Watchlist Token Exists:", Boolean(token));
+
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -178,7 +205,24 @@ export async function addCloudWatchlistItem(token, stockData) {
     }),
   });
 
-  return await parseResponse(response, "Unable to save cloud watchlist item.");
+  const text = await response.text();
+
+  console.log("Add Cloud Watchlist Status:", response.status);
+  console.log("Add Cloud Watchlist Raw Response:", text);
+
+  let data = null;
+
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    throw new Error(`Backend returned non-JSON response: ${text}`);
+  }
+
+  if (!response.ok) {
+    throw new Error(getErrorMessage(data, "Unable to save cloud watchlist item."));
+  }
+
+  return data;
 }
 
 export async function removeCloudWatchlistItem(token, ticker) {
