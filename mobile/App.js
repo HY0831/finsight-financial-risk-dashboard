@@ -3,6 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import HomeScreen from "./src/screens/HomeScreen";
 import AnalyzeScreen from "./src/screens/AnalyzeScreen";
+import CompareScreen from "./src/screens/CompareScreen";
 import GoldScreen from "./src/screens/GoldScreen";
 import WatchlistScreen from "./src/screens/WatchlistScreen";
 import AccountScreen from "./src/screens/AccountScreen";
@@ -41,6 +42,7 @@ export default function App() {
         <Tab.Screen name="Analyze" component={AnalyzeScreen} />
         <Tab.Screen name="Gold" component={GoldScreen} />
         <Tab.Screen name="Watchlist" component={WatchlistScreen} />
+        <Tab.Screen name="Compare" component={CompareScreen} />
         <Tab.Screen name="Account" component={AccountScreen} />
       </Tab.Navigator>
     </NavigationContainer>
