@@ -61,38 +61,14 @@ async function parseResponse(response, fallbackMessage) {
 }
 
 export async function analyzeStock(ticker, period = "1y") {
-  try {
-    const cleanTicker = encodeURIComponent(ticker);
-    const cleanPeriod = encodeURIComponent(period);
+  const cleanTicker = encodeURIComponent(ticker);
+  const cleanPeriod = encodeURIComponent(period);
 
-    const url = `${API_BASE_URL}/analyze/${cleanTicker}?period=${cleanPeriod}`;
+  const response = await fetch(
+    `${API_BASE_URL}/analyze/${cleanTicker}?period=${cleanPeriod}`
+  );
 
-    console.log("Analyze URL:", url);
-
-    const response = await fetch(url);
-
-    const text = await response.text();
-
-    console.log("Analyze status:", response.status);
-    console.log("Analyze raw response:", text);
-
-    let data = null;
-
-    try {
-      data = text ? JSON.parse(text) : null;
-    } catch {
-      throw new Error(`Backend returned non-JSON response: ${text}`);
-    }
-
-    if (!response.ok) {
-      throw new Error(getErrorMessage(data, "Unable to analyze stock."));
-    }
-
-    return data;
-  } catch (error) {
-    console.log("analyzeStock API error:", error);
-    throw new Error(error.message || "Unable to connect to stock analysis API.");
-  }
+  return await parseResponse(response, "Unable to analyze stock.");
 }
 
 export async function getGoldPrice(period = "1y") {
@@ -153,44 +129,17 @@ export async function getCurrentUser(token) {
 }
 
 export async function getCloudWatchlist(token) {
-  const url = `${API_BASE_URL}/watchlist/`;
-
-  console.log("Cloud Watchlist URL:", url);
-  console.log("Cloud Watchlist Token Exists:", Boolean(token));
-
-  const response = await fetch(url, {
+  const response = await fetch(`${API_BASE_URL}/watchlist/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
 
-  const text = await response.text();
-
-  console.log("Cloud Watchlist Status:", response.status);
-  console.log("Cloud Watchlist Raw Response:", text);
-
-  let data = null;
-
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    throw new Error(`Backend returned non-JSON response: ${text}`);
-  }
-
-  if (!response.ok) {
-    throw new Error(getErrorMessage(data, "Unable to load cloud watchlist."));
-  }
-
-  return data;
+  return await parseResponse(response, "Unable to load cloud watchlist.");
 }
 
 export async function addCloudWatchlistItem(token, stockData) {
-  const url = `${API_BASE_URL}/watchlist/`;
-
-  console.log("Add Cloud Watchlist URL:", url);
-  console.log("Add Cloud Watchlist Token Exists:", Boolean(token));
-
-  const response = await fetch(url, {
+  const response = await fetch(`${API_BASE_URL}/watchlist/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -205,24 +154,7 @@ export async function addCloudWatchlistItem(token, stockData) {
     }),
   });
 
-  const text = await response.text();
-
-  console.log("Add Cloud Watchlist Status:", response.status);
-  console.log("Add Cloud Watchlist Raw Response:", text);
-
-  let data = null;
-
-  try {
-    data = text ? JSON.parse(text) : null;
-  } catch {
-    throw new Error(`Backend returned non-JSON response: ${text}`);
-  }
-
-  if (!response.ok) {
-    throw new Error(getErrorMessage(data, "Unable to save cloud watchlist item."));
-  }
-
-  return data;
+  return await parseResponse(response, "Unable to save cloud watchlist item.");
 }
 
 export async function removeCloudWatchlistItem(token, ticker) {
