@@ -1,3 +1,5 @@
+from multiprocessing.dummy import connection
+
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from risk_analysis import analyze_stock, search_stocks, analyze_gold
@@ -62,6 +64,21 @@ def run_simple_migrations():
                     "ADD COLUMN IF NOT EXISTS period VARCHAR"
                 ))
 
+                connection.execute(text(
+                    "ALTER TABLE risk_profiles "
+                    "ADD COLUMN IF NOT EXISTS profile_type VARCHAR"
+                ))
+
+                connection.execute(text(
+                    "ALTER TABLE risk_profiles "
+                    "ADD COLUMN IF NOT EXISTS score INTEGER"
+                ))
+
+                connection.execute(text(
+                    "ALTER TABLE risk_profiles "
+                    "ADD COLUMN IF NOT EXISTS answers JSONB"
+                ))
+
             if dialect == "sqlite":
                 history_columns = connection.execute(text(
                     "PRAGMA table_info(search_history_items)"
@@ -92,6 +109,25 @@ def run_simple_migrations():
                     if column_name not in watchlist_column_names:
                         connection.execute(text(
                             f"ALTER TABLE watchlist_items "
+                            f"ADD COLUMN {column_name} {column_type}"
+                        ))
+
+                risk_profile_columns = connection.execute(text(
+                    "PRAGMA table_info(risk_profiles)"
+                )).fetchall()
+
+                risk_profile_column_names = [column[1] for column in risk_profile_columns]
+
+                risk_profile_extra_columns = {
+                    "profile_type": "VARCHAR",
+                    "score": "INTEGER",
+                    "answers": "JSON",
+                }
+
+                for column_name, column_type in risk_profile_extra_columns.items():
+                    if column_name not in risk_profile_column_names:
+                        connection.execute(text(
+                            f"ALTER TABLE risk_profiles "
                             f"ADD COLUMN {column_name} {column_type}"
                         ))
 

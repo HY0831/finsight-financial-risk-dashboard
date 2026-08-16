@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 from pydantic import BaseModel, EmailStr
 
 
@@ -52,14 +52,14 @@ class WatchlistResponse(BaseModel):
 class RiskProfileCreate(BaseModel):
     profile_type: str
     score: int
-    answers: Optional[Dict[str, int]] = None
+    answers: Optional[Dict[str, Any]] = None
 
 
 class RiskProfileResponse(BaseModel):
     id: int
     profile_type: str
     score: int
-    answers: Optional[Dict[str, int]] = None
+    answers: Optional[Dict[str, Any]] = None
 
     class Config:
         from_attributes = True

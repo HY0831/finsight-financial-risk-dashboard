@@ -281,3 +281,41 @@ export async function clearCloudHistory(token) {
 
   return await parseResponse(response, "Unable to clear cloud history.");
 }
+
+export async function getCloudRiskProfile(token) {
+  const response = await fetch(`${API_BASE_URL}/risk-profile/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await parseResponse(response, "Unable to load cloud risk profile.");
+}
+
+export async function saveCloudRiskProfile(token, profileData) {
+  const response = await fetch(`${API_BASE_URL}/risk-profile/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      profile_type: profileData.profile,
+      score: profileData.score,
+      answers: profileData.answers || {},
+    }),
+  });
+
+  return await parseResponse(response, "Unable to save cloud risk profile.");
+}
+
+export async function clearCloudRiskProfile(token) {
+  const response = await fetch(`${API_BASE_URL}/risk-profile/`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await parseResponse(response, "Unable to clear cloud risk profile.");
+}

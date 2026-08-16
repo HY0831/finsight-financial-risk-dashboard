@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -9,6 +10,12 @@ import {
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 
+import {
+  clearCloudRiskProfile,
+  getCloudRiskProfile,
+  saveCloudRiskProfile,
+} from "../api/finsightApi";
+import { getAuthToken } from "../api/authStorage";
 import {
   clearRiskProfile,
   getRiskAnswers,
@@ -101,14 +108,57 @@ const riskQuestions = [
 export default function RiskProfileScreen() {
   const [answers, setAnswers] = useState({});
   const [riskProfile, setRiskProfile] = useState(null);
+  const [storageMode, setStorageMode] = useState("Local");
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const loadSavedProfile = async () => {
-    const savedAnswers = await getRiskAnswers();
-    const savedProfile = await getRiskProfile();
+    setLoading(true);
+    setMessage("");
 
-    setAnswers(savedAnswers);
-    setRiskProfile(savedProfile);
+    try {
+      const token = await getAuthToken();
+
+      if (token) {
+        const cloudProfile = await getCloudRiskProfile(token);
+
+        if (cloudProfile) {
+          setRiskProfile({
+            profile: cloudProfile.profile || cloudProfile.profile_type,
+            score: cloudProfile.score,
+            description: cloudProfile.description,
+            updated_at: cloudProfile.updated_at || "Cloud saved",
+          });
+
+          setAnswers(cloudProfile.answers || {});
+        } else {
+          setRiskProfile(null);
+          setAnswers({});
+        }
+
+        setStorageMode("Cloud");
+        return;
+      }
+
+      const savedAnswers = await getRiskAnswers();
+      const savedProfile = await getRiskProfile();
+
+      setAnswers(savedAnswers);
+      setRiskProfile(savedProfile);
+      setStorageMode("Local");
+    } catch (error) {
+      console.log("Cloud risk profile load error:", error);
+
+      const savedAnswers = await getRiskAnswers();
+      const savedProfile = await getRiskProfile();
+
+      setAnswers(savedAnswers);
+      setRiskProfile(savedProfile);
+      setStorageMode("Local");
+      setMessage("Unable to load cloud risk profile. Showing local profile.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useFocusEffect(
@@ -125,7 +175,10 @@ export default function RiskProfileScreen() {
 
     setAnswers(updatedAnswers);
     setMessage("");
-    await saveRiskAnswers(updatedAnswers);
+
+    if (storageMode === "Local") {
+      await saveRiskAnswers(updatedAnswers);
+    }
   };
 
   const calculateProfile = async () => {
@@ -135,7 +188,7 @@ export default function RiskProfileScreen() {
     }
 
     const totalScore = Object.values(answers).reduce(
-      (total, answer) => total + answer.score,
+      (total, answer) => total + Number(answer.score || 0),
       0
     );
 
@@ -159,19 +212,72 @@ export default function RiskProfileScreen() {
       profile: profileType,
       score: totalScore,
       description,
+      answers,
       updated_at: new Date().toLocaleString(),
     };
 
     setRiskProfile(profile);
-    setMessage("Risk profile saved locally.");
-    await saveRiskProfile(profile);
+
+    try {
+      const token = await getAuthToken();
+
+      if (token) {
+        const savedCloudProfile = await saveCloudRiskProfile(token, profile);
+
+        setRiskProfile({
+          profile: savedCloudProfile.profile || savedCloudProfile.profile_type,
+          score: savedCloudProfile.score,
+          description: savedCloudProfile.description || description,
+          answers: savedCloudProfile.answers || answers,
+          updated_at: savedCloudProfile.updated_at || profile.updated_at,
+        });
+
+        setStorageMode("Cloud");
+        setMessage("Risk profile saved to cloud.");
+        return;
+      }
+
+      await saveRiskProfile(profile);
+      await saveRiskAnswers(answers);
+
+      setStorageMode("Local");
+      setMessage("Risk profile saved locally.");
+    } catch (error) {
+      console.log("Cloud risk profile save error:", error);
+
+      await saveRiskProfile(profile);
+      await saveRiskAnswers(answers);
+
+      setStorageMode("Local");
+      setMessage("Cloud save failed, so risk profile was saved locally.");
+    }
   };
 
   const resetProfile = async () => {
-    await clearRiskProfile();
-    setAnswers({});
-    setRiskProfile(null);
-    setMessage("Risk profile reset.");
+    try {
+      const token = await getAuthToken();
+
+      if (token && storageMode === "Cloud") {
+        await clearCloudRiskProfile(token);
+        setAnswers({});
+        setRiskProfile(null);
+        setMessage("Cloud risk profile reset.");
+        return;
+      }
+
+      await clearRiskProfile();
+      setAnswers({});
+      setRiskProfile(null);
+      setMessage("Local risk profile reset.");
+    } catch (error) {
+      console.log("Risk profile reset error:", error);
+
+      await clearRiskProfile();
+      setAnswers({});
+      setRiskProfile(null);
+      setStorageMode("Local");
+      setMessage("Cloud reset failed, local risk profile reset.");
+    }
   };
 
   const getProfileStyle = (profile) => {
@@ -201,9 +307,21 @@ export default function RiskProfileScreen() {
           <Text style={styles.title}>Investor Risk Questionnaire</Text>
           <Text style={styles.description}>
             Answer simple questions to estimate your personal risk tolerance.
-            This mobile version saves your result locally on your device.
+            Logged-in users use cloud storage, while guests use local storage.
           </Text>
         </View>
+
+        <View style={styles.modeCard}>
+          <Text style={styles.modeLabel}>Current Storage Mode</Text>
+          <Text style={styles.modeValue}>{storageMode}</Text>
+        </View>
+
+        {loading ? (
+          <View style={styles.loadingCard}>
+            <ActivityIndicator color={colors.primary} />
+            <Text style={styles.loadingText}>Loading Risk Profile...</Text>
+          </View>
+        ) : null}
 
         {riskProfile ? (
           <View style={styles.resultCard}>
@@ -325,6 +443,45 @@ const styles = StyleSheet.create({
     color: "#e5e7eb",
     fontSize: 15,
     lineHeight: 23,
+  },
+
+  modeCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 18,
+  },
+
+  modeLabel: {
+    color: colors.muted,
+    fontSize: 13,
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+
+  modeValue: {
+    color: colors.primary,
+    fontSize: 24,
+    fontWeight: "900",
+  },
+
+  loadingCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 18,
+    alignItems: "center",
+    gap: 10,
+  },
+
+  loadingText: {
+    color: colors.muted,
+    fontSize: 14,
+    fontWeight: "700",
   },
 
   resultCard: {
