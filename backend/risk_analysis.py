@@ -1,6 +1,39 @@
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import time
+
+analysis_cache = {}
+CACHE_DURATION_SECONDS = 600
+
+def get_cache_key(ticker, period):
+    return f"{ticker.upper()}_{period}"
+
+
+def get_cached_analysis(ticker, period):
+    cache_key = get_cache_key(ticker, period)
+    cached_item = analysis_cache.get(cache_key)
+
+    if not cached_item:
+        return None
+
+    current_time = time.time()
+    cache_age = current_time - cached_item["timestamp"]
+
+    if cache_age > CACHE_DURATION_SECONDS:
+        del analysis_cache[cache_key]
+        return None
+
+    return cached_item["data"]
+
+
+def save_cached_analysis(ticker, period, data):
+    cache_key = get_cache_key(ticker, period)
+
+    analysis_cache[cache_key] = {
+        "timestamp": time.time(),
+        "data": data,
+    }
 
 def classify_risk(annualized_volatility):
     """
@@ -82,6 +115,12 @@ def analyze_stock(ticker, period="1y"):
     """
     Download stock data and calculate basic financial risk metrics.
     """
+
+    cached_result = get_cached_analysis(ticker,period)
+
+    if cached_result:
+        return cached_result
+    
     ticker = ticker.upper()
 
     #Download historical stock data for the specified period
@@ -147,6 +186,8 @@ def analyze_stock(ticker, period="1y"):
         "summary": summary,
         "price_data": price_data
     }
+
+    save_cached_analysis(ticker, period, result)
 
     return result
 

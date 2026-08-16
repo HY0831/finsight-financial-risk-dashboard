@@ -64,11 +64,19 @@ def analyze_stock_endpoint(ticker: str, period: str = "1y"):
         return result
 
     except Exception as error:
-        print("Analyze stock backend error:", error)
+        error_message = str(error)
+
+        print("Analyze stock backend error:", error_message)
+
+        if "Too Many Requests" in error_message or "Rate limited" in error_message:
+            raise HTTPException(
+                status_code=429,
+                detail="Yahoo Finance is temporarily rate limited. Please try again later."
+            )
 
         raise HTTPException(
             status_code=500,
-            detail=str(error)
+            detail=error_message
         )
 
 @app.get("/gold-price")
