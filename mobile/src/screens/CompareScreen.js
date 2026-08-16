@@ -11,7 +11,7 @@ import {
 } from "react-native";
 
 import { analyzeStock, searchStocks } from "../api/finsightApi";
-import { colors } from "../theme/colors";
+import { useAppTheme } from "../theme/ThemeContext";
 
 const periodOptions = [
   { label: "6M", value: "6mo" },
@@ -21,6 +21,9 @@ const periodOptions = [
 ];
 
 export default function CompareScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const [firstTicker, setFirstTicker] = useState("");
   const [secondTicker, setSecondTicker] = useState("");
   const [period, setPeriod] = useState("1y");
@@ -40,9 +43,7 @@ export default function CompareScreen() {
   useEffect(() => {
     const searchText = firstTicker.trim();
 
-    if (activeSearchBox !== "first") {
-      return;
-    }
+    if (activeSearchBox !== "first") return;
 
     if (searchText.length < 2) {
       setFirstSuggestions([]);
@@ -52,11 +53,8 @@ export default function CompareScreen() {
     const timeoutId = setTimeout(async () => {
       try {
         setFirstSearchLoading(true);
-
         const data = await searchStocks(searchText);
-        const results = Array.isArray(data.results) ? data.results : [];
-
-        setFirstSuggestions(results);
+        setFirstSuggestions(Array.isArray(data.results) ? data.results : []);
       } catch (searchError) {
         console.log("First stock suggestion error:", searchError);
         setFirstSuggestions([]);
@@ -71,9 +69,7 @@ export default function CompareScreen() {
   useEffect(() => {
     const searchText = secondTicker.trim();
 
-    if (activeSearchBox !== "second") {
-      return;
-    }
+    if (activeSearchBox !== "second") return;
 
     if (searchText.length < 2) {
       setSecondSuggestions([]);
@@ -83,11 +79,8 @@ export default function CompareScreen() {
     const timeoutId = setTimeout(async () => {
       try {
         setSecondSearchLoading(true);
-
         const data = await searchStocks(searchText);
-        const results = Array.isArray(data.results) ? data.results : [];
-
-        setSecondSuggestions(results);
+        setSecondSuggestions(Array.isArray(data.results) ? data.results : []);
       } catch (searchError) {
         console.log("Second stock suggestion error:", searchError);
         setSecondSuggestions([]);
@@ -113,20 +106,6 @@ export default function CompareScreen() {
     }
 
     return `${(Number(value) * 100).toFixed(2)}%`;
-  };
-
-  const handleSelectFirstSuggestion = (item) => {
-    setFirstTicker(item.ticker);
-    setFirstSuggestions([]);
-    setActiveSearchBox(null);
-    setError("");
-  };
-
-  const handleSelectSecondSuggestion = (item) => {
-    setSecondTicker(item.ticker);
-    setSecondSuggestions([]);
-    setActiveSearchBox(null);
-    setError("");
   };
 
   const handleCompare = async () => {
@@ -167,57 +146,30 @@ export default function CompareScreen() {
     }
   };
 
-  const getLowerRiskStock = () => {
-    if (!firstStock || !secondStock) {
-      return null;
-    }
+  const lowerRiskStock =
+    firstStock && secondStock
+      ? Number(firstStock.annualized_volatility) <
+        Number(secondStock.annualized_volatility)
+        ? firstStock
+        : Number(secondStock.annualized_volatility) <
+          Number(firstStock.annualized_volatility)
+        ? secondStock
+        : null
+      : null;
 
-    if (
-      Number(firstStock.annualized_volatility) <
-      Number(secondStock.annualized_volatility)
-    ) {
-      return firstStock;
-    }
-
-    if (
-      Number(secondStock.annualized_volatility) <
-      Number(firstStock.annualized_volatility)
-    ) {
-      return secondStock;
-    }
-
-    return null;
-  };
-
-  const getHigherReturnStock = () => {
-    if (!firstStock || !secondStock) {
-      return null;
-    }
-
-    if (
-      Number(firstStock.average_daily_return) >
-      Number(secondStock.average_daily_return)
-    ) {
-      return firstStock;
-    }
-
-    if (
-      Number(secondStock.average_daily_return) >
-      Number(firstStock.average_daily_return)
-    ) {
-      return secondStock;
-    }
-
-    return null;
-  };
-
-  const lowerRiskStock = getLowerRiskStock();
-  const higherReturnStock = getHigherReturnStock();
+  const higherReturnStock =
+    firstStock && secondStock
+      ? Number(firstStock.average_daily_return) >
+        Number(secondStock.average_daily_return)
+        ? firstStock
+        : Number(secondStock.average_daily_return) >
+          Number(firstStock.average_daily_return)
+        ? secondStock
+        : null
+      : null;
 
   const renderSuggestionBox = (suggestions, onSelect) => {
-    if (!suggestions || suggestions.length === 0) {
-      return null;
-    }
+    if (!suggestions || suggestions.length === 0) return null;
 
     return (
       <View style={styles.suggestionBox}>
@@ -242,45 +194,18 @@ export default function CompareScreen() {
   };
 
   const renderStockCard = (stock) => {
-    if (!stock) {
-      return null;
-    }
+    if (!stock) return null;
 
     return (
       <View style={styles.stockCard}>
         <Text style={styles.stockTicker}>{stock.ticker}</Text>
         <Text style={styles.companyName}>{stock.company_name || "N/A"}</Text>
 
-        <View style={styles.metricRow}>
-          <Text style={styles.metricLabel}>Latest Price</Text>
-          <Text style={styles.metricValue}>{formatMoney(stock.latest_price)}</Text>
-        </View>
-
-        <View style={styles.metricRow}>
-          <Text style={styles.metricLabel}>Average Daily Return</Text>
-          <Text style={styles.metricValue}>
-            {formatPercent(stock.average_daily_return)}
-          </Text>
-        </View>
-
-        <View style={styles.metricRow}>
-          <Text style={styles.metricLabel}>Annual Volatility</Text>
-          <Text style={styles.metricValue}>
-            {formatPercent(stock.annualized_volatility)}
-          </Text>
-        </View>
-
-        <View style={styles.metricRow}>
-          <Text style={styles.metricLabel}>Maximum Drawdown</Text>
-          <Text style={styles.metricValue}>
-            {formatPercent(stock.maximum_drawdown)}
-          </Text>
-        </View>
-
-        <View style={styles.metricRow}>
-          <Text style={styles.metricLabel}>Risk Level</Text>
-          <Text style={styles.metricValue}>{stock.risk_level}</Text>
-        </View>
+        <MetricRow label="Latest Price" value={formatMoney(stock.latest_price)} styles={styles} />
+        <MetricRow label="Average Daily Return" value={formatPercent(stock.average_daily_return)} styles={styles} />
+        <MetricRow label="Annual Volatility" value={formatPercent(stock.annualized_volatility)} styles={styles} />
+        <MetricRow label="Maximum Drawdown" value={formatPercent(stock.maximum_drawdown)} styles={styles} />
+        <MetricRow label="Risk Level" value={stock.risk_level} styles={styles} />
       </View>
     );
   };
@@ -308,7 +233,7 @@ export default function CompareScreen() {
             <TextInput
               style={styles.input}
               placeholder="Example: AAP, Apple"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor={colors.muted}
               value={firstTicker}
               autoCapitalize="characters"
               onFocus={() => setActiveSearchBox("first")}
@@ -327,10 +252,12 @@ export default function CompareScreen() {
             ) : null}
 
             {activeSearchBox === "first"
-              ? renderSuggestionBox(
-                  firstSuggestions,
-                  handleSelectFirstSuggestion
-                )
+              ? renderSuggestionBox(firstSuggestions, (item) => {
+                  setFirstTicker(item.ticker);
+                  setFirstSuggestions([]);
+                  setActiveSearchBox(null);
+                  setError("");
+                })
               : null}
           </View>
 
@@ -340,7 +267,7 @@ export default function CompareScreen() {
             <TextInput
               style={styles.input}
               placeholder="Example: TSLA, Tesla"
-              placeholderTextColor="#9ca3af"
+              placeholderTextColor={colors.muted}
               value={secondTicker}
               autoCapitalize="characters"
               onFocus={() => setActiveSearchBox("second")}
@@ -359,10 +286,12 @@ export default function CompareScreen() {
             ) : null}
 
             {activeSearchBox === "second"
-              ? renderSuggestionBox(
-                  secondSuggestions,
-                  handleSelectSecondSuggestion
-                )
+              ? renderSuggestionBox(secondSuggestions, (item) => {
+                  setSecondTicker(item.ticker);
+                  setSecondSuggestions([]);
+                  setActiveSearchBox(null);
+                  setError("");
+                })
               : null}
           </View>
 
@@ -442,8 +371,7 @@ export default function CompareScreen() {
 
               <Text style={styles.summaryNote}>
                 This comparison is based on historical price movement during the
-                selected period. It is for educational purposes only and should
-                not be treated as financial advice.
+                selected period. It is for educational purposes only.
               </Text>
             </View>
           </View>
@@ -453,295 +381,231 @@ export default function CompareScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+function MetricRow({ label, value, styles }) {
+  return (
+    <View style={styles.metricRow}>
+      <Text style={styles.metricLabel}>{label}</Text>
+      <Text style={styles.metricValue}>{value}</Text>
+    </View>
+  );
+}
 
-  container: {
-    padding: 18,
-    paddingBottom: 36,
-  },
-
-  hero: {
-    backgroundColor: colors.primary,
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 18,
-  },
-
-  tag: {
-    color: "#d1d5db",
-    fontSize: 13,
-    fontWeight: "800",
-    letterSpacing: 0.5,
-    marginBottom: 10,
-    textTransform: "uppercase",
-  },
-
-  title: {
-    color: "#ffffff",
-    fontSize: 28,
-    fontWeight: "900",
-    lineHeight: 36,
-    marginBottom: 10,
-  },
-
-  description: {
-    color: "#e5e7eb",
-    fontSize: 15,
-    lineHeight: 23,
-  },
-
-  formCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 22,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 18,
-  },
-
-  label: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: "900",
-    marginBottom: 8,
-  },
-
-  searchWrapper: {
-    position: "relative",
-    marginBottom: 16,
-    zIndex: 10,
-  },
-
-  input: {
-    backgroundColor: "#f9fafb",
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingHorizontal: 14,
-    paddingVertical: 13,
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "700",
-  },
-
-  searchLoadingRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    marginTop: 8,
-  },
-
-  searchLoadingText: {
-    color: colors.muted,
-    fontSize: 13,
-    fontWeight: "700",
-  },
-
-  suggestionBox: {
-    backgroundColor: "#ffffff",
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginTop: 8,
-    overflow: "hidden",
-  },
-
-  suggestionItem: {
-    padding: 14,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-
-  suggestionTicker: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "900",
-    marginBottom: 3,
-  },
-
-  suggestionName: {
-    color: colors.muted,
-    fontSize: 13,
-    fontWeight: "600",
-    maxWidth: 220,
-  },
-
-  suggestionExchange: {
-    color: colors.secondary,
-    fontSize: 12,
-    fontWeight: "800",
-    alignSelf: "center",
-  },
-
-  periodRow: {
-    flexDirection: "row",
-    gap: 8,
-    marginBottom: 16,
-  },
-
-  periodButton: {
-    flex: 1,
-    backgroundColor: "#f9fafb",
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-    paddingVertical: 12,
-    alignItems: "center",
-  },
-
-  periodButtonActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-
-  periodButtonText: {
-    color: colors.secondary,
-    fontSize: 13,
-    fontWeight: "900",
-  },
-
-  periodButtonTextActive: {
-    color: "#ffffff",
-  },
-
-  compareButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 16,
-    paddingVertical: 15,
-    alignItems: "center",
-  },
-
-  disabledButton: {
-    opacity: 0.6,
-  },
-
-  compareButtonText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "900",
-  },
-
-  errorCard: {
-    backgroundColor: "#fef2f2",
-    borderWidth: 1,
-    borderColor: "#fecaca",
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 14,
-  },
-
-  errorText: {
-    color: colors.danger,
-    fontSize: 14,
-    fontWeight: "800",
-  },
-
-  loadingCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 18,
-    alignItems: "center",
-    gap: 10,
-  },
-
-  loadingText: {
-    color: colors.muted,
-    fontSize: 14,
-    fontWeight: "700",
-  },
-
-  resultSection: {
-    gap: 16,
-  },
-
-  sectionTitle: {
-    color: colors.primary,
-    fontSize: 20,
-    fontWeight: "900",
-    marginBottom: 4,
-  },
-
-  stockCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 22,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  stockTicker: {
-    color: colors.primary,
-    fontSize: 26,
-    fontWeight: "900",
-    marginBottom: 4,
-  },
-
-  companyName: {
-    color: colors.muted,
-    fontSize: 14,
-    fontWeight: "600",
-    marginBottom: 14,
-  },
-
-  metricRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: 10,
-    marginTop: 10,
-  },
-
-  metricLabel: {
-    color: colors.muted,
-    fontSize: 13,
-    fontWeight: "700",
-    flex: 1,
-  },
-
-  metricValue: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: "900",
-    textAlign: "right",
-    flex: 1,
-  },
-
-  summaryCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 22,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  summaryText: {
-    color: colors.secondary,
-    fontSize: 15,
-    lineHeight: 23,
-    marginTop: 8,
-  },
-
-  boldText: {
-    color: colors.primary,
-    fontWeight: "900",
-  },
-
-  summaryNote: {
-    color: colors.muted,
-    fontSize: 14,
-    lineHeight: 22,
-    marginTop: 14,
-  },
-});
+function createStyles(colors) {
+  return StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    container: { padding: 18, paddingBottom: 36 },
+    hero: {
+      backgroundColor: colors.heroBackground,
+      borderRadius: 24,
+      padding: 24,
+      marginBottom: 18,
+    },
+    tag: {
+      color: colors.heroMuted,
+      fontSize: 13,
+      fontWeight: "800",
+      letterSpacing: 0.5,
+      marginBottom: 10,
+      textTransform: "uppercase",
+    },
+    title: {
+      color: colors.heroText,
+      fontSize: 28,
+      fontWeight: "900",
+      lineHeight: 36,
+      marginBottom: 10,
+    },
+    description: { color: colors.heroMuted, fontSize: 15, lineHeight: 23 },
+    formCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 22,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 18,
+    },
+    label: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: "900",
+      marginBottom: 8,
+    },
+    searchWrapper: { marginBottom: 16, zIndex: 10 },
+    input: {
+      backgroundColor: colors.inputBackground,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingHorizontal: 14,
+      paddingVertical: 13,
+      color: colors.primary,
+      fontSize: 16,
+      fontWeight: "700",
+    },
+    searchLoadingRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      marginTop: 8,
+    },
+    searchLoadingText: {
+      color: colors.muted,
+      fontSize: 13,
+      fontWeight: "700",
+    },
+    suggestionBox: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginTop: 8,
+      overflow: "hidden",
+    },
+    suggestionItem: {
+      padding: 14,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 10,
+    },
+    suggestionTicker: {
+      color: colors.primary,
+      fontSize: 16,
+      fontWeight: "900",
+      marginBottom: 3,
+    },
+    suggestionName: {
+      color: colors.muted,
+      fontSize: 13,
+      fontWeight: "600",
+      maxWidth: 220,
+    },
+    suggestionExchange: {
+      color: colors.secondary,
+      fontSize: 12,
+      fontWeight: "800",
+      alignSelf: "center",
+    },
+    periodRow: { flexDirection: "row", gap: 8, marginBottom: 16 },
+    periodButton: {
+      flex: 1,
+      backgroundColor: colors.inputBackground,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+    periodButtonActive: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    periodButtonText: {
+      color: colors.secondary,
+      fontSize: 13,
+      fontWeight: "900",
+    },
+    periodButtonTextActive: { color: colors.surface },
+    compareButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 16,
+      paddingVertical: 15,
+      alignItems: "center",
+    },
+    disabledButton: { opacity: 0.6 },
+    compareButtonText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "900",
+    },
+    errorCard: {
+      backgroundColor: colors.errorBackground,
+      borderWidth: 1,
+      borderColor: colors.errorBorder,
+      borderRadius: 16,
+      padding: 14,
+      marginBottom: 14,
+    },
+    errorText: { color: colors.danger, fontSize: 14, fontWeight: "800" },
+    loadingCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 18,
+      alignItems: "center",
+      gap: 10,
+    },
+    loadingText: { color: colors.muted, fontSize: 14, fontWeight: "700" },
+    resultSection: { gap: 16 },
+    sectionTitle: {
+      color: colors.primary,
+      fontSize: 20,
+      fontWeight: "900",
+      marginBottom: 4,
+    },
+    stockCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 22,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    stockTicker: {
+      color: colors.primary,
+      fontSize: 26,
+      fontWeight: "900",
+      marginBottom: 4,
+    },
+    companyName: {
+      color: colors.muted,
+      fontSize: 14,
+      fontWeight: "600",
+      marginBottom: 14,
+    },
+    metricRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 12,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+      paddingTop: 10,
+      marginTop: 10,
+    },
+    metricLabel: {
+      color: colors.muted,
+      fontSize: 13,
+      fontWeight: "700",
+      flex: 1,
+    },
+    metricValue: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: "900",
+      textAlign: "right",
+      flex: 1,
+    },
+    summaryCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 22,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    summaryText: {
+      color: colors.secondary,
+      fontSize: 15,
+      lineHeight: 23,
+      marginTop: 8,
+    },
+    boldText: { color: colors.primary, fontWeight: "900" },
+    summaryNote: {
+      color: colors.muted,
+      fontSize: 14,
+      lineHeight: 22,
+      marginTop: 14,
+    },
+  });
+}

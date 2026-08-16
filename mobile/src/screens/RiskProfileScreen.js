@@ -23,7 +23,7 @@ import {
   saveRiskAnswers,
   saveRiskProfile,
 } from "../api/riskProfileStorage";
-import { colors } from "../theme/colors";
+import { useAppTheme } from "../theme/ThemeContext";
 
 const riskQuestions = [
   {
@@ -106,6 +106,9 @@ const riskQuestions = [
 ];
 
 export default function RiskProfileScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const [answers, setAnswers] = useState({});
   const [riskProfile, setRiskProfile] = useState(null);
   const [storageMode, setStorageMode] = useState("Local");
@@ -127,6 +130,7 @@ export default function RiskProfileScreen() {
             profile: cloudProfile.profile || cloudProfile.profile_type,
             score: cloudProfile.score,
             description: cloudProfile.description,
+            answers: cloudProfile.answers || {},
             updated_at: cloudProfile.updated_at || "Cloud saved",
           });
 
@@ -143,7 +147,7 @@ export default function RiskProfileScreen() {
       const savedAnswers = await getRiskAnswers();
       const savedProfile = await getRiskProfile();
 
-      setAnswers(savedAnswers);
+      setAnswers(savedAnswers || {});
       setRiskProfile(savedProfile);
       setStorageMode("Local");
     } catch (error) {
@@ -152,7 +156,7 @@ export default function RiskProfileScreen() {
       const savedAnswers = await getRiskAnswers();
       const savedProfile = await getRiskProfile();
 
-      setAnswers(savedAnswers);
+      setAnswers(savedAnswers || {});
       setRiskProfile(savedProfile);
       setStorageMode("Local");
       setMessage("Unable to load cloud risk profile. Showing local profile.");
@@ -325,14 +329,20 @@ export default function RiskProfileScreen() {
 
         {riskProfile ? (
           <View style={styles.resultCard}>
-            <View style={[styles.profileBadge, getProfileStyle(riskProfile.profile)]}>
+            <View
+              style={[styles.profileBadge, getProfileStyle(riskProfile.profile)]}
+            >
               <Text style={styles.profileBadgeText}>{riskProfile.profile}</Text>
             </View>
 
             <Text style={styles.resultTitle}>Your Risk Profile</Text>
             <Text style={styles.scoreText}>Score: {riskProfile.score} / 35</Text>
-            <Text style={styles.resultDescription}>{riskProfile.description}</Text>
-            <Text style={styles.updatedText}>Updated: {riskProfile.updated_at}</Text>
+            <Text style={styles.resultDescription}>
+              {riskProfile.description}
+            </Text>
+            <Text style={styles.updatedText}>
+              Updated: {riskProfile.updated_at}
+            </Text>
           </View>
         ) : null}
 
@@ -404,278 +414,280 @@ export default function RiskProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+function createStyles(colors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  container: {
-    padding: 18,
-    paddingBottom: 36,
-  },
+    container: {
+      padding: 18,
+      paddingBottom: 36,
+    },
 
-  hero: {
-    backgroundColor: colors.primary,
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 18,
-  },
+    hero: {
+      backgroundColor: colors.heroBackground,
+      borderRadius: 24,
+      padding: 24,
+      marginBottom: 18,
+    },
 
-  tag: {
-    color: "#d1d5db",
-    fontSize: 13,
-    fontWeight: "800",
-    letterSpacing: 0.5,
-    marginBottom: 10,
-    textTransform: "uppercase",
-  },
+    tag: {
+      color: colors.heroMuted,
+      fontSize: 13,
+      fontWeight: "800",
+      letterSpacing: 0.5,
+      marginBottom: 10,
+      textTransform: "uppercase",
+    },
 
-  title: {
-    color: "#ffffff",
-    fontSize: 28,
-    fontWeight: "900",
-    lineHeight: 36,
-    marginBottom: 10,
-  },
+    title: {
+      color: colors.heroText,
+      fontSize: 28,
+      fontWeight: "900",
+      lineHeight: 36,
+      marginBottom: 10,
+    },
 
-  description: {
-    color: "#e5e7eb",
-    fontSize: 15,
-    lineHeight: 23,
-  },
+    description: {
+      color: colors.heroMuted,
+      fontSize: 15,
+      lineHeight: 23,
+    },
 
-  modeCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 18,
-  },
+    modeCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 18,
+    },
 
-  modeLabel: {
-    color: colors.muted,
-    fontSize: 13,
-    fontWeight: "700",
-    marginBottom: 6,
-  },
+    modeLabel: {
+      color: colors.muted,
+      fontSize: 13,
+      fontWeight: "700",
+      marginBottom: 6,
+    },
 
-  modeValue: {
-    color: colors.primary,
-    fontSize: 24,
-    fontWeight: "900",
-  },
+    modeValue: {
+      color: colors.primary,
+      fontSize: 24,
+      fontWeight: "900",
+    },
 
-  loadingCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 18,
-    alignItems: "center",
-    gap: 10,
-  },
+    loadingCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 18,
+      alignItems: "center",
+      gap: 10,
+    },
 
-  loadingText: {
-    color: colors.muted,
-    fontSize: 14,
-    fontWeight: "700",
-  },
+    loadingText: {
+      color: colors.muted,
+      fontSize: 14,
+      fontWeight: "700",
+    },
 
-  resultCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 22,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 18,
-  },
+    resultCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 22,
+      padding: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 18,
+    },
 
-  profileBadge: {
-    alignSelf: "flex-start",
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginBottom: 12,
-  },
+    profileBadge: {
+      alignSelf: "flex-start",
+      borderRadius: 999,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      marginBottom: 12,
+    },
 
-  conservativeBadge: {
-    backgroundColor: colors.success,
-  },
+    conservativeBadge: {
+      backgroundColor: colors.success,
+    },
 
-  moderateBadge: {
-    backgroundColor: colors.warning,
-  },
+    moderateBadge: {
+      backgroundColor: colors.warning,
+    },
 
-  aggressiveBadge: {
-    backgroundColor: colors.danger,
-  },
+    aggressiveBadge: {
+      backgroundColor: colors.danger,
+    },
 
-  neutralBadge: {
-    backgroundColor: colors.secondary,
-  },
+    neutralBadge: {
+      backgroundColor: colors.secondary,
+    },
 
-  profileBadgeText: {
-    color: "#ffffff",
-    fontSize: 12,
-    fontWeight: "900",
-  },
+    profileBadgeText: {
+      color: "#ffffff",
+      fontSize: 12,
+      fontWeight: "900",
+    },
 
-  resultTitle: {
-    color: colors.primary,
-    fontSize: 21,
-    fontWeight: "900",
-    marginBottom: 6,
-  },
+    resultTitle: {
+      color: colors.primary,
+      fontSize: 21,
+      fontWeight: "900",
+      marginBottom: 6,
+    },
 
-  scoreText: {
-    color: colors.primary,
-    fontSize: 17,
-    fontWeight: "800",
-    marginBottom: 8,
-  },
+    scoreText: {
+      color: colors.primary,
+      fontSize: 17,
+      fontWeight: "800",
+      marginBottom: 8,
+    },
 
-  resultDescription: {
-    color: colors.muted,
-    fontSize: 15,
-    lineHeight: 23,
-    marginBottom: 8,
-  },
+    resultDescription: {
+      color: colors.muted,
+      fontSize: 15,
+      lineHeight: 23,
+      marginBottom: 8,
+    },
 
-  updatedText: {
-    color: colors.muted,
-    fontSize: 12,
-    fontWeight: "700",
-  },
+    updatedText: {
+      color: colors.muted,
+      fontSize: 12,
+      fontWeight: "700",
+    },
 
-  questionCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 16,
-  },
+    questionCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 16,
+    },
 
-  questionNumber: {
-    color: colors.muted,
-    fontSize: 13,
-    fontWeight: "800",
-    marginBottom: 6,
-    textTransform: "uppercase",
-  },
+    questionNumber: {
+      color: colors.muted,
+      fontSize: 13,
+      fontWeight: "800",
+      marginBottom: 6,
+      textTransform: "uppercase",
+    },
 
-  questionText: {
-    color: colors.primary,
-    fontSize: 18,
-    fontWeight: "900",
-    lineHeight: 25,
-    marginBottom: 14,
-  },
+    questionText: {
+      color: colors.primary,
+      fontSize: 18,
+      fontWeight: "900",
+      lineHeight: 25,
+      marginBottom: 14,
+    },
 
-  optionList: {
-    gap: 10,
-  },
+    optionList: {
+      gap: 10,
+    },
 
-  optionButton: {
-    backgroundColor: "#f9fafb",
-    borderRadius: 14,
-    padding: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-  },
+    optionButton: {
+      backgroundColor: colors.inputBackground,
+      borderRadius: 14,
+      padding: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 12,
+    },
 
-  optionButtonSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
+    optionButtonSelected: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
 
-  optionText: {
-    color: colors.secondary,
-    fontSize: 14,
-    fontWeight: "700",
-    flex: 1,
-    lineHeight: 20,
-  },
+    optionText: {
+      color: colors.secondary,
+      fontSize: 14,
+      fontWeight: "700",
+      flex: 1,
+      lineHeight: 20,
+    },
 
-  optionTextSelected: {
-    color: "#ffffff",
-  },
+    optionTextSelected: {
+      color: colors.surface,
+    },
 
-  optionScore: {
-    color: colors.primary,
-    fontSize: 14,
-    fontWeight: "900",
-  },
+    optionScore: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: "900",
+    },
 
-  messageCard: {
-    backgroundColor: "#ecfdf5",
-    borderWidth: 1,
-    borderColor: "#bbf7d0",
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 14,
-  },
+    messageCard: {
+      backgroundColor: colors.messageBackground,
+      borderWidth: 1,
+      borderColor: colors.messageBorder,
+      borderRadius: 16,
+      padding: 14,
+      marginBottom: 14,
+    },
 
-  messageText: {
-    color: colors.success,
-    fontSize: 14,
-    fontWeight: "800",
-  },
+    messageText: {
+      color: colors.success,
+      fontSize: 14,
+      fontWeight: "800",
+    },
 
-  calculateButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 16,
-    paddingVertical: 15,
-    alignItems: "center",
-    marginBottom: 12,
-  },
+    calculateButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 16,
+      paddingVertical: 15,
+      alignItems: "center",
+      marginBottom: 12,
+    },
 
-  calculateButtonText: {
-    color: "#ffffff",
-    fontSize: 16,
-    fontWeight: "900",
-  },
+    calculateButtonText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "900",
+    },
 
-  resetButton: {
-    backgroundColor: "#fef2f2",
-    borderRadius: 16,
-    paddingVertical: 15,
-    alignItems: "center",
-    marginBottom: 18,
-    borderWidth: 1,
-    borderColor: "#fecaca",
-  },
+    resetButton: {
+      backgroundColor: colors.errorBackground,
+      borderRadius: 16,
+      paddingVertical: 15,
+      alignItems: "center",
+      marginBottom: 18,
+      borderWidth: 1,
+      borderColor: colors.errorBorder,
+    },
 
-  resetButtonText: {
-    color: colors.danger,
-    fontSize: 15,
-    fontWeight: "900",
-  },
+    resetButtonText: {
+      color: colors.danger,
+      fontSize: 15,
+      fontWeight: "900",
+    },
 
-  noteCard: {
-    backgroundColor: "#fffbeb",
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: "#fde68a",
-  },
+    noteCard: {
+      backgroundColor: colors.noteBackground,
+      borderRadius: 18,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.noteBorder,
+    },
 
-  noteTitle: {
-    color: colors.warning,
-    fontSize: 17,
-    fontWeight: "900",
-    marginBottom: 6,
-  },
+    noteTitle: {
+      color: colors.warning,
+      fontSize: 17,
+      fontWeight: "900",
+      marginBottom: 6,
+    },
 
-  noteText: {
-    color: "#78350f",
-    fontSize: 14,
-    lineHeight: 21,
-  },
-});
+    noteText: {
+      color: colors.secondary,
+      fontSize: 14,
+      lineHeight: 21,
+    },
+  });
+}

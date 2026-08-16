@@ -20,9 +20,12 @@ import {
   getWatchlist,
   removeFromWatchlist,
 } from "../api/watchlistStorage";
-import { colors } from "../theme/colors";
+import { useAppTheme } from "../theme/ThemeContext";
 
 export default function WatchlistScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const [watchlist, setWatchlist] = useState([]);
   const [storageMode, setStorageMode] = useState("Local");
   const [loading, setLoading] = useState(false);
@@ -37,17 +40,19 @@ export default function WatchlistScreen() {
 
       if (token) {
         const cloudWatchlist = await getCloudWatchlist(token);
-        setWatchlist(cloudWatchlist);
+        setWatchlist(cloudWatchlist || []);
         setStorageMode("Cloud");
         return;
       }
 
-      const savedWatchlist = await getWatchlist();
-      setWatchlist(savedWatchlist);
+      const localWatchlist = await getWatchlist();
+      setWatchlist(localWatchlist || []);
       setStorageMode("Local");
-    } catch {
-      const savedWatchlist = await getWatchlist();
-      setWatchlist(savedWatchlist);
+    } catch (error) {
+      console.log("Cloud watchlist load error:", error);
+
+      const localWatchlist = await getWatchlist();
+      setWatchlist(localWatchlist || []);
       setStorageMode("Local");
       setMessage("Unable to load cloud watchlist. Showing local watchlist.");
     } finally {
@@ -77,36 +82,6 @@ export default function WatchlistScreen() {
     return `${(Number(value) * 100).toFixed(2)}%`;
   };
 
-  const handleRemove = async (ticker) => {
-    try {
-      const token = await getAuthToken();
-
-      if (token && storageMode === "Cloud") {
-        await removeCloudWatchlistItem(token, ticker);
-        await loadWatchlist();
-        setMessage(`${ticker} removed from cloud Watchlist.`);
-        return;
-      }
-
-      const updatedWatchlist = await removeFromWatchlist(ticker);
-      setWatchlist(updatedWatchlist);
-      setMessage(`${ticker} removed from local Watchlist.`);
-    } catch {
-      setMessage("Unable to remove item.");
-    }
-  };
-
-  const handleClear = async () => {
-    if (storageMode === "Cloud") {
-      setMessage("Cloud clear is not enabled yet. Remove items one by one.");
-      return;
-    }
-
-    await clearWatchlist();
-    setWatchlist([]);
-    setMessage("Local Watchlist cleared.");
-  };
-
   const getRiskStyle = (riskLevel) => {
     if (riskLevel === "Low Risk") {
       return styles.lowRisk;
@@ -123,6 +98,45 @@ export default function WatchlistScreen() {
     return styles.neutralRisk;
   };
 
+  const handleRemove = async (ticker) => {
+    try {
+      const token = await getAuthToken();
+
+      if (token && storageMode === "Cloud") {
+        await removeCloudWatchlistItem(token, ticker);
+        const updatedWatchlist = watchlist.filter(
+          (item) => item.ticker !== ticker
+        );
+        setWatchlist(updatedWatchlist);
+        setMessage(`${ticker} removed from cloud Watchlist.`);
+        return;
+      }
+
+      const updatedWatchlist = await removeFromWatchlist(ticker);
+      setWatchlist(updatedWatchlist);
+      setMessage(`${ticker} removed from local Watchlist.`);
+    } catch (error) {
+      console.log("Remove watchlist error:", error);
+      setMessage("Unable to remove stock from Watchlist.");
+    }
+  };
+
+  const handleClearLocalWatchlist = async () => {
+    try {
+      if (storageMode === "Cloud") {
+        setMessage("Cloud clear is disabled. Remove stocks one by one.");
+        return;
+      }
+
+      await clearWatchlist();
+      setWatchlist([]);
+      setMessage("Local Watchlist cleared.");
+    } catch (error) {
+      console.log("Clear watchlist error:", error);
+      setMessage("Unable to clear Watchlist.");
+    }
+  };
+
   const highRiskCount = watchlist.filter(
     (item) => item.risk_level === "High Risk"
   ).length;
@@ -135,6 +149,14 @@ export default function WatchlistScreen() {
     (item) => item.risk_level === "Low Risk"
   ).length;
 
+  const averageVolatility =
+    watchlist.length > 0
+      ? watchlist.reduce(
+          (total, item) => total + Number(item.annualized_volatility || 0),
+          0
+        ) / watchlist.length
+      : 0;
+
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView
@@ -143,10 +165,10 @@ export default function WatchlistScreen() {
       >
         <View style={styles.hero}>
           <Text style={styles.tag}>Watchlist</Text>
-          <Text style={styles.title}>Saved Assets</Text>
+          <Text style={styles.title}>Saved Stocks</Text>
           <Text style={styles.description}>
-            Review saved stocks. Logged-in users use cloud storage, while guests
-            use local device storage.
+            Track stocks saved from analysis. Logged-in users use cloud
+            watchlist, while guests use local device watchlist.
           </Text>
         </View>
 
@@ -162,17 +184,19 @@ export default function WatchlistScreen() {
           </View>
 
           <View style={styles.summaryBox}>
-            <Text style={styles.summaryLabel}>Low</Text>
+            <Text style={styles.summaryLabel}>Average Volatility</Text>
+            <Text style={styles.summaryValue}>
+              {formatPercent(averageVolatility)}
+            </Text>
+          </View>
+
+          <View style={styles.summaryBox}>
+            <Text style={styles.summaryLabel}>Low Risk</Text>
             <Text style={styles.summaryValue}>{lowRiskCount}</Text>
           </View>
 
           <View style={styles.summaryBox}>
-            <Text style={styles.summaryLabel}>Medium</Text>
-            <Text style={styles.summaryValue}>{mediumRiskCount}</Text>
-          </View>
-
-          <View style={styles.summaryBox}>
-            <Text style={styles.summaryLabel}>High</Text>
+            <Text style={styles.summaryLabel}>High Risk</Text>
             <Text style={styles.summaryValue}>{highRiskCount}</Text>
           </View>
         </View>
@@ -190,26 +214,30 @@ export default function WatchlistScreen() {
           </View>
         ) : null}
 
-        {watchlist.length > 0 ? (
-          <Pressable style={styles.clearButton} onPress={handleClear}>
-            <Text style={styles.clearButtonText}>
-              {storageMode === "Cloud" ? "Cloud Clear Disabled" : "Clear Watchlist"}
-            </Text>
+        <View style={styles.actionRow}>
+          <Pressable style={styles.refreshButton} onPress={loadWatchlist}>
+            <Text style={styles.refreshButtonText}>Refresh</Text>
           </Pressable>
-        ) : null}
+
+          <Pressable
+            style={styles.clearButton}
+            onPress={handleClearLocalWatchlist}
+          >
+            <Text style={styles.clearButtonText}>Clear Local</Text>
+          </Pressable>
+        </View>
 
         {watchlist.length === 0 && !loading ? (
           <View style={styles.emptyCard}>
-            <Text style={styles.emptyTitle}>No Saved Assets Yet</Text>
+            <Text style={styles.emptyTitle}>No Saved Stocks Yet</Text>
             <Text style={styles.emptyText}>
-              Go to the Analyze tab, analyse a stock, and save it to your
-              watchlist.
+              Go to the Analyze tab, analyse a stock, and save it to Watchlist.
             </Text>
           </View>
         ) : (
           <View style={styles.listSection}>
             {watchlist.map((item) => (
-              <View key={item.ticker} style={styles.stockCard}>
+              <View key={`${item.ticker}-${item.id || item.saved_at}`} style={styles.stockCard}>
                 <View style={styles.stockHeader}>
                   <View>
                     <Text style={styles.ticker}>{item.ticker}</Text>
@@ -241,21 +269,9 @@ export default function WatchlistScreen() {
                   </View>
                 </View>
 
-                <View style={styles.metricRow}>
-                  <View style={styles.metricBox}>
-                    <Text style={styles.metricLabel}>Max Drawdown</Text>
-                    <Text style={styles.metricValue}>
-                      {formatPercent(item.maximum_drawdown)}
-                    </Text>
-                  </View>
-
-                  <View style={styles.metricBox}>
-                    <Text style={styles.metricLabel}>Saved At</Text>
-                    <Text style={styles.savedAtText}>
-                      {item.saved_at || item.created_at || "N/A"}
-                    </Text>
-                  </View>
-                </View>
+                <Text style={styles.savedText}>
+                  Saved: {item.saved_at || "Cloud saved"}
+                </Text>
 
                 <Pressable
                   style={styles.removeButton}
@@ -267,280 +283,332 @@ export default function WatchlistScreen() {
             ))}
           </View>
         )}
+
+        <View style={styles.noteCard}>
+          <Text style={styles.noteTitle}>Risk Distribution</Text>
+          <Text style={styles.noteText}>
+            Low Risk: {lowRiskCount} | Medium Risk: {mediumRiskCount} | High
+            Risk: {highRiskCount}
+          </Text>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+function createStyles(colors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  container: {
-    padding: 18,
-    paddingBottom: 36,
-  },
+    container: {
+      padding: 18,
+      paddingBottom: 36,
+    },
 
-  hero: {
-    backgroundColor: colors.primary,
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 18,
-  },
+    hero: {
+      backgroundColor: colors.heroBackground,
+      borderRadius: 24,
+      padding: 24,
+      marginBottom: 18,
+    },
 
-  tag: {
-    color: "#d1d5db",
-    fontSize: 13,
-    fontWeight: "800",
-    letterSpacing: 0.5,
-    marginBottom: 10,
-    textTransform: "uppercase",
-  },
+    tag: {
+      color: colors.heroMuted,
+      fontSize: 13,
+      fontWeight: "800",
+      letterSpacing: 0.5,
+      marginBottom: 10,
+      textTransform: "uppercase",
+    },
 
-  title: {
-    color: "#ffffff",
-    fontSize: 28,
-    fontWeight: "900",
-    lineHeight: 36,
-    marginBottom: 10,
-  },
+    title: {
+      color: colors.heroText,
+      fontSize: 28,
+      fontWeight: "900",
+      lineHeight: 36,
+      marginBottom: 10,
+    },
 
-  description: {
-    color: "#e5e7eb",
-    fontSize: 15,
-    lineHeight: 23,
-  },
+    description: {
+      color: colors.heroMuted,
+      fontSize: 15,
+      lineHeight: 23,
+    },
 
-  modeCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 18,
-  },
+    modeCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 18,
+    },
 
-  modeLabel: {
-    color: colors.muted,
-    fontSize: 13,
-    fontWeight: "700",
-    marginBottom: 6,
-  },
+    modeLabel: {
+      color: colors.muted,
+      fontSize: 13,
+      fontWeight: "700",
+      marginBottom: 6,
+    },
 
-  modeValue: {
-    color: colors.primary,
-    fontSize: 24,
-    fontWeight: "900",
-  },
+    modeValue: {
+      color: colors.primary,
+      fontSize: 24,
+      fontWeight: "900",
+    },
 
-  summaryGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 18,
-  },
+    summaryGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 12,
+      marginBottom: 18,
+    },
 
-  summaryBox: {
-    width: "48%",
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    summaryBox: {
+      width: "48%",
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  summaryLabel: {
-    color: colors.muted,
-    fontSize: 13,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
+    summaryLabel: {
+      color: colors.muted,
+      fontSize: 12,
+      fontWeight: "700",
+      marginBottom: 8,
+    },
 
-  summaryValue: {
-    color: colors.primary,
-    fontSize: 26,
-    fontWeight: "900",
-  },
+    summaryValue: {
+      color: colors.primary,
+      fontSize: 20,
+      fontWeight: "900",
+    },
 
-  messageCard: {
-    backgroundColor: "#ecfdf5",
-    borderWidth: 1,
-    borderColor: "#bbf7d0",
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 14,
-  },
+    messageCard: {
+      backgroundColor: colors.messageBackground,
+      borderWidth: 1,
+      borderColor: colors.messageBorder,
+      borderRadius: 16,
+      padding: 14,
+      marginBottom: 14,
+    },
 
-  messageText: {
-    color: colors.success,
-    fontSize: 14,
-    fontWeight: "800",
-  },
+    messageText: {
+      color: colors.success,
+      fontSize: 14,
+      fontWeight: "800",
+    },
 
-  loadingCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 18,
-    alignItems: "center",
-    gap: 10,
-  },
+    loadingCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 18,
+      alignItems: "center",
+      gap: 10,
+    },
 
-  loadingText: {
-    color: colors.muted,
-    fontSize: 14,
-    fontWeight: "700",
-  },
+    loadingText: {
+      color: colors.muted,
+      fontSize: 14,
+      fontWeight: "700",
+    },
 
-  clearButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 16,
-    paddingVertical: 14,
-    alignItems: "center",
-    marginBottom: 18,
-  },
+    actionRow: {
+      flexDirection: "row",
+      gap: 12,
+      marginBottom: 18,
+    },
 
-  clearButtonText: {
-    color: "#ffffff",
-    fontSize: 15,
-    fontWeight: "900",
-  },
+    refreshButton: {
+      flex: 1,
+      backgroundColor: colors.primary,
+      borderRadius: 16,
+      paddingVertical: 14,
+      alignItems: "center",
+    },
 
-  emptyCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 22,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    refreshButtonText: {
+      color: colors.surface,
+      fontSize: 14,
+      fontWeight: "900",
+    },
 
-  emptyTitle: {
-    color: colors.primary,
-    fontSize: 20,
-    fontWeight: "900",
-    marginBottom: 8,
-  },
+    clearButton: {
+      flex: 1,
+      backgroundColor: colors.inputBackground,
+      borderRadius: 16,
+      paddingVertical: 14,
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  emptyText: {
-    color: colors.muted,
-    fontSize: 15,
-    lineHeight: 23,
-  },
+    clearButtonText: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: "900",
+    },
 
-  listSection: {
-    gap: 16,
-  },
+    emptyCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 20,
+      padding: 22,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  stockCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 22,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    emptyTitle: {
+      color: colors.primary,
+      fontSize: 20,
+      fontWeight: "900",
+      marginBottom: 8,
+    },
 
-  stockHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-    marginBottom: 14,
-  },
+    emptyText: {
+      color: colors.muted,
+      fontSize: 15,
+      lineHeight: 23,
+    },
 
-  ticker: {
-    color: colors.primary,
-    fontSize: 25,
-    fontWeight: "900",
-    marginBottom: 4,
-  },
+    listSection: {
+      gap: 16,
+    },
 
-  companyName: {
-    color: colors.muted,
-    fontSize: 13,
-    lineHeight: 19,
-    maxWidth: 190,
-  },
+    stockCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 22,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  riskBadge: {
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    alignSelf: "flex-start",
-  },
+    stockHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 12,
+      marginBottom: 14,
+    },
 
-  riskBadgeText: {
-    color: "#ffffff",
-    fontSize: 12,
-    fontWeight: "900",
-  },
+    ticker: {
+      color: colors.primary,
+      fontSize: 25,
+      fontWeight: "900",
+      marginBottom: 4,
+    },
 
-  lowRisk: {
-    backgroundColor: colors.success,
-  },
+    companyName: {
+      color: colors.muted,
+      fontSize: 13,
+      lineHeight: 19,
+      maxWidth: 190,
+    },
 
-  mediumRisk: {
-    backgroundColor: colors.warning,
-  },
+    riskBadge: {
+      borderRadius: 999,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+      alignSelf: "flex-start",
+    },
 
-  highRisk: {
-    backgroundColor: colors.danger,
-  },
+    riskBadgeText: {
+      color: "#ffffff",
+      fontSize: 12,
+      fontWeight: "900",
+    },
 
-  neutralRisk: {
-    backgroundColor: colors.secondary,
-  },
+    lowRisk: {
+      backgroundColor: colors.success,
+    },
 
-  metricRow: {
-    flexDirection: "row",
-    gap: 10,
-    marginBottom: 10,
-  },
+    mediumRisk: {
+      backgroundColor: colors.warning,
+    },
 
-  metricBox: {
-    flex: 1,
-    backgroundColor: "#f9fafb",
-    borderRadius: 14,
-    padding: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    highRisk: {
+      backgroundColor: colors.danger,
+    },
 
-  metricLabel: {
-    color: colors.muted,
-    fontSize: 12,
-    fontWeight: "700",
-    marginBottom: 6,
-  },
+    neutralRisk: {
+      backgroundColor: colors.secondary,
+    },
 
-  metricValue: {
-    color: colors.primary,
-    fontSize: 16,
-    fontWeight: "900",
-  },
+    metricRow: {
+      flexDirection: "row",
+      gap: 10,
+      marginBottom: 10,
+    },
 
-  savedAtText: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: "800",
-    lineHeight: 17,
-  },
+    metricBox: {
+      flex: 1,
+      backgroundColor: colors.inputBackground,
+      borderRadius: 14,
+      padding: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  removeButton: {
-    backgroundColor: "#fef2f2",
-    borderRadius: 14,
-    paddingVertical: 12,
-    alignItems: "center",
-    marginTop: 6,
-    borderWidth: 1,
-    borderColor: "#fecaca",
-  },
+    metricLabel: {
+      color: colors.muted,
+      fontSize: 12,
+      fontWeight: "700",
+      marginBottom: 6,
+    },
 
-  removeButtonText: {
-    color: colors.danger,
-    fontSize: 14,
-    fontWeight: "900",
-  },
-});
+    metricValue: {
+      color: colors.primary,
+      fontSize: 16,
+      fontWeight: "900",
+    },
+
+    savedText: {
+      color: colors.muted,
+      fontSize: 12,
+      fontWeight: "700",
+      marginTop: 2,
+      marginBottom: 12,
+    },
+
+    removeButton: {
+      backgroundColor: colors.danger,
+      borderRadius: 14,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
+
+    removeButtonText: {
+      color: "#ffffff",
+      fontSize: 13,
+      fontWeight: "900",
+    },
+
+    noteCard: {
+      backgroundColor: colors.noteBackground,
+      borderRadius: 18,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.noteBorder,
+      marginTop: 18,
+    },
+
+    noteTitle: {
+      color: colors.warning,
+      fontSize: 17,
+      fontWeight: "900",
+      marginBottom: 6,
+    },
+
+    noteText: {
+      color: colors.secondary,
+      fontSize: 14,
+      lineHeight: 21,
+    },
+  });
+}

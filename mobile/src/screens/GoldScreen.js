@@ -11,21 +11,43 @@ import {
 
 import { getGoldPrice } from "../api/finsightApi";
 import SimpleLineChart from "../components/SimpleLineChart";
-import { colors } from "../theme/colors";
+import { useAppTheme } from "../theme/ThemeContext";
 
-const periods = [
-  { label: "1 Week", value: "1w" },
-  { label: "1 Month", value: "1mo" },
-  { label: "3 Months", value: "3mo" },
-  { label: "1 Year", value: "1y" },
-  { label: "5 Years", value: "5y" },
+const periodOptions = [
+  { label: "1W", value: "1w" },
+  { label: "1M", value: "1mo" },
+  { label: "3M", value: "3mo" },
+  { label: "1Y", value: "1y" },
+  { label: "5Y", value: "5y" },
 ];
 
 export default function GoldScreen() {
+  const { colors } = useAppTheme();
+  const styles = createStyles(colors);
+
   const [period, setPeriod] = useState("1y");
   const [goldData, setGoldData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const loadGoldData = async () => {
+    setLoading(true);
+    setError("");
+
+    try {
+      const result = await getGoldPrice(period);
+      setGoldData(result);
+    } catch (goldError) {
+      console.log("Gold load error:", goldError);
+      setError(goldError.message || "Unable to load gold price.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadGoldData();
+  }, [period]);
 
   const formatMoney = (value) => {
     if (value === null || value === undefined || Number.isNaN(Number(value))) {
@@ -43,26 +65,21 @@ export default function GoldScreen() {
     return `${(Number(value) * 100).toFixed(2)}%`;
   };
 
-  const fetchGoldData = async (selectedPeriod = period) => {
-    setLoading(true);
-    setError("");
-
-    try {
-      const result = await getGoldPrice(selectedPeriod);
-      setGoldData(result);
-    } catch (err) {
-      setError(err.message || "Unable to load gold price.");
-      setGoldData(null);
-    } finally {
-      setLoading(false);
+  const getChangeStyle = () => {
+    if (!goldData) {
+      return styles.neutralChange;
     }
+
+    if (Number(goldData.price_change) > 0) {
+      return styles.positiveChange;
+    }
+
+    if (Number(goldData.price_change) < 0) {
+      return styles.negativeChange;
+    }
+
+    return styles.neutralChange;
   };
-
-  useEffect(() => {
-    fetchGoldData(period);
-  }, [period]);
-
-  const isPositiveChange = goldData && goldData.price_change >= 0;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -71,19 +88,19 @@ export default function GoldScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.hero}>
-          <Text style={styles.tag}>Gold Market</Text>
-          <Text style={styles.title}>Gold Price Dashboard</Text>
+          <Text style={styles.tag}>Gold Dashboard</Text>
+          <Text style={styles.title}>Gold Price Risk Analysis</Text>
           <Text style={styles.description}>
-            Track gold futures price, trend movement, volatility, and maximum
-            drawdown using simple risk metrics.
+            Track gold futures price movement, volatility, and maximum drawdown.
+            This uses Yahoo Finance ticker GC=F.
           </Text>
         </View>
 
-        <View style={styles.periodCard}>
-          <Text style={styles.label}>Select Period</Text>
+        <View style={styles.formCard}>
+          <Text style={styles.label}>Time Range</Text>
 
-          <View style={styles.periodGrid}>
-            {periods.map((item) => (
+          <View style={styles.periodRow}>
+            {periodOptions.map((item) => (
               <Pressable
                 key={item.value}
                 style={[
@@ -103,53 +120,55 @@ export default function GoldScreen() {
               </Pressable>
             ))}
           </View>
-        </View>
 
-        {loading ? (
-          <View style={styles.loadingCard}>
-            <ActivityIndicator color={colors.primary} />
-            <Text style={styles.loadingText}>Loading gold price data...</Text>
-          </View>
-        ) : null}
+          <Pressable
+            style={[styles.refreshButton, loading && styles.disabledButton]}
+            onPress={loadGoldData}
+            disabled={loading}
+          >
+            <Text style={styles.refreshButtonText}>
+              {loading ? "Loading..." : "Refresh Gold Data"}
+            </Text>
+          </Pressable>
+        </View>
 
         {error ? (
           <View style={styles.errorCard}>
-            <Text style={styles.errorTitle}>Unable to Load Gold Price</Text>
             <Text style={styles.errorText}>{error}</Text>
           </View>
         ) : null}
 
-        {goldData && !loading ? (
+        {loading ? (
+          <View style={styles.loadingCard}>
+            <ActivityIndicator color={colors.primary} />
+            <Text style={styles.loadingText}>Loading gold price...</Text>
+          </View>
+        ) : null}
+
+        {goldData ? (
           <View style={styles.resultSection}>
             <View style={styles.priceCard}>
-              <Text style={styles.assetName}>{goldData.asset_name}</Text>
-              <Text style={styles.priceValue}>
+              <Text style={styles.assetName}>
+                {goldData.asset_name || "Gold Futures"}
+              </Text>
+              <Text style={styles.ticker}>{goldData.ticker || "GC=F"}</Text>
+
+              <Text style={styles.latestPrice}>
                 {formatMoney(goldData.latest_price)}
               </Text>
 
-              <Text
-                style={[
-                  styles.priceChange,
-                  isPositiveChange ? styles.positiveChange : styles.negativeChange,
-                ]}
-              >
-                {isPositiveChange ? "+" : ""}
-                {formatMoney(goldData.price_change)} (
-                {isPositiveChange ? "+" : ""}
-                {formatPercent(goldData.price_change_percent)})
-              </Text>
-
-              <Text style={styles.sourceText}>
-                Data source ticker: {goldData.ticker}
-              </Text>
+              <View style={[styles.changeBadge, getChangeStyle()]}>
+                <Text style={styles.changeText}>
+                  {formatMoney(goldData.price_change)} (
+                  {formatPercent(goldData.price_change_percent)})
+                </Text>
+              </View>
             </View>
 
-            <SimpleLineChart
-              title="Gold Price Trend"
-              data={goldData.price_data}
-              dataKey="close"
-              valuePrefix="$"
-            />
+            <View style={styles.chartCard}>
+              <Text style={styles.sectionTitle}>Gold Price Trend</Text>
+              <SimpleLineChart data={goldData.price_data || []} />
+            </View>
 
             <View style={styles.metricGrid}>
               <View style={styles.metricCard}>
@@ -196,16 +215,15 @@ export default function GoldScreen() {
             </View>
 
             <View style={styles.summaryCard}>
-              <Text style={styles.summaryTitle}>Gold Market Insight</Text>
+              <Text style={styles.sectionTitle}>Gold Market Insight</Text>
               <Text style={styles.summaryText}>{goldData.summary}</Text>
             </View>
 
             <View style={styles.noteCard}>
               <Text style={styles.noteTitle}>Important Note</Text>
               <Text style={styles.noteText}>
-                This page uses gold futures data from Yahoo Finance ticker GC=F.
-                It does not represent physical gold jewellery price or local
-                retail gold shop price.
+                This feature uses gold futures data. It does not represent local
+                jewellery shop price or physical gold retail price.
               </Text>
             </View>
           </View>
@@ -215,245 +233,278 @@ export default function GoldScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
+function createStyles(colors) {
+  return StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
 
-  container: {
-    padding: 18,
-    paddingBottom: 36,
-  },
+    container: {
+      padding: 18,
+      paddingBottom: 36,
+    },
 
-  hero: {
-    backgroundColor: colors.primary,
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 18,
-  },
+    hero: {
+      backgroundColor: colors.heroBackground,
+      borderRadius: 24,
+      padding: 24,
+      marginBottom: 18,
+    },
 
-  tag: {
-    color: "#d1d5db",
-    fontSize: 13,
-    fontWeight: "800",
-    letterSpacing: 0.5,
-    marginBottom: 10,
-    textTransform: "uppercase",
-  },
+    tag: {
+      color: colors.heroMuted,
+      fontSize: 13,
+      fontWeight: "800",
+      letterSpacing: 0.5,
+      marginBottom: 10,
+      textTransform: "uppercase",
+    },
 
-  title: {
-    color: "#ffffff",
-    fontSize: 28,
-    fontWeight: "900",
-    lineHeight: 36,
-    marginBottom: 10,
-  },
+    title: {
+      color: colors.heroText,
+      fontSize: 28,
+      fontWeight: "900",
+      lineHeight: 36,
+      marginBottom: 10,
+    },
 
-  description: {
-    color: "#e5e7eb",
-    fontSize: 15,
-    lineHeight: 23,
-  },
+    description: {
+      color: colors.heroMuted,
+      fontSize: 15,
+      lineHeight: 23,
+    },
 
-  periodCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 18,
-  },
+    formCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 22,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 18,
+    },
 
-  label: {
-    color: colors.primary,
-    fontSize: 15,
-    fontWeight: "800",
-    marginBottom: 12,
-  },
+    label: {
+      color: colors.primary,
+      fontSize: 14,
+      fontWeight: "900",
+      marginBottom: 8,
+    },
 
-  periodGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 10,
-  },
+    periodRow: {
+      flexDirection: "row",
+      gap: 8,
+      marginBottom: 16,
+    },
 
-  periodButton: {
-    backgroundColor: "#f9fafb",
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 999,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
+    periodButton: {
+      flex: 1,
+      backgroundColor: colors.inputBackground,
+      borderRadius: 14,
+      borderWidth: 1,
+      borderColor: colors.border,
+      paddingVertical: 12,
+      alignItems: "center",
+    },
 
-  periodButtonActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
+    periodButtonActive: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
 
-  periodButtonText: {
-    color: colors.secondary,
-    fontSize: 14,
-    fontWeight: "800",
-  },
+    periodButtonText: {
+      color: colors.secondary,
+      fontSize: 13,
+      fontWeight: "900",
+    },
 
-  periodButtonTextActive: {
-    color: "#ffffff",
-  },
+    periodButtonTextActive: {
+      color: colors.surface,
+    },
 
-  loadingCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: 18,
-    alignItems: "center",
-    gap: 10,
-  },
+    refreshButton: {
+      backgroundColor: colors.primary,
+      borderRadius: 16,
+      paddingVertical: 15,
+      alignItems: "center",
+    },
 
-  loadingText: {
-    color: colors.muted,
-    fontSize: 14,
-    fontWeight: "700",
-  },
+    disabledButton: {
+      opacity: 0.6,
+    },
 
-  errorCard: {
-    backgroundColor: "#fef2f2",
-    borderWidth: 1,
-    borderColor: "#fecaca",
-    borderRadius: 18,
-    padding: 18,
-    marginBottom: 18,
-  },
+    refreshButtonText: {
+      color: colors.surface,
+      fontSize: 16,
+      fontWeight: "900",
+    },
 
-  errorTitle: {
-    color: colors.danger,
-    fontSize: 17,
-    fontWeight: "900",
-    marginBottom: 6,
-  },
+    errorCard: {
+      backgroundColor: colors.errorBackground,
+      borderWidth: 1,
+      borderColor: colors.errorBorder,
+      borderRadius: 16,
+      padding: 14,
+      marginBottom: 14,
+    },
 
-  errorText: {
-    color: "#7f1d1d",
-    fontSize: 14,
-    lineHeight: 21,
-  },
+    errorText: {
+      color: colors.danger,
+      fontSize: 14,
+      fontWeight: "800",
+    },
 
-  resultSection: {
-    gap: 16,
-  },
+    loadingCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: 18,
+      alignItems: "center",
+      gap: 10,
+    },
 
-  priceCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 22,
-    padding: 22,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    loadingText: {
+      color: colors.muted,
+      fontSize: 14,
+      fontWeight: "700",
+    },
 
-  assetName: {
-    color: colors.muted,
-    fontSize: 15,
-    fontWeight: "800",
-    marginBottom: 8,
-  },
+    resultSection: {
+      gap: 16,
+    },
 
-  priceValue: {
-    color: colors.primary,
-    fontSize: 38,
-    fontWeight: "900",
-    marginBottom: 8,
-  },
+    priceCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 22,
+      padding: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  priceChange: {
-    fontSize: 18,
-    fontWeight: "900",
-    marginBottom: 8,
-  },
+    assetName: {
+      color: colors.primary,
+      fontSize: 22,
+      fontWeight: "900",
+      marginBottom: 4,
+    },
 
-  positiveChange: {
-    color: colors.success,
-  },
+    ticker: {
+      color: colors.muted,
+      fontSize: 14,
+      fontWeight: "700",
+      marginBottom: 12,
+    },
 
-  negativeChange: {
-    color: colors.danger,
-  },
+    latestPrice: {
+      color: colors.primary,
+      fontSize: 34,
+      fontWeight: "900",
+      marginBottom: 12,
+    },
 
-  sourceText: {
-    color: colors.muted,
-    fontSize: 12,
-    fontWeight: "700",
-  },
+    changeBadge: {
+      alignSelf: "flex-start",
+      borderRadius: 999,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+    },
 
-  metricGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-  },
+    positiveChange: {
+      backgroundColor: colors.success,
+    },
 
-  metricCard: {
-    width: "48%",
-    backgroundColor: colors.surface,
-    borderRadius: 18,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    negativeChange: {
+      backgroundColor: colors.danger,
+    },
 
-  metricLabel: {
-    color: colors.muted,
-    fontSize: 13,
-    fontWeight: "700",
-    marginBottom: 8,
-  },
+    neutralChange: {
+      backgroundColor: colors.secondary,
+    },
 
-  metricValue: {
-    color: colors.primary,
-    fontSize: 19,
-    fontWeight: "900",
-  },
+    changeText: {
+      color: "#ffffff",
+      fontSize: 13,
+      fontWeight: "900",
+    },
 
-  summaryCard: {
-    backgroundColor: colors.surface,
-    borderRadius: 20,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    chartCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 22,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  summaryTitle: {
-    color: colors.primary,
-    fontSize: 19,
-    fontWeight: "900",
-    marginBottom: 8,
-  },
+    sectionTitle: {
+      color: colors.primary,
+      fontSize: 19,
+      fontWeight: "900",
+      marginBottom: 12,
+    },
 
-  summaryText: {
-    color: colors.muted,
-    fontSize: 15,
-    lineHeight: 23,
-  },
+    metricGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 12,
+    },
 
-  noteCard: {
-    backgroundColor: "#fffbeb",
-    borderRadius: 18,
-    padding: 18,
-    borderWidth: 1,
-    borderColor: "#fde68a",
-  },
+    metricCard: {
+      width: "48%",
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      padding: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
 
-  noteTitle: {
-    color: colors.warning,
-    fontSize: 17,
-    fontWeight: "900",
-    marginBottom: 6,
-  },
+    metricLabel: {
+      color: colors.muted,
+      fontSize: 12,
+      fontWeight: "700",
+      marginBottom: 8,
+    },
 
-  noteText: {
-    color: "#78350f",
-    fontSize: 14,
-    lineHeight: 21,
-  },
-});
+    metricValue: {
+      color: colors.primary,
+      fontSize: 17,
+      fontWeight: "900",
+    },
+
+    summaryCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 22,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+
+    summaryText: {
+      color: colors.muted,
+      fontSize: 15,
+      lineHeight: 23,
+    },
+
+    noteCard: {
+      backgroundColor: colors.noteBackground,
+      borderRadius: 18,
+      padding: 18,
+      borderWidth: 1,
+      borderColor: colors.noteBorder,
+    },
+
+    noteTitle: {
+      color: colors.warning,
+      fontSize: 17,
+      fontWeight: "900",
+      marginBottom: 6,
+    },
+
+    noteText: {
+      color: colors.secondary,
+      fontSize: 14,
+      lineHeight: 21,
+    },
+  });
+}
