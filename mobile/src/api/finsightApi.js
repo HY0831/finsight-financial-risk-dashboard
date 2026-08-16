@@ -153,7 +153,7 @@ export async function getCurrentUser(token) {
 }
 
 export async function getCloudWatchlist(token) {
-  const response = await fetch(`${API_BASE_URL}/watchlist`, {
+  const response = await fetch(`${API_BASE_URL}/watchlist/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -163,7 +163,7 @@ export async function getCloudWatchlist(token) {
 }
 
 export async function addCloudWatchlistItem(token, stockData) {
-  const response = await fetch(`${API_BASE_URL}/watchlist`, {
+  const response = await fetch(`${API_BASE_URL}/watchlist/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -175,10 +175,6 @@ export async function addCloudWatchlistItem(token, stockData) {
       latest_price: stockData.latest_price,
       risk_level: stockData.risk_level,
       annualized_volatility: stockData.annualized_volatility,
-      maximum_drawdown: stockData.maximum_drawdown,
-      average_daily_return: stockData.average_daily_return,
-      volatility: stockData.volatility,
-      period: stockData.period || "1y",
     }),
   });
 

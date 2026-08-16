@@ -1,36 +1,39 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from auth import get_current_user
 from database import get_db
 from models import User, WatchlistItem
-from schemas import WatchlistItemCreate, WatchlistItemResponse
+from schemas import WatchlistCreate, WatchlistResponse
 
-router = APIRouter(prefix="/user/watchlist", tags=["User Watchlist"])
+router = APIRouter(
+    prefix="/watchlist",
+    tags=["Watchlist"],
+)
 
 
-@router.get("/", response_model=list[WatchlistItemResponse])
-def get_user_watchlist(
-    current_user: User = Depends(get_current_user),
+@router.get("/", response_model=list[WatchlistResponse])
+def get_watchlist(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     watchlist_items = (
         db.query(WatchlistItem)
         .filter(WatchlistItem.user_id == current_user.id)
-        .order_by(WatchlistItem.saved_at.desc())
+        .order_by(WatchlistItem.id.desc())
         .all()
     )
 
     return watchlist_items
 
 
-@router.post("/", response_model=WatchlistItemResponse)
+@router.post("/", response_model=WatchlistResponse)
 def add_watchlist_item(
-    item_data: WatchlistItemCreate,
-    current_user: User = Depends(get_current_user),
+    item: WatchlistCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    ticker = item_data.ticker.upper().strip()
+    ticker = item.ticker.upper().strip()
 
     existing_item = (
         db.query(WatchlistItem)
@@ -42,10 +45,10 @@ def add_watchlist_item(
     )
 
     if existing_item:
-        existing_item.company_name = item_data.company_name
-        existing_item.latest_price = item_data.latest_price
-        existing_item.risk_level = item_data.risk_level
-        existing_item.annualized_volatility = item_data.annualized_volatility
+        existing_item.company_name = item.company_name
+        existing_item.latest_price = item.latest_price
+        existing_item.risk_level = item.risk_level
+        existing_item.annualized_volatility = item.annualized_volatility
 
         db.commit()
         db.refresh(existing_item)
@@ -55,10 +58,10 @@ def add_watchlist_item(
     new_item = WatchlistItem(
         user_id=current_user.id,
         ticker=ticker,
-        company_name=item_data.company_name,
-        latest_price=item_data.latest_price,
-        risk_level=item_data.risk_level,
-        annualized_volatility=item_data.annualized_volatility,
+        company_name=item.company_name,
+        latest_price=item.latest_price,
+        risk_level=item.risk_level,
+        annualized_volatility=item.annualized_volatility,
     )
 
     db.add(new_item)
@@ -71,39 +74,29 @@ def add_watchlist_item(
 @router.delete("/{ticker}")
 def remove_watchlist_item(
     ticker: str,
-    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    watchlist_item = (
+    ticker = ticker.upper().strip()
+
+    item = (
         db.query(WatchlistItem)
         .filter(
             WatchlistItem.user_id == current_user.id,
-            WatchlistItem.ticker == ticker.upper().strip(),
+            WatchlistItem.ticker == ticker,
         )
         .first()
     )
 
-    if not watchlist_item:
+    if not item:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=404,
             detail="Watchlist item not found.",
         )
 
-    db.delete(watchlist_item)
+    db.delete(item)
     db.commit()
 
-    return {"message": "Watchlist item removed successfully."}
-
-
-@router.delete("/")
-def clear_user_watchlist(
-    current_user: User = Depends(get_current_user),
-    db: Session = Depends(get_db),
-):
-    db.query(WatchlistItem).filter(
-        WatchlistItem.user_id == current_user.id
-    ).delete()
-
-    db.commit()
-
-    return {"message": "Watchlist cleared successfully."}
+    return {
+        "message": f"{ticker} removed from watchlist."
+    }
