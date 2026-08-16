@@ -17,67 +17,88 @@ app = FastAPI(
 Base.metadata.create_all(bind=engine)
 
 def run_simple_migrations():
-    with engine.begin() as connection:
-        dialect = engine.dialect.name
+    try:
+        with engine.begin() as connection:
+            dialect = engine.dialect.name
 
-        if dialect == "postgresql":
-            connection.execute(text(
-                "ALTER TABLE search_history_items "
-                "ADD COLUMN IF NOT EXISTS company_name VARCHAR"
-            ))
-            connection.execute(text(
-                "ALTER TABLE search_history_items "
-                "ADD COLUMN IF NOT EXISTS latest_price DOUBLE PRECISION"
-            ))
-            connection.execute(text(
-                "ALTER TABLE search_history_items "
-                "ADD COLUMN IF NOT EXISTS risk_level VARCHAR"
-            ))
-            connection.execute(text(
-                "ALTER TABLE search_history_items "
-                "ADD COLUMN IF NOT EXISTS annualized_volatility DOUBLE PRECISION"
-            ))
-            connection.execute(text(
-                "ALTER TABLE search_history_items "
-                "ADD COLUMN IF NOT EXISTS maximum_drawdown DOUBLE PRECISION"
-            ))
-            connection.execute(text(
-                "ALTER TABLE search_history_items "
-                "ADD COLUMN IF NOT EXISTS average_daily_return DOUBLE PRECISION"
-            ))
-            connection.execute(text(
-                "ALTER TABLE search_history_items "
-                "ADD COLUMN IF NOT EXISTS volatility DOUBLE PRECISION"
-            ))
-            connection.execute(text(
-                "ALTER TABLE search_history_items "
-                "ADD COLUMN IF NOT EXISTS period VARCHAR"
-            ))
+            if dialect == "postgresql":
+                connection.execute(text(
+                    "ALTER TABLE search_history_items "
+                    "ADD COLUMN IF NOT EXISTS maximum_drawdown DOUBLE PRECISION"
+                ))
 
-        if dialect == "sqlite":
-            existing_columns = connection.execute(text(
-                "PRAGMA table_info(search_history_items)"
-            )).fetchall()
+                connection.execute(text(
+                    "ALTER TABLE search_history_items "
+                    "ADD COLUMN IF NOT EXISTS average_daily_return DOUBLE PRECISION"
+                ))
 
-            existing_column_names = [column[1] for column in existing_columns]
+                connection.execute(text(
+                    "ALTER TABLE search_history_items "
+                    "ADD COLUMN IF NOT EXISTS volatility DOUBLE PRECISION"
+                ))
 
-            sqlite_columns = {
-                "company_name": "VARCHAR",
-                "latest_price": "FLOAT",
-                "risk_level": "VARCHAR",
-                "annualized_volatility": "FLOAT",
-                "maximum_drawdown": "FLOAT",
-                "average_daily_return": "FLOAT",
-                "volatility": "FLOAT",
-                "period": "VARCHAR",
-            }
+                connection.execute(text(
+                    "ALTER TABLE search_history_items "
+                    "ADD COLUMN IF NOT EXISTS period VARCHAR"
+                ))
 
-            for column_name, column_type in sqlite_columns.items():
-                if column_name not in existing_column_names:
-                    connection.execute(text(
-                        f"ALTER TABLE search_history_items "
-                        f"ADD COLUMN {column_name} {column_type}"
-                    ))
+                connection.execute(text(
+                    "ALTER TABLE watchlist_items "
+                    "ADD COLUMN IF NOT EXISTS maximum_drawdown DOUBLE PRECISION"
+                ))
+
+                connection.execute(text(
+                    "ALTER TABLE watchlist_items "
+                    "ADD COLUMN IF NOT EXISTS average_daily_return DOUBLE PRECISION"
+                ))
+
+                connection.execute(text(
+                    "ALTER TABLE watchlist_items "
+                    "ADD COLUMN IF NOT EXISTS volatility DOUBLE PRECISION"
+                ))
+
+                connection.execute(text(
+                    "ALTER TABLE watchlist_items "
+                    "ADD COLUMN IF NOT EXISTS period VARCHAR"
+                ))
+
+            if dialect == "sqlite":
+                history_columns = connection.execute(text(
+                    "PRAGMA table_info(search_history_items)"
+                )).fetchall()
+
+                history_column_names = [column[1] for column in history_columns]
+
+                watchlist_columns = connection.execute(text(
+                    "PRAGMA table_info(watchlist_items)"
+                )).fetchall()
+
+                watchlist_column_names = [column[1] for column in watchlist_columns]
+
+                extra_columns = {
+                    "maximum_drawdown": "FLOAT",
+                    "average_daily_return": "FLOAT",
+                    "volatility": "FLOAT",
+                    "period": "VARCHAR",
+                }
+
+                for column_name, column_type in extra_columns.items():
+                    if column_name not in history_column_names:
+                        connection.execute(text(
+                            f"ALTER TABLE search_history_items "
+                            f"ADD COLUMN {column_name} {column_type}"
+                        ))
+
+                    if column_name not in watchlist_column_names:
+                        connection.execute(text(
+                            f"ALTER TABLE watchlist_items "
+                            f"ADD COLUMN {column_name} {column_type}"
+                        ))
+
+        print("Simple database migrations completed.")
+
+    except Exception as error:
+        print("Simple migration error:", error)
 
 
 run_simple_migrations()
