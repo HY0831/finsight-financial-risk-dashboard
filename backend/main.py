@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from risk_analysis import analyze_stock, search_stocks, analyze_gold
+from sqlalchemy import text
 from auth_routes import router as auth_router
 from database import Base, engine
 from watchlist_routes import router as watchlist_router
@@ -14,6 +15,73 @@ app = FastAPI(
 )
 
 Base.metadata.create_all(bind=engine)
+
+def run_simple_migrations():
+    with engine.begin() as connection:
+        dialect = engine.dialect.name
+
+        if dialect == "postgresql":
+            connection.execute(text(
+                "ALTER TABLE search_history_items "
+                "ADD COLUMN IF NOT EXISTS company_name VARCHAR"
+            ))
+            connection.execute(text(
+                "ALTER TABLE search_history_items "
+                "ADD COLUMN IF NOT EXISTS latest_price DOUBLE PRECISION"
+            ))
+            connection.execute(text(
+                "ALTER TABLE search_history_items "
+                "ADD COLUMN IF NOT EXISTS risk_level VARCHAR"
+            ))
+            connection.execute(text(
+                "ALTER TABLE search_history_items "
+                "ADD COLUMN IF NOT EXISTS annualized_volatility DOUBLE PRECISION"
+            ))
+            connection.execute(text(
+                "ALTER TABLE search_history_items "
+                "ADD COLUMN IF NOT EXISTS maximum_drawdown DOUBLE PRECISION"
+            ))
+            connection.execute(text(
+                "ALTER TABLE search_history_items "
+                "ADD COLUMN IF NOT EXISTS average_daily_return DOUBLE PRECISION"
+            ))
+            connection.execute(text(
+                "ALTER TABLE search_history_items "
+                "ADD COLUMN IF NOT EXISTS volatility DOUBLE PRECISION"
+            ))
+            connection.execute(text(
+                "ALTER TABLE search_history_items "
+                "ADD COLUMN IF NOT EXISTS period VARCHAR"
+            ))
+
+        if dialect == "sqlite":
+            existing_columns = connection.execute(text(
+                "PRAGMA table_info(search_history_items)"
+            )).fetchall()
+
+            existing_column_names = [column[1] for column in existing_columns]
+
+            sqlite_columns = {
+                "company_name": "VARCHAR",
+                "latest_price": "FLOAT",
+                "risk_level": "VARCHAR",
+                "annualized_volatility": "FLOAT",
+                "maximum_drawdown": "FLOAT",
+                "average_daily_return": "FLOAT",
+                "volatility": "FLOAT",
+                "period": "VARCHAR",
+            }
+
+            for column_name, column_type in sqlite_columns.items():
+                if column_name not in existing_column_names:
+                    connection.execute(text(
+                        f"ALTER TABLE search_history_items "
+                        f"ADD COLUMN {column_name} {column_type}"
+                    ))
+
+
+run_simple_migrations()
+
 
 app.include_router(auth_router)
 app.include_router(watchlist_router)
