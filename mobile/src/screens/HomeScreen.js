@@ -162,14 +162,16 @@ function createStyles(colors) {
     },
 
     heroButton: {
-      backgroundColor: colors.surface,
+      backgroundColor: "#ffffff",
       borderRadius: 16,
       paddingVertical: 14,
       alignItems: "center",
+      borderWidth: 1,
+      borderColor: "#ffffff",
     },
 
     heroButtonText: {
-      color: colors.primary,
+      color: "#111827",
       fontSize: 15,
       fontWeight: "900",
     },
