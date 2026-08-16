@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
 import {
+  ActivityIndicator,
   Pressable,
   SafeAreaView,
   ScrollView,
@@ -10,6 +11,11 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 
 import {
+  getCloudWatchlist,
+  removeCloudWatchlistItem,
+} from "../api/finsightApi";
+import { getAuthToken } from "../api/authStorage";
+import {
   clearWatchlist,
   getWatchlist,
   removeFromWatchlist,
@@ -18,10 +24,35 @@ import { colors } from "../theme/colors";
 
 export default function WatchlistScreen() {
   const [watchlist, setWatchlist] = useState([]);
+  const [storageMode, setStorageMode] = useState("Local");
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
 
   const loadWatchlist = async () => {
-    const savedWatchlist = await getWatchlist();
-    setWatchlist(savedWatchlist);
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const token = await getAuthToken();
+
+      if (token) {
+        const cloudWatchlist = await getCloudWatchlist(token);
+        setWatchlist(cloudWatchlist);
+        setStorageMode("Cloud");
+        return;
+      }
+
+      const savedWatchlist = await getWatchlist();
+      setWatchlist(savedWatchlist);
+      setStorageMode("Local");
+    } catch {
+      const savedWatchlist = await getWatchlist();
+      setWatchlist(savedWatchlist);
+      setStorageMode("Local");
+      setMessage("Unable to load cloud watchlist. Showing local watchlist.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useFocusEffect(
@@ -47,13 +78,33 @@ export default function WatchlistScreen() {
   };
 
   const handleRemove = async (ticker) => {
-    const updatedWatchlist = await removeFromWatchlist(ticker);
-    setWatchlist(updatedWatchlist);
+    try {
+      const token = await getAuthToken();
+
+      if (token && storageMode === "Cloud") {
+        await removeCloudWatchlistItem(token, ticker);
+        await loadWatchlist();
+        setMessage(`${ticker} removed from cloud Watchlist.`);
+        return;
+      }
+
+      const updatedWatchlist = await removeFromWatchlist(ticker);
+      setWatchlist(updatedWatchlist);
+      setMessage(`${ticker} removed from local Watchlist.`);
+    } catch {
+      setMessage("Unable to remove item.");
+    }
   };
 
   const handleClear = async () => {
+    if (storageMode === "Cloud") {
+      setMessage("Cloud clear is not enabled yet. Remove items one by one.");
+      return;
+    }
+
     await clearWatchlist();
     setWatchlist([]);
+    setMessage("Local Watchlist cleared.");
   };
 
   const getRiskStyle = (riskLevel) => {
@@ -94,9 +145,14 @@ export default function WatchlistScreen() {
           <Text style={styles.tag}>Watchlist</Text>
           <Text style={styles.title}>Saved Assets</Text>
           <Text style={styles.description}>
-            Review stocks saved from your analysis results. This mobile version
-            currently stores data locally on your device.
+            Review saved stocks. Logged-in users use cloud storage, while guests
+            use local device storage.
           </Text>
+        </View>
+
+        <View style={styles.modeCard}>
+          <Text style={styles.modeLabel}>Current Storage Mode</Text>
+          <Text style={styles.modeValue}>{storageMode}</Text>
         </View>
 
         <View style={styles.summaryGrid}>
@@ -121,13 +177,28 @@ export default function WatchlistScreen() {
           </View>
         </View>
 
+        {message ? (
+          <View style={styles.messageCard}>
+            <Text style={styles.messageText}>{message}</Text>
+          </View>
+        ) : null}
+
+        {loading ? (
+          <View style={styles.loadingCard}>
+            <ActivityIndicator color={colors.primary} />
+            <Text style={styles.loadingText}>Loading Watchlist...</Text>
+          </View>
+        ) : null}
+
         {watchlist.length > 0 ? (
           <Pressable style={styles.clearButton} onPress={handleClear}>
-            <Text style={styles.clearButtonText}>Clear Watchlist</Text>
+            <Text style={styles.clearButtonText}>
+              {storageMode === "Cloud" ? "Cloud Clear Disabled" : "Clear Watchlist"}
+            </Text>
           </Pressable>
         ) : null}
 
-        {watchlist.length === 0 ? (
+        {watchlist.length === 0 && !loading ? (
           <View style={styles.emptyCard}>
             <Text style={styles.emptyTitle}>No Saved Assets Yet</Text>
             <Text style={styles.emptyText}>
@@ -148,7 +219,9 @@ export default function WatchlistScreen() {
                   </View>
 
                   <View style={[styles.riskBadge, getRiskStyle(item.risk_level)]}>
-                    <Text style={styles.riskBadgeText}>{item.risk_level}</Text>
+                    <Text style={styles.riskBadgeText}>
+                      {item.risk_level || "N/A"}
+                    </Text>
                   </View>
                 </View>
 
@@ -178,7 +251,9 @@ export default function WatchlistScreen() {
 
                   <View style={styles.metricBox}>
                     <Text style={styles.metricLabel}>Saved At</Text>
-                    <Text style={styles.savedAtText}>{item.saved_at}</Text>
+                    <Text style={styles.savedAtText}>
+                      {item.saved_at || item.created_at || "N/A"}
+                    </Text>
                   </View>
                 </View>
 
@@ -238,6 +313,28 @@ const styles = StyleSheet.create({
     lineHeight: 23,
   },
 
+  modeCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 18,
+  },
+
+  modeLabel: {
+    color: colors.muted,
+    fontSize: 13,
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+
+  modeValue: {
+    color: colors.primary,
+    fontSize: 24,
+    fontWeight: "900",
+  },
+
   summaryGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -265,6 +362,38 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 26,
     fontWeight: "900",
+  },
+
+  messageCard: {
+    backgroundColor: "#ecfdf5",
+    borderWidth: 1,
+    borderColor: "#bbf7d0",
+    borderRadius: 16,
+    padding: 14,
+    marginBottom: 14,
+  },
+
+  messageText: {
+    color: colors.success,
+    fontSize: 14,
+    fontWeight: "800",
+  },
+
+  loadingCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 18,
+    alignItems: "center",
+    gap: 10,
+  },
+
+  loadingText: {
+    color: colors.muted,
+    fontSize: 14,
+    fontWeight: "700",
   },
 
   clearButton: {

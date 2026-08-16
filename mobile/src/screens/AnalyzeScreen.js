@@ -10,7 +10,8 @@ import {
   View,
 } from "react-native";
 
-import { analyzeStock } from "../api/finsightApi";
+import { addCloudWatchlistItem, analyzeStock } from "../api/finsightApi";
+import { getAuthToken } from "../api/authStorage";
 import { addToWatchlist } from "../api/watchlistStorage";
 import { addToHistory } from "../api/historyStorage";
 import SimpleLineChart from "../components/SimpleLineChart";
@@ -48,39 +49,70 @@ export default function AnalyzeScreen() {
   };
 
   const handleAnalyze = async () => {
-    if (!ticker.trim()) {
-      setError("Please enter a stock ticker, for example AAPL or TSLA.");
-      return;
-    }
+  if (!ticker.trim()) {
+    setError("Please enter a stock ticker, for example AAPL or TSLA.");
+    return;
+  }
 
-    setLoading(true);
-    setError("");
-    setSaveMessage("");
-    setStockData(null);
+  setLoading(true);
+  setError("");
+  setSaveMessage("");
+  setStockData(null);
+
+  try {
+    const selectedTicker = ticker.trim().toUpperCase();
+
+    const result = await analyzeStock(selectedTicker, period);
+
+    setStockData(result);
 
     try {
-      const result = await analyzeStock(ticker.trim().toUpperCase(), period);
-      setStockData(result);
       await addToHistory(result, period);
-    } catch (err) {
-      setError(err.message || "Unable to analyze stock.");
-    } finally {
-      setLoading(false);
+    } catch (historyError) {
+      console.log("History save error:", historyError);
     }
-  };
+  } catch (err) {
+    console.log("Analyze error:", err);
+    setError(err.message || "Something went wrong while analysing the stock.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSaveToWatchlist = async () => {
-    if (!stockData) {
+  if (!stockData) {
+    setSaveMessage("No stock data to save.");
+    return;
+  }
+
+  try {
+    const token = await getAuthToken();
+
+    if (token) {
+      try {
+        await addCloudWatchlistItem(token, {
+          ...stockData,
+          period,
+        });
+
+        setSaveMessage(`${stockData.ticker} saved to cloud Watchlist.`);
         return;
+      } catch (cloudError) {
+        console.log("Cloud watchlist save error:", cloudError);
+      }
     }
 
-    try {
-        await addToWatchlist(stockData);
-        setSaveMessage(`${stockData.ticker} saved to Watchlist.`);
-    } catch {
-        setSaveMessage("Unable to save stock to Watchlist.");
-    }
-    };
+    await addToWatchlist({
+      ...stockData,
+      period,
+    });
+
+    setSaveMessage(`${stockData.ticker} saved to local Watchlist.`);
+  } catch (error) {
+    console.log("Local watchlist save error:", error);
+    setSaveMessage(error.message || "Unable to save stock to Watchlist.");
+  }
+};
 
   const getRiskStyle = (riskLevel) => {
     if (riskLevel === "Low Risk") {

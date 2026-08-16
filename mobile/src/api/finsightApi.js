@@ -42,42 +42,71 @@ function getErrorMessage(data, fallbackMessage) {
   return fallbackMessage;
 }
 
-export async function analyzeStock(ticker, period = "1y") {
-  const response = await fetch(
-    `${API_BASE_URL}/analyze/${ticker}?period=${period}`
-  );
+async function parseResponse(response, fallbackMessage) {
+  const text = await response.text();
 
-  const data = await response.json();
+  let data = null;
+
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    throw new Error(`Backend returned non-JSON response: ${text}`);
+  }
 
   if (!response.ok) {
-    throw new Error(getErrorMessage(data, "Unable to analyze stock."));
+    throw new Error(getErrorMessage(data, fallbackMessage));
   }
 
   return data;
 }
 
-export async function getGoldPrice(period = "1y") {
-  const response = await fetch(`${API_BASE_URL}/gold-price?period=${period}`);
+export async function analyzeStock(ticker, period = "1y") {
+  try {
+    const cleanTicker = encodeURIComponent(ticker);
+    const cleanPeriod = encodeURIComponent(period);
 
-  const data = await response.json();
+    const url = `${API_BASE_URL}/analyze/${cleanTicker}?period=${cleanPeriod}`;
 
-  if (!response.ok) {
-    throw new Error(getErrorMessage(data, "Unable to load gold price."));
+    console.log("Analyze URL:", url);
+
+    const response = await fetch(url);
+
+    const text = await response.text();
+
+    console.log("Analyze status:", response.status);
+    console.log("Analyze raw response:", text);
+
+    let data = null;
+
+    try {
+      data = text ? JSON.parse(text) : null;
+    } catch {
+      throw new Error(`Backend returned non-JSON response: ${text}`);
+    }
+
+    if (!response.ok) {
+      throw new Error(getErrorMessage(data, "Unable to analyze stock."));
+    }
+
+    return data;
+  } catch (error) {
+    console.log("analyzeStock API error:", error);
+    throw new Error(error.message || "Unable to connect to stock analysis API.");
   }
+}
 
-  return data;
+export async function getGoldPrice(period = "1y") {
+  const cleanPeriod = encodeURIComponent(period);
+
+  const response = await fetch(`${API_BASE_URL}/gold-price?period=${cleanPeriod}`);
+
+  return await parseResponse(response, "Unable to load gold price.");
 }
 
 export async function checkApiHealth() {
   const response = await fetch(`${API_BASE_URL}/health`);
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(getErrorMessage(data, "Unable to connect to backend API."));
-  }
-
-  return data;
+  return await parseResponse(response, "Unable to connect to backend API.");
 }
 
 export async function registerUser(name, email, password) {
@@ -95,13 +124,7 @@ export async function registerUser(name, email, password) {
     }),
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(getErrorMessage(data, "Unable to register account."));
-  }
-
-  return data;
+  return await parseResponse(response, "Unable to register account.");
 }
 
 export async function loginUser(email, password) {
@@ -111,18 +134,12 @@ export async function loginUser(email, password) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      email,
-      password,
+      email: email,
+      password: password,
     }),
   });
 
-  const data = await response.json();
-
-  if (!response.ok) {
-    throw new Error(getErrorMessage(data, "Unable to login."));
-  }
-
-  return data;
+  return await parseResponse(response, "Unable to login.");
 }
 
 export async function getCurrentUser(token) {
@@ -132,11 +149,51 @@ export async function getCurrentUser(token) {
     },
   });
 
-  const data = await response.json();
+  return await parseResponse(response, "Unable to load user.");
+}
 
-  if (!response.ok) {
-    throw new Error(getErrorMessage(data, "Unable to load user."));
-  }
+export async function getCloudWatchlist(token) {
+  const response = await fetch(`${API_BASE_URL}/watchlist`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-  return data;
+  return await parseResponse(response, "Unable to load cloud watchlist.");
+}
+
+export async function addCloudWatchlistItem(token, stockData) {
+  const response = await fetch(`${API_BASE_URL}/watchlist`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      ticker: stockData.ticker,
+      company_name: stockData.company_name,
+      latest_price: stockData.latest_price,
+      risk_level: stockData.risk_level,
+      annualized_volatility: stockData.annualized_volatility,
+      maximum_drawdown: stockData.maximum_drawdown,
+      average_daily_return: stockData.average_daily_return,
+      volatility: stockData.volatility,
+      period: stockData.period || "1y",
+    }),
+  });
+
+  return await parseResponse(response, "Unable to save cloud watchlist item.");
+}
+
+export async function removeCloudWatchlistItem(token, ticker) {
+  const cleanTicker = encodeURIComponent(ticker);
+
+  const response = await fetch(`${API_BASE_URL}/watchlist/${cleanTicker}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await parseResponse(response, "Unable to remove cloud watchlist item.");
 }
