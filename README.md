@@ -2,9 +2,11 @@
 
 FinSight is a full-stack financial risk analysis dashboard that helps users understand stock and gold price risk using historical market data. The system converts financial market data into simple risk insights such as average daily return, daily volatility, annualized volatility, maximum drawdown, risk level, and price trend movement.
 
-The project includes stock risk analysis, stock comparison, dynamic stock search, watchlist management, user risk profile analysis, analysis history, gold price dashboard, PDF report generation, user authentication, and database-backed user storage.
+The project includes a web application and a mobile application. The web app provides a full dashboard experience, while the mobile app provides key FinSight features in a React Native Expo app.
 
-FinSight supports both guest users and logged-in users. Guest users can try the system using browser localStorage, while logged-in users can save their watchlist, risk profile, and analysis history to a PostgreSQL database.
+FinSight includes stock risk analysis, stock comparison, dynamic stock search, watchlist management, user risk profile analysis, analysis history, gold price dashboard, PDF report generation, user authentication, and database-backed user storage.
+
+FinSight supports both guest users and logged-in users. Guest users can try the system using local storage, while logged-in users can save their watchlist, risk profile, and analysis history to a PostgreSQL database.
 
 ---
 
@@ -13,6 +15,8 @@ FinSight supports both guest users and logged-in users. Guest users can try the 
 Frontend: https://finsight-financial-risk-dashboard-k.vercel.app/
 
 Backend API: https://finsight-financial-risk-dashboard.onrender.com
+
+Mobile App: Built with Expo React Native and connected to the same Render backend API.
 
 ---
 
@@ -23,7 +27,9 @@ The purpose of FinSight is to make financial risk analysis easier for beginner u
 This project was developed as a personal portfolio project to demonstrate skills in:
 
 - Full-stack web development
+- Mobile app development
 - React frontend development
+- React Native Expo development
 - FastAPI backend development
 - REST API development
 - Database-backed user features
@@ -92,7 +98,7 @@ This helps beginner users who may not know the exact stock ticker.
 
 ### Analysis Period Selection
 
-Users can select different analysis periods:
+Users can select different stock analysis periods:
 
 - 6 Months
 - 1 Year
@@ -128,6 +134,7 @@ The comparison includes:
 - Average daily return
 - Daily volatility
 - Annualized volatility
+- Maximum drawdown
 - Risk level
 - Comparison summary
 - Comparison recommendation summary
@@ -154,7 +161,7 @@ The Gold Price Dashboard includes:
 - Daily price change
 - Daily percentage change
 - Historical gold price line chart
-- Time range dropdown
+- Time range selection
 - 1 Week, 1 Month, 3 Months, 1 Year, and 5 Years trend selection
 - Highest price in the selected period
 - Lowest price in the selected period
@@ -191,13 +198,15 @@ The Watchlist page includes:
 
 Guest users:
 
-- Watchlist is saved in browser localStorage
+- Web watchlist is saved in browser localStorage
+- Mobile watchlist is saved using AsyncStorage
 - Data remains only on the same browser or device
 
 Logged-in users:
 
 - Watchlist is saved in PostgreSQL database
 - Data remains after refresh, logout, and login
+- Mobile app and web app can use the same backend user data
 
 ---
 
@@ -256,11 +265,13 @@ Based on the total score, users are classified as:
 
 Guest users:
 
-- Risk profile answers and result are saved in browser localStorage
+- Web risk profile answers and result are saved in browser localStorage
+- Mobile risk profile answers and result are saved using AsyncStorage
 
 Logged-in users:
 
 - Risk profile answers and result are saved in PostgreSQL database
+- Risk profile remains available after logout and login
 
 ---
 
@@ -296,12 +307,14 @@ The History page includes:
 
 Guest users:
 
-- Analysis history is saved locally in the browser
+- Web analysis history is saved locally in the browser
+- Mobile analysis history is saved using AsyncStorage
 
 Logged-in users:
 
 - Analysis history is saved in PostgreSQL database
 - History remains available after refresh, logout, and login
+- Mobile app can save and load cloud history through protected API routes
 
 ---
 
@@ -334,13 +347,13 @@ It displays:
 - Risk profile status
 - Analysis history count
 - Backend API status
-- Explanation of localStorage and database storage
+- Explanation of local storage and database storage
 
 ---
 
 ### Theme Modes
 
-FinSight supports three visual modes:
+FinSight web supports three visual modes:
 
 - Light Mode
 - Dark Mode
@@ -395,6 +408,39 @@ The PDF report includes:
 
 ---
 
+### Mobile App Version
+
+FinSight also includes a mobile app built with Expo React Native.
+
+The mobile app includes:
+
+- Home overview screen
+- Stock analysis screen
+- Gold price dashboard screen
+- Stock comparison screen
+- Watchlist screen
+- Risk profile questionnaire screen
+- Analysis history screen
+- Account screen
+- Login and register function
+- Local storage for guest users
+- Cloud watchlist sync for logged-in users
+- Cloud analysis history sync for logged-in users
+- Cloud risk profile sync for logged-in users
+- Simple mobile line charts using react-native-svg
+- Backend API connection status
+
+Mobile storage design:
+
+| User Type | Watchlist | Risk Profile | Analysis History |
+|---|---|---|---|
+| Guest User | AsyncStorage | AsyncStorage | AsyncStorage |
+| Logged-in User | PostgreSQL Database | PostgreSQL Database | PostgreSQL Database |
+
+The mobile app uses the same FastAPI backend deployed on Render.
+
+---
+
 ### Improved Error Messages
 
 FinSight provides clearer error messages for common issues such as:
@@ -406,6 +452,9 @@ FinSight provides clearer error messages for common issues such as:
 - Invalid comparison input
 - Same stock selected for comparison
 - Gold price data loading error
+- Login or registration error
+- Cloud storage error
+- Third-party market data rate limit
 
 The messages include suggestions to help users understand and solve the issue.
 
@@ -429,9 +478,24 @@ The messages include suggestions to help users understand and solve the issue.
 
 ---
 
+## Mobile App Screens
+
+| Screen | Description |
+|---|---|
+| Home | Shows FinSight mobile overview and key features |
+| Analyze | Allows users to analyse stock risk using backend API |
+| Compare | Allows users to compare two stocks side by side |
+| Gold | Displays gold futures price and risk metrics |
+| Watchlist | Shows local or cloud saved stocks |
+| Profile | Provides mobile risk profile questionnaire |
+| History | Shows local or cloud analysis history |
+| Account | Shows login, register, logout, API status, and storage mode |
+
+---
+
 ## Tech Stack
 
-### Frontend
+### Web Frontend
 
 - React
 - Vite
@@ -439,6 +503,14 @@ The messages include suggestions to help users understand and solve the issue.
 - Recharts
 - jsPDF
 - CSS
+
+### Mobile Frontend
+
+- Expo
+- React Native
+- React Navigation
+- AsyncStorage
+- react-native-svg
 
 ### Backend
 
@@ -449,6 +521,7 @@ The messages include suggestions to help users understand and solve the issue.
 - JWT Authentication
 - passlib bcrypt
 - yfinance
+- requests
 - pandas
 - NumPy
 
@@ -459,9 +532,10 @@ The messages include suggestions to help users understand and solve the issue.
 
 ### Deployment
 
-- Frontend deployed on Vercel
+- Web frontend deployed on Vercel
 - Backend deployed on Render
 - PostgreSQL database hosted on Render
+- Mobile app developed and tested using Expo Go
 
 ---
 
@@ -472,7 +546,25 @@ User
  |
  | interacts with
  v
-React Frontend - Vercel
+React Web Frontend - Vercel
+ |
+ | API requests
+ v
+FastAPI Backend - Render
+ |
+ | database connection
+ v
+PostgreSQL Database - Render
+```
+
+Mobile architecture:
+
+```text
+Mobile User
+ |
+ | interacts with
+ v
+Expo React Native Mobile App
  |
  | API requests
  v
@@ -487,14 +579,35 @@ PostgreSQL Database - Render
 
 ## Data Storage Design
 
-| User Type | Watchlist | Risk Profile | Analysis History |
-|---|---|---|---|
-| Guest User | localStorage | localStorage | localStorage |
-| Logged-in User | PostgreSQL Database | PostgreSQL Database | PostgreSQL Database |
+| Platform | User Type | Watchlist | Risk Profile | Analysis History |
+|---|---|---|---|---|
+| Web | Guest User | localStorage | localStorage | localStorage |
+| Web | Logged-in User | PostgreSQL Database | PostgreSQL Database | PostgreSQL Database |
+| Mobile | Guest User | AsyncStorage | AsyncStorage | AsyncStorage |
+| Mobile | Logged-in User | PostgreSQL Database | PostgreSQL Database | PostgreSQL Database |
 
 Guest mode allows users to try the system without creating an account.
 
 Logged-in mode provides persistent storage because user data is linked to their account.
+
+---
+
+## Market Data Source and Fallback Design
+
+FinSight mainly uses Yahoo Finance data through the yfinance Python library.
+
+For stock analysis, the backend also includes a fallback data source using Stooq for common US tickers. This fallback helps reduce the impact of Yahoo Finance rate limits on deployed cloud servers.
+
+The backend flow is:
+
+```text
+1. Try to fetch stock data from Yahoo Finance using yfinance
+2. If Yahoo Finance fails or is rate limited, use Stooq fallback data
+3. Calculate risk metrics from the available historical price data
+4. Return beginner-friendly risk results to web and mobile apps
+```
+
+This improves reliability for common US stocks such as AAPL, MSFT, TSLA, NVDA, GOOGL, and AMZN.
 
 ---
 
@@ -550,6 +663,35 @@ finsight-dashboard/
 │   │
 │   ├── package.json
 │   └── vite.config.js
+│
+├── mobile/
+│   ├── src/
+│   │   ├── api/
+│   │   │   ├── authStorage.js
+│   │   │   ├── finsightApi.js
+│   │   │   ├── historyStorage.js
+│   │   │   ├── riskProfileStorage.js
+│   │   │   └── watchlistStorage.js
+│   │   │
+│   │   ├── components/
+│   │   │   └── SimpleLineChart.js
+│   │   │
+│   │   ├── screens/
+│   │   │   ├── AccountScreen.js
+│   │   │   ├── AnalyzeScreen.js
+│   │   │   ├── CompareScreen.js
+│   │   │   ├── GoldScreen.js
+│   │   │   ├── HistoryScreen.js
+│   │   │   ├── HomeScreen.js
+│   │   │   ├── RiskProfileScreen.js
+│   │   │   └── WatchlistScreen.js
+│   │   │
+│   │   └── theme/
+│   │       └── colors.js
+│   │
+│   ├── App.js
+│   ├── app.json
+│   └── package.json
 │
 ├── README.md
 └── .gitignore
@@ -679,6 +821,12 @@ GET /
 GET /health
 ```
 
+### Debug Routes
+
+```text
+GET /debug/routes
+```
+
 ### Stock Analysis
 
 ```text
@@ -720,29 +868,28 @@ POST /auth/swagger-login
 GET /auth/me
 ```
 
-### User Watchlist
+### Watchlist
 
 ```text
-GET /user/watchlist/
-POST /user/watchlist/
-DELETE /user/watchlist/{ticker}
-DELETE /user/watchlist/
+GET /watchlist/
+POST /watchlist/
+DELETE /watchlist/{ticker}
 ```
 
-### User Risk Profile
+### Risk Profile
 
 ```text
-GET /user/risk-profile/
-POST /user/risk-profile/
-DELETE /user/risk-profile/
+GET /risk-profile/
+POST /risk-profile/
+DELETE /risk-profile/
 ```
 
-### User Analysis History
+### Analysis History
 
 ```text
-GET /user/history/
-POST /user/history/
-DELETE /user/history/
+GET /history/
+POST /history/
+DELETE /history/
 ```
 
 ---
@@ -848,6 +995,48 @@ http://localhost:5173/
 
 ---
 
+## Mobile App Setup
+
+Go to the mobile folder:
+
+```bash
+cd mobile
+```
+
+Install mobile dependencies:
+
+```bash
+npm install
+```
+
+Install Expo-compatible native packages if needed:
+
+```bash
+npx expo install react-native-screens react-native-safe-area-context
+npx expo install @react-native-async-storage/async-storage
+npx expo install react-native-svg
+```
+
+Create a `.env` file inside the mobile folder:
+
+```env
+EXPO_PUBLIC_API_BASE_URL=https://finsight-financial-risk-dashboard.onrender.com
+```
+
+Start the Expo development server:
+
+```bash
+npx expo start -c
+```
+
+The mobile app can be tested using:
+
+- Expo Go on a physical device
+- iOS Simulator
+- Android Emulator
+
+---
+
 ## Deployment Setup
 
 ### Backend on Render
@@ -887,6 +1076,16 @@ Vercel environment variable:
 VITE_API_BASE_URL=https://finsight-financial-risk-dashboard.onrender.com
 ```
 
+### Mobile App
+
+The mobile app is developed using Expo. It currently connects to the deployed Render backend through:
+
+```env
+EXPO_PUBLIC_API_BASE_URL=https://finsight-financial-risk-dashboard.onrender.com
+```
+
+The mobile app is not yet published to the App Store or Google Play Store.
+
 ---
 
 ## Screenshots
@@ -897,7 +1096,7 @@ Screenshots can be stored in:
 frontend/public/screenshots/
 ```
 
-Suggested screenshots:
+Suggested web screenshots:
 
 ```text
 home-page.png
@@ -919,6 +1118,21 @@ dark-mode.png
 eye-protection-mode.png
 pdf-report.png
 api-docs.png
+```
+
+Suggested mobile screenshots:
+
+```text
+mobile-home.png
+mobile-analyze.png
+mobile-gold.png
+mobile-compare.png
+mobile-watchlist-cloud.png
+mobile-profile-cloud.png
+mobile-history-cloud.png
+mobile-account.png
+mobile-login.png
+mobile-register.png
 ```
 
 Example:
@@ -962,6 +1176,14 @@ Example:
 | Version 24 | Added maximum drawdown risk metric |
 | Version 25 | Added gold price dashboard |
 | Version 26 | Refined minimalist UI and chart styling |
+| Version 27 | Added Expo React Native mobile app foundation |
+| Version 28 | Added mobile stock analysis and gold dashboard |
+| Version 29 | Added mobile watchlist, risk profile, and history local storage |
+| Version 30 | Added mobile login and registration |
+| Version 31 | Added mobile cloud watchlist sync |
+| Version 32 | Added mobile cloud analysis history sync |
+| Version 33 | Added mobile cloud risk profile sync |
+| Version 34 | Added Stooq fallback for stock analysis when Yahoo Finance is rate limited |
 
 ---
 
@@ -983,7 +1205,10 @@ Possible future improvements include:
 - Candlestick charts
 - Alembic database migrations
 - Unit testing and API testing
-- Mobile app version
+- Mobile app UI polish
+- Mobile bottom tab icons
+- Mobile app publishing preparation
+- App Store and Google Play deployment
 
 ---
 
@@ -992,19 +1217,24 @@ Possible future improvements include:
 Through this project, I practised:
 
 - Building a full-stack web application
+- Building a mobile app using Expo React Native
 - Creating backend APIs using FastAPI
 - Fetching stock and gold futures market data using yfinance
+- Adding fallback stock data using Stooq when Yahoo Finance is rate limited
 - Processing financial data using pandas and NumPy
 - Calculating return, volatility, annualized volatility, and maximum drawdown
 - Designing a dashboard using React and Recharts
+- Creating simple mobile line charts using react-native-svg
 - Creating a multi-page React application using React Router
+- Creating a mobile tab navigation system using React Navigation
 - Creating a user risk profile questionnaire
 - Creating JWT-based login and registration
-- Connecting frontend user features to database APIs
+- Connecting frontend and mobile user features to database APIs
 - Using PostgreSQL for deployed user data storage
-- Using browser localStorage for guest mode
+- Using browser localStorage for web guest mode
+- Using AsyncStorage for mobile guest mode
 - Generating PDF reports using jsPDF
-- Refactoring React code into reusable components
+- Refactoring code into reusable components
 - Improving UI and UX design for dashboard-based applications
 - Handling user-friendly error messages
 - Structuring a GitHub portfolio project
@@ -1020,6 +1250,10 @@ FinSight is designed for educational and portfolio demonstration purposes.
 The analysis is based mainly on historical market price data and volatility. It does not include full fundamental analysis, macroeconomic analysis, company financial statements, or real-time professional investment advice.
 
 The Gold Price Dashboard uses gold futures data from Yahoo Finance ticker `GC=F`. It does not represent physical gold jewellery price, local gold shop price, or official spot gold trading price.
+
+Stock data is mainly retrieved using yfinance. If Yahoo Finance is rate limited on the deployed backend, the system attempts to use Stooq fallback data for common US stocks. However, fallback data may not support every ticker or market.
+
+The mobile app is currently a portfolio and development version tested using Expo. It is not yet published to public app stores.
 
 Users should not make investment decisions based only on this dashboard.
 
@@ -1042,6 +1276,7 @@ Stock and gold market data may be delayed, incomplete, or affected by third-part
 - CIRO. Investor Questionnaire. Available at: https://www.ciro.ca
 - Ameriprise. Investment Risk Tolerance Quiz. Available at: https://www.ameriprise.com/financial-goals-priorities/investing/investment-risk-tolerance-quiz
 - Yahoo Finance data accessed using the yfinance Python library.
+- Stooq historical market data is used as a fallback source for selected common US stocks when Yahoo Finance is unavailable or rate limited.
 
 ---
 
