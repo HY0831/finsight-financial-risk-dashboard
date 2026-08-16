@@ -237,3 +237,47 @@ export async function removeCloudWatchlistItem(token, ticker) {
 
   return await parseResponse(response, "Unable to remove cloud watchlist item.");
 }
+
+export async function getCloudHistory(token) {
+  const response = await fetch(`${API_BASE_URL}/history/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await parseResponse(response, "Unable to load cloud history.");
+}
+
+export async function addCloudHistoryItem(token, stockData) {
+  const response = await fetch(`${API_BASE_URL}/history/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      ticker: stockData.ticker,
+      company_name: stockData.company_name,
+      latest_price: stockData.latest_price,
+      risk_level: stockData.risk_level,
+      annualized_volatility: stockData.annualized_volatility,
+      maximum_drawdown: stockData.maximum_drawdown,
+      average_daily_return: stockData.average_daily_return,
+      volatility: stockData.volatility,
+      period: stockData.period || "1y",
+    }),
+  });
+
+  return await parseResponse(response, "Unable to save cloud history item.");
+}
+
+export async function clearCloudHistory(token) {
+  const response = await fetch(`${API_BASE_URL}/history/`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return await parseResponse(response, "Unable to clear cloud history.");
+}

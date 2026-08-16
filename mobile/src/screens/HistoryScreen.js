@@ -8,23 +8,50 @@ import {
   Text,
   View,
 } from "react-native";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useFocusEffect } from "@react-navigation/native";
 
-import { analyzeStock } from "../api/finsightApi";
+import {
+  clearCloudHistory,
+  getCloudHistory,
+} from "../api/finsightApi";
+import { getAuthToken } from "../api/authStorage";
 import { clearHistory, getHistory } from "../api/historyStorage";
 import { addToWatchlist } from "../api/watchlistStorage";
 import { colors } from "../theme/colors";
 
 export default function HistoryScreen() {
-  const navigation = useNavigation();
-
   const [history, setHistory] = useState([]);
-  const [loadingTicker, setLoadingTicker] = useState("");
+  const [storageMode, setStorageMode] = useState("Local");
+  const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
   const loadHistory = async () => {
-    const savedHistory = await getHistory();
-    setHistory(savedHistory);
+    setLoading(true);
+    setMessage("");
+
+    try {
+      const token = await getAuthToken();
+
+      if (token) {
+        const cloudHistory = await getCloudHistory(token);
+        setHistory(cloudHistory);
+        setStorageMode("Cloud");
+        return;
+      }
+
+      const savedHistory = await getHistory();
+      setHistory(savedHistory);
+      setStorageMode("Local");
+    } catch (error) {
+      console.log("Cloud history load error:", error);
+
+      const savedHistory = await getHistory();
+      setHistory(savedHistory);
+      setStorageMode("Local");
+      setMessage("Unable to load cloud history. Showing local history.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   useFocusEffect(
@@ -49,6 +76,35 @@ export default function HistoryScreen() {
     return `${(Number(value) * 100).toFixed(2)}%`;
   };
 
+  const handleClearHistory = async () => {
+    try {
+      const token = await getAuthToken();
+
+      if (token && storageMode === "Cloud") {
+        await clearCloudHistory(token);
+        setHistory([]);
+        setMessage("Cloud history cleared.");
+        return;
+      }
+
+      await clearHistory();
+      setHistory([]);
+      setMessage("Local history cleared.");
+    } catch (error) {
+      console.log("Clear history error:", error);
+      setMessage("Unable to clear history.");
+    }
+  };
+
+  const handleSaveToWatchlist = async (item) => {
+    try {
+      await addToWatchlist(item);
+      setMessage(`${item.ticker} saved to local Watchlist.`);
+    } catch {
+      setMessage("Unable to save stock to Watchlist.");
+    }
+  };
+
   const getRiskStyle = (riskLevel) => {
     if (riskLevel === "Low Risk") {
       return styles.lowRisk;
@@ -63,35 +119,6 @@ export default function HistoryScreen() {
     }
 
     return styles.neutralRisk;
-  };
-
-  const handleClearHistory = async () => {
-    await clearHistory();
-    setHistory([]);
-    setMessage("Analysis history cleared.");
-  };
-
-  const handleSaveToWatchlist = async (item) => {
-    try {
-      await addToWatchlist(item);
-      setMessage(`${item.ticker} saved to Watchlist.`);
-    } catch {
-      setMessage("Unable to save stock to Watchlist.");
-    }
-  };
-
-  const handleAnalyseAgain = async (item) => {
-    setLoadingTicker(item.ticker);
-    setMessage("");
-
-    try {
-      await analyzeStock(item.ticker, item.period || "1y");
-      navigation.navigate("Analyze");
-    } catch {
-      setMessage(`Unable to analyse ${item.ticker} again.`);
-    } finally {
-      setLoadingTicker("");
-    }
   };
 
   const highRiskCount = history.filter(
@@ -116,9 +143,14 @@ export default function HistoryScreen() {
           <Text style={styles.tag}>History</Text>
           <Text style={styles.title}>Analysis History</Text>
           <Text style={styles.description}>
-            Review stocks recently analysed on your mobile device. This history
-            is saved locally.
+            Review recently analysed stocks. Logged-in users use cloud history,
+            while guests use local device history.
           </Text>
+        </View>
+
+        <View style={styles.modeCard}>
+          <Text style={styles.modeLabel}>Current Storage Mode</Text>
+          <Text style={styles.modeValue}>{storageMode}</Text>
         </View>
 
         <View style={styles.summaryGrid}>
@@ -149,13 +181,20 @@ export default function HistoryScreen() {
           </View>
         ) : null}
 
+        {loading ? (
+          <View style={styles.loadingCard}>
+            <ActivityIndicator color={colors.primary} />
+            <Text style={styles.loadingText}>Loading History...</Text>
+          </View>
+        ) : null}
+
         {history.length > 0 ? (
           <Pressable style={styles.clearButton} onPress={handleClearHistory}>
             <Text style={styles.clearButtonText}>Clear History</Text>
           </Pressable>
         ) : null}
 
-        {history.length === 0 ? (
+        {history.length === 0 && !loading ? (
           <View style={styles.emptyCard}>
             <Text style={styles.emptyTitle}>No Analysis History Yet</Text>
             <Text style={styles.emptyText}>
@@ -166,7 +205,10 @@ export default function HistoryScreen() {
         ) : (
           <View style={styles.listSection}>
             {history.map((item) => (
-              <View key={`${item.ticker}-${item.searched_at}`} style={styles.stockCard}>
+              <View
+                key={`${item.ticker}-${item.searched_at || item.id}`}
+                style={styles.stockCard}
+              >
                 <View style={styles.stockHeader}>
                   <View>
                     <Text style={styles.ticker}>{item.ticker}</Text>
@@ -176,7 +218,9 @@ export default function HistoryScreen() {
                   </View>
 
                   <View style={[styles.riskBadge, getRiskStyle(item.risk_level)]}>
-                    <Text style={styles.riskBadgeText}>{item.risk_level}</Text>
+                    <Text style={styles.riskBadgeText}>
+                      {item.risk_level || "N/A"}
+                    </Text>
                   </View>
                 </View>
 
@@ -211,31 +255,15 @@ export default function HistoryScreen() {
                 </View>
 
                 <Text style={styles.searchedAtText}>
-                  Analysed at: {item.searched_at}
+                  Analysed at: {item.searched_at || "N/A"}
                 </Text>
 
-                <View style={styles.actionRow}>
-                  <Pressable
-                    style={styles.secondaryButton}
-                    onPress={() => handleSaveToWatchlist(item)}
-                  >
-                    <Text style={styles.secondaryButtonText}>
-                      Save to Watchlist
-                    </Text>
-                  </Pressable>
-
-                  <Pressable
-                    style={styles.primaryButton}
-                    onPress={() => handleAnalyseAgain(item)}
-                    disabled={loadingTicker === item.ticker}
-                  >
-                    {loadingTicker === item.ticker ? (
-                      <ActivityIndicator color="#ffffff" />
-                    ) : (
-                      <Text style={styles.primaryButtonText}>Analyse Again</Text>
-                    )}
-                  </Pressable>
-                </View>
+                <Pressable
+                  style={styles.saveButton}
+                  onPress={() => handleSaveToWatchlist(item)}
+                >
+                  <Text style={styles.saveButtonText}>Save to Local Watchlist</Text>
+                </Pressable>
               </View>
             ))}
           </View>
@@ -286,6 +314,28 @@ const styles = StyleSheet.create({
     lineHeight: 23,
   },
 
+  modeCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 18,
+  },
+
+  modeLabel: {
+    color: colors.muted,
+    fontSize: 13,
+    fontWeight: "700",
+    marginBottom: 6,
+  },
+
+  modeValue: {
+    color: colors.primary,
+    fontSize: 24,
+    fontWeight: "900",
+  },
+
   summaryGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -328,6 +378,23 @@ const styles = StyleSheet.create({
     color: colors.success,
     fontSize: 14,
     fontWeight: "800",
+  },
+
+  loadingCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 18,
+    padding: 18,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 18,
+    alignItems: "center",
+    gap: 10,
+  },
+
+  loadingText: {
+    color: colors.muted,
+    fontSize: 14,
+    fontWeight: "700",
   },
 
   clearButton: {
@@ -463,36 +530,14 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
 
-  actionRow: {
-    flexDirection: "row",
-    gap: 10,
-  },
-
-  secondaryButton: {
-    flex: 1,
-    backgroundColor: "#f9fafb",
-    borderRadius: 14,
-    paddingVertical: 12,
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-
-  secondaryButtonText: {
-    color: colors.primary,
-    fontSize: 13,
-    fontWeight: "900",
-  },
-
-  primaryButton: {
-    flex: 1,
+  saveButton: {
     backgroundColor: colors.primary,
     borderRadius: 14,
     paddingVertical: 12,
     alignItems: "center",
   },
 
-  primaryButtonText: {
+  saveButtonText: {
     color: "#ffffff",
     fontSize: 13,
     fontWeight: "900",

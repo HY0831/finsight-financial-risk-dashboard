@@ -10,7 +10,11 @@ import {
   View,
 } from "react-native";
 
-import { addCloudWatchlistItem, analyzeStock } from "../api/finsightApi";
+import {
+  addCloudHistoryItem,
+  addCloudWatchlistItem,
+  analyzeStock,
+} from "../api/finsightApi";
 import { getAuthToken } from "../api/authStorage";
 import { addToWatchlist } from "../api/watchlistStorage";
 import { addToHistory } from "../api/historyStorage";
@@ -66,11 +70,26 @@ export default function AnalyzeScreen() {
 
     setStockData(result);
 
+  try {
+    const token = await getAuthToken();
+
+    if (token) {
+      await addCloudHistoryItem(token, {
+        ...result,
+        period,
+      });
+    } else {
+      await addToHistory(result, period);
+    }
+  } catch (historyError) {
+    console.log("History save error:", historyError);
+
     try {
       await addToHistory(result, period);
-    } catch (historyError) {
-      console.log("History save error:", historyError);
+    } catch (localHistoryError) {
+      console.log("Local history fallback error:", localHistoryError);
     }
+  }
   } catch (err) {
     console.log("Analyze error:", err);
     setError(err.message || "Something went wrong while analysing the stock.");

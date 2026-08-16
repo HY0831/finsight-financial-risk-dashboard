@@ -4,57 +4,121 @@ from sqlalchemy.orm import Session
 from auth import get_current_user
 from database import get_db
 from models import SearchHistoryItem, User
-from schemas import SearchHistoryCreate, SearchHistoryResponse
+from schemas import SearchHistoryCreate
 
-router = APIRouter(prefix="/user/history", tags=["User Search History"])
+router = APIRouter(
+    prefix="/history",
+    tags=["History"],
+)
 
 
-@router.get("/", response_model=list[SearchHistoryResponse])
-def get_user_history(
-    current_user: User = Depends(get_current_user),
+def history_item_to_dict(item):
+    return {
+        "id": item.id,
+        "ticker": item.ticker,
+        "company_name": getattr(item, "company_name", None),
+        "latest_price": getattr(item, "latest_price", None),
+        "risk_level": getattr(item, "risk_level", None),
+        "annualized_volatility": getattr(item, "annualized_volatility", None),
+        "maximum_drawdown": getattr(item, "maximum_drawdown", None),
+        "average_daily_return": getattr(item, "average_daily_return", None),
+        "volatility": getattr(item, "volatility", None),
+        "period": getattr(item, "period", None),
+        "searched_at": str(getattr(item, "searched_at", "")),
+    }
+
+
+@router.get("")
+@router.get("/")
+def get_history(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     history_items = (
         db.query(SearchHistoryItem)
         .filter(SearchHistoryItem.user_id == current_user.id)
-        .order_by(SearchHistoryItem.searched_at.desc())
+        .order_by(SearchHistoryItem.id.desc())
         .limit(30)
         .all()
     )
 
-    return history_items
+    return [history_item_to_dict(item) for item in history_items]
 
 
-@router.post("/", response_model=SearchHistoryResponse)
-def save_history_item(
-    history_data: SearchHistoryCreate,
-    current_user: User = Depends(get_current_user),
+@router.post("")
+@router.post("/")
+def add_history_item(
+    history_item: SearchHistoryCreate,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
+    ticker = history_item.ticker.upper().strip()
+
+    existing_item = (
+        db.query(SearchHistoryItem)
+        .filter(
+            SearchHistoryItem.user_id == current_user.id,
+            SearchHistoryItem.ticker == ticker,
+        )
+        .first()
+    )
+
+    if existing_item:
+        existing_item.company_name = history_item.company_name
+        existing_item.latest_price = history_item.latest_price
+        existing_item.risk_level = history_item.risk_level
+        existing_item.annualized_volatility = history_item.annualized_volatility
+
+        if hasattr(existing_item, "maximum_drawdown"):
+            existing_item.maximum_drawdown = history_item.maximum_drawdown
+
+        if hasattr(existing_item, "average_daily_return"):
+            existing_item.average_daily_return = history_item.average_daily_return
+
+        if hasattr(existing_item, "volatility"):
+            existing_item.volatility = history_item.volatility
+
+        if hasattr(existing_item, "period"):
+            existing_item.period = history_item.period
+
+        db.commit()
+        db.refresh(existing_item)
+
+        return history_item_to_dict(existing_item)
+
     new_history_item = SearchHistoryItem(
         user_id=current_user.id,
-        ticker=history_data.ticker.upper().strip(),
-        company_name=history_data.company_name,
-        latest_price=history_data.latest_price,
-        risk_level=history_data.risk_level,
-        annualized_volatility=history_data.annualized_volatility,
-        maximum_drawdown=history_data.maximum_drawdown,
-        average_daily_return=history_data.average_daily_return,
-        volatility=history_data.volatility,
-        period=history_data.period,
+        ticker=ticker,
+        company_name=history_item.company_name,
+        latest_price=history_item.latest_price,
+        risk_level=history_item.risk_level,
+        annualized_volatility=history_item.annualized_volatility,
     )
+
+    if hasattr(new_history_item, "maximum_drawdown"):
+        new_history_item.maximum_drawdown = history_item.maximum_drawdown
+
+    if hasattr(new_history_item, "average_daily_return"):
+        new_history_item.average_daily_return = history_item.average_daily_return
+
+    if hasattr(new_history_item, "volatility"):
+        new_history_item.volatility = history_item.volatility
+
+    if hasattr(new_history_item, "period"):
+        new_history_item.period = history_item.period
 
     db.add(new_history_item)
     db.commit()
     db.refresh(new_history_item)
 
-    return new_history_item
+    return history_item_to_dict(new_history_item)
 
 
+@router.delete("")
 @router.delete("/")
-def clear_user_history(
-    current_user: User = Depends(get_current_user),
+def clear_history(
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
     db.query(SearchHistoryItem).filter(
         SearchHistoryItem.user_id == current_user.id
@@ -62,4 +126,6 @@ def clear_user_history(
 
     db.commit()
 
-    return {"message": "Search history cleared successfully."}
+    return {
+        "message": "History cleared."
+    }
